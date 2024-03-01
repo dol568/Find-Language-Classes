@@ -1,0 +1,11 @@
+ngx-timepicker-field .ngx-clock {
+  border: none;  /* Remove borders */
+}
+
+ngx-timepicker-field .ngx-clock-cell {
+  border-bottom: none;  /* Remove horizontal lines */
+}
+
+ngx-timepicker-field .ngx-clock-cell.active {
+  background-color: #ddd;  /* Change background color for active cell if needed */
+}

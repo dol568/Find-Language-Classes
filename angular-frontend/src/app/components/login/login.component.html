@@ -1,0 +1,59 @@
+<div class="login-bg">
+  <div class="d-flex mx-auto flex-column  justify-content-center" style="height: 100vh; width: 30%; ">
+    <div *ngIf="!(currentUser$ | async)" class="card px-3 py-3 shadow-lg flex-column">
+      <div class="row d-flex align-items-center justify-content-center">
+        <h3 style="color: #0cabba">Login</h3>
+      </div>
+      <form (ngSubmit)="submitFunc(form, $event)" #form="ngForm">
+        <div class="mb-3">
+          <label for="email">Email</label>
+          <input
+            type="text"
+            class="form-control"
+            id="email"
+            required
+            name="email"
+            ngModel
+            #email="ngModel"
+            [ngClass]="{'is-invalid': isValidateTextFalse(email)}"/>
+          <div class="invalid-feedback">
+            Please enter a valid email address
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            required
+            name="password"
+            ngModel
+            #password="ngModel"
+            [ngClass]="{'is-invalid': isValidateTextFalse(password)}"/>
+          <div class="invalid-feedback">
+            Please enter a password
+          </div>
+        </div>
+        <br/>
+        <button
+          class="btn btn-success btn-lg btn-block"
+          [disabled]=form.invalid
+          type="submit"
+          style="background-color: #0cabba; border-color: #0cabba"
+        >Log in
+        </button>
+      </form>
+      <div class="text-center mt-2 pt-2" style="font-size: 18px;">
+        <p class="small mt-2 pt-1 mb-0" style="font-weight: bold">Don't have an account?
+          <a [routerLink]="client_signup" style="color: #dc4c64;">Register</a></p>
+      </div>
+    </div>
+    <div *ngIf="(currentUser$ | async) as user" class="flex-column justify-content-center align-items-center d-flex">
+      <h3 class="logo text-white">Welcome back, {{ user.userName | titlecase }} !</h3>
+      <button [routerLink]="training_classes" class="btn btn-outline-light mt-3" type="button" style="font-size: 24px">
+        Go To Classes!
+      </button>
+    </div>
+  </div>
+</div>

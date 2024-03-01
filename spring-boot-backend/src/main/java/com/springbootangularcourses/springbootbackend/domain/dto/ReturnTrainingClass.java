@@ -1,0 +1,33 @@
+package com.springbootangularcourses.springbootbackend.domain.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ReturnTrainingClass {
+
+    private String address;
+    private String category;
+    private String city;
+    private String country;
+    private int dayOfWeek;
+    private String description;
+    private String time;
+    private Long id;
+    private String postalCode;
+    private String province;
+    private String title;
+    private int totalSpots;
+    private List<ReturnUserTrainingClass> userTrainingClasses;
+    private String hostName;
+    private String hostUserName;
+    private String hostImage;
+//    comments?: IComment[];
+}

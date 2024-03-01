@@ -1,0 +1,218 @@
+<div class="mt-5 mb-5">
+  <div class="container pt-5">
+    <div class="row">
+      <section class="col-8">
+        <form [formGroup]="addClassForm" (ngSubmit)="submitFunc()" class="card px-3 py-2 shadow-lg">
+          <div class="form-group">
+            <label for="title">Title</label>
+            <input
+              type="text"
+              class="form-control"
+              id="title"
+              placeholder="Enter title..."
+              formControlName="title"
+              [ngClass]="{
+          'is-invalid':
+          addClassForm.get('title').errors && addClassForm.get('title').touched
+        }"/>
+            <div class="invalid-feedback">
+              Please enter a title
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="category">Category</label>
+            <select
+              id="category"
+              class="form-control"
+              formControlName="category"
+              [ngClass]="{
+          'is-invalid':
+          addClassForm.get('category').errors && addClassForm.get('category').touched
+        }">
+              <option value="English" selected>English</option>
+              <option value="French">French</option>
+              <option value="German">German</option>
+              <option value="Italian">Italian</option>
+              <option value="Polish">Polish</option>
+              <option value="Spanish">Spanish</option>
+            </select>
+            <div class="invalid-feedback">
+              Please choose a category
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="city">City</label>
+            <input
+              type="text"
+              class="form-control"
+              id="city"
+              placeholder="Enter city..."
+              formControlName="city"
+              [ngClass]="{
+          'is-invalid':
+          addClassForm.get('city').errors && addClassForm.get('city').touched
+        }"/>
+            <div class="invalid-feedback">
+              Please enter a city
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="country">Country</label>
+            <input
+              type="text"
+              class="form-control"
+              id="country"
+              placeholder="Enter country..."
+              formControlName="country"
+              [ngClass]="{
+          'is-invalid':
+          addClassForm.get('country').errors && addClassForm.get('country').touched
+        }"/>
+            <div class="invalid-feedback">
+              Please enter a country
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="province">Province</label>
+            <input
+              type="text"
+              class="form-control"
+              id="province"
+              placeholder="Enter province..."
+              formControlName="province"
+              [ngClass]="{
+          'is-invalid':
+          addClassForm.get('province').errors && addClassForm.get('province').touched
+        }"/>
+            <div class="invalid-feedback">
+              Please enter a province
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="address">Address</label>
+            <input
+              type="text"
+              class="form-control"
+              id="address"
+              placeholder="Enter address..."
+              formControlName="address"
+              [ngClass]="{
+          'is-invalid':
+          addClassForm.get('address').errors && addClassForm.get('address').touched
+        }"/>
+            <div class="invalid-feedback">
+              Please enter an address
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="postalCode">Postal Code</label>
+            <input
+              type="text"
+              class="form-control"
+              id="postalCode"
+              placeholder="Enter postal code..."
+              formControlName="postalCode"
+              [ngClass]="{
+          'is-invalid':
+          addClassForm.get('postalCode').errors && addClassForm.get('postalCode').touched
+        }"/>
+            <div class="invalid-feedback">
+              Please enter a postal code
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="dayOfWeek">Day Of Week</label>
+            <select id="dayOfWeek" class="form-control"
+                    formControlName="dayOfWeek"
+                    [ngClass]="{
+          'is-invalid':
+          addClassForm.get('dayOfWeek').errors && addClassForm.get('dayOfWeek').touched
+        }">
+              <option value="Monday" selected>Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
+              <option value="Saturday">Saturday</option>
+              <option value="Sunday">Sunday</option>
+            </select>
+            <div class="invalid-feedback">
+              Please choose a day of the week
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea
+              class="form-control"
+              id="description"
+              rows="3"
+              placeholder="Enter description..."
+              formControlName="description"
+              [ngClass]="{
+          'is-invalid':
+          addClassForm.get('description').errors && addClassForm.get('description').touched
+        }"></textarea>
+            <div class="invalid-feedback">
+              Please enter a description
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="time">Time</label>
+            <input
+              id="time"
+              [ngxTimepicker]="picker" min="9:00" max="21:00"
+              [format]="24"
+              class="form-control"
+              placeholder="--:--"
+              formControlName="time"
+              [ngClass]="{
+          'is-invalid':
+          addClassForm.get('time').errors && addClassForm.get('time').touched
+        }"
+            />
+            <ngx-material-timepicker #picker></ngx-material-timepicker>
+            <div class="invalid-feedback">
+              Please enter a time
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="totalSpots">Total Spots</label>
+            <input
+              type="text"
+              class="form-control"
+              id="totalSpots"
+              placeholder="Enter total spots..."
+              formControlName="totalSpots"
+              [ngClass]="{
+          'is-invalid':
+          addClassForm.get('totalSpots').errors && addClassForm.get('totalSpots').touched
+        }"/>
+            <div class="invalid-feedback">
+              Please enter a total spots
+            </div>
+          </div>
+
+          <div class="form-group">
+            <button type="button" class="btn btn-secondary btn-md float-right" (click) = "cancel()">Cancel</button>
+            <button
+              type="submit"
+              class="btn btn-success btn-md float-right mr-3"
+              [disabled]="!addClassForm.valid"
+            >Submit
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </div>
+</div>

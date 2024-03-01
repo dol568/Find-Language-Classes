@@ -1,0 +1,303 @@
+<div class="mt-5">
+    <div *ngIf="profile" class="pt-5 container" >
+        <div class="w-100 d-flex card flex-row shadow-lg align-items-center">
+            <div class="col-2">
+                <img
+                        class="rounded-circle py-3 "
+                        [src]="profile.photoUrl | authenticate"
+                        handleImageError
+                        alt="image cap"
+                        style="width: 100%">
+            </div>
+            <div class="col-10 d-flex align-items-center justify-content-between">
+                <h2 class="card-text">{{profile.fullName}}</h2>
+                <div class="d-flex flex-column justify-content-start  pr-3">
+                    <div class="d-flex flex-row align-items-center">
+                        <div class="d-flex flex-column align-items-center mr-4">
+                            <h1 style="font-size: 80px">{{profile.followings?.length}}</h1>
+                            <span>FOLLOWINGS</span>
+                        </div>
+                        <div class=" d-flex flex-column align-items-center">
+                            <h1 style="font-size: 80px">{{profile.followers?.length}}</h1>
+                            <span>FOLLOWERS</span>
+                        </div>
+                    </div>
+                    <div>
+                        <hr>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex w-100">
+            <ng-container *ngIf="info === ProfileInfo.ABOUT && (currentUser$ | async) as currentUser">
+                <div class=" col-9 shadow-lg mt-4 align-items-start w-100">
+                    <div class=" d-flex justify-content-between flex-row w-100 px-2 pt-3">
+                        <div style="font-size: 20px">
+                            <i class="fas fa-user-alt mr-3" style="font-size: 26px"></i>
+                            <strong>About {{profile.fullName}}</strong>
+                        </div>
+                        <div>
+                            <button
+                                    *ngIf="!isEditMode && (profile.username === currentUser.userName)"
+                                    class="btn btn-outline-secondary"
+                                    type="button"
+                                    (click)="changeMode()"
+                            >Edit Profile
+                            </button>
+                            <button
+                                    *ngIf="isEditMode && (profile.username === currentUser.userName)"
+                                    class="btn btn-outline-secondary"
+                                    type="button"
+                                    (click)="changeMode()"
+                            >Cancel
+                            </button>
+                            <button
+                                    *ngIf="shouldShowFollowButton(profile, currentUser)"
+                                    class="btn btn-primary"
+                                    (click)="follow(profile.username)"
+                            >Follow
+                            </button>
+                            <button
+                                    *ngIf="shouldShowUnFollowButton(profile, currentUser)"
+                                    class="btn btn-primary"
+                                    (click)="unfollow(profile.username)"
+                            >Unfollow
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body pl-2" *ngIf="!isEditMode">
+                        <p class="card-text text-break">{{profile.bio}}</p>
+                    </div>
+                    <div class="w-100 mt-4" *ngIf="isEditMode">
+                        <form class="w-100" [formGroup]="editProfileForm" (ngSubmit)="submitFunc()">
+                            <div class="form-group">
+                                <label for="fullName">Full Name</label>
+                                <input
+                                        type="text"
+                                        class="form-control"
+                                        id="fullName"
+                                        placeholder="Enter full name..."
+                                        formControlName="fullName"
+                                        [ngClass]="{'is-invalid':
+                                        editProfileForm.get('fullName').errors
+                                        && editProfileForm.get('fullName').touched}"
+                                />
+                                <div class="invalid-feedback">
+                                    Please enter full name
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="bio">Bio</label>
+                                <textarea
+                                        class="form-control"
+                                        id="bio"
+                                        rows="3"
+                                        placeholder="Enter bio..."
+                                        formControlName="bio"
+                                        [ngClass]="{'is-invalid':
+                                        editProfileForm.get('bio').errors
+                                        && editProfileForm.get('bio').touched}"
+                                ></textarea>
+                                <div class="invalid-feedback">
+                                    Please enter a bio
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <button
+                                        type="submit"
+                                        class="btn btn-success btn-block"
+                                        [disabled]="!editProfileForm.valid"
+                                >Submit
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="info === ProfileInfo.PHOTO">
+<!--                <div class=" col-9 shadow-lg mt-4 align-items-start w-100">-->
+<!--                    <div class=" d-flex justify-content-between flex-row w-100 px-2 pt-3">-->
+<!--                        <div style="font-size: 20px">-->
+<!--                            <i class="fas fa-user-alt mr-3" style="font-size: 26px"></i>-->
+<!--                            <strong>About {{profile.fullName}}</strong>-->
+<!--                        </div>-->
+<!--                        <div>-->
+<!--                            <button-->
+<!--                                    *ngIf="!isEditMode && (profile.username === currentUser.userName)"-->
+<!--                                    class="btn btn-outline-secondary"-->
+<!--                                    type="button"-->
+<!--                                    (click)="changeMode()"-->
+<!--                            >Edit Profile-->
+<!--                            </button>-->
+
+                <div class=" col-9 shadow-lg mt-4 align-items-start w-100">
+                    <div class="d-flex justify-content-between flex-row w-100 px-2 pt-3 mb-3">
+
+                        <div class="mb-2" style="font-size: 20px">
+                            <strong>Photo</strong>
+                        </div>
+                        <ng-container *ngIf="profile.username === (currentUser$ | async).userName">
+
+
+                        <div *ngIf="!imageChangedEvent">
+                            <input id="files" style="visibility:hidden;" type="file"
+                                   (change)="fileChangeEvent($event)">
+                            <label for="files" class="btn btn-outline-secondary">Select Image</label>
+                        </div>
+                        <button
+                                *ngIf="imageChangedEvent"
+                                class="btn btn-outline-secondary"
+                                type="button"
+                                (click)="cancelPhotoSelection()"
+                        >Cancel
+                        </button>
+                        </ng-container>
+                    </div>
+                        <ng-container  *ngIf="imageChangedEvent">
+
+                        <div class="row mb-3 justify-content-center">
+
+
+<!--                            <div class="col-3  d-flex flex-column align-items-center justify-content-center">-->
+<!--                                <label for="files" class="btn btn-outline-secondary btn-lg">Select Image</label>-->
+<!--                                <input id="files" style="visibility:hidden;" type="file"-->
+<!--                                       (change)="fileChangeEvent($event)">-->
+<!--                            </div>-->
+                            <div class="col-4 p-1  mx-3">
+
+                                <image-cropper
+                                        [imageChangedEvent]="imageChangedEvent"
+                                        [maintainAspectRatio]="true"
+                                        [aspectRatio]="4 / 4"
+                                        [resizeToWidth]="256"
+                                        format="png"
+                                        (imageCropped)="imageCropped($event)"
+                                ></image-cropper>
+                            </div>
+                            <div class="col-4  p-1 d-flex flex-column align-items-center justify-content-center">
+                                <img [src]="croppedImage" style="width: 100%"/>
+                                <button type="button" class="btn btn-success w-100 mt-1" (click)="uploadFile()"><i
+                                        class="fa fa-check"></i></button>
+                            </div>
+                        </div>
+                        </ng-container>
+                    </div>
+            </ng-container>
+            <ng-container *ngIf="info === ProfileInfo.CLASSES">
+                <div class=" col-9 shadow-lg mt-4 align-items-start w-100">
+                    <div class=" d-flex justify-content-between flex-row w-100 px-2 pt-3">
+                        <div class="mb-2" style="font-size: 20px">
+                            <strong>Language Classes</strong>
+                        </div>
+                    </div>
+                    <ng-container *ngFor="let tc of profile.profileTrainingClasses">
+                        <div class="card w-100 mb-3 mt-2">
+                            <div *ngIf="tc.hostUserName === profile.username" class="ribbon"><span>HOST</span></div>
+                            <div *ngIf="tc.hostUserName !== profile.username" class="ribbon-not-host">
+                                <span>ATTENDEE</span></div>
+                            <div class="card-header">
+                                <h4>{{tc.title}}</h4>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="card-title">Category: {{tc.category}}</h6>
+                                <p class="card-text">Every {{getDaysOfWeekWords(tc.dayOfWeek)}} at {{tc.time}}</p>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="info === ProfileInfo.FOLLOWERS">
+                <div class=" col-9 shadow-lg mt-4 align-items-start w-100">
+                    <div class=" d-flex justify-content-between flex-row w-100 px-2 pt-3">
+                        <div style="font-size: 20px">
+                            <strong>Followers</strong>
+                        </div>
+                    </div>
+                    <ng-container *ngFor="let follower of profile.followers">
+                        <div class="card w-100 mb-3 mt-2">
+                            <div class="card-header">
+                                <h5>{{ follower.fullName }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-2 pl-2 pr-1">
+                                        <img
+                                                [src]="follower.photoUrl | authenticate"
+                                                handleImageError
+                                                alt="image cap"
+                                                style="width: 100%">
+                                    </div>
+                                    <div class="col-md-10 pl-1">
+                                        <p style="font-size: 18px;">Bio: {{ follower.bio }}</p>
+                                        <p style="font-size: 18px;">Username: {{ follower.username }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="info === ProfileInfo.FOLLOWINGS">
+                <div class=" col-9 shadow-lg mt-4 align-items-start w-100">
+                    <div class=" d-flex justify-content-between flex-row w-100 px-2 pt-3">
+                        <div style="font-size: 20px">
+                            <strong>Followings</strong>
+                        </div>
+                    </div>
+                    <ng-container *ngFor="let following of profile.followings">
+                        <div class="card w-100 mb-3 mt-2">
+                            <div class="card-header">
+                                <h5>{{ following.fullName }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-2 pl-2 pr-1">
+                                        <img
+                                                [src]="following.photoUrl | authenticate"
+                                                handleImageError
+                                                alt="image cap"
+                                                style="width: 100%">
+                                    </div>
+                                    <div class="col-md-10 pl-1">
+                                        <p style="; font-size: 18px;">Bio: {{ following.bio }}</p>
+                                        <p style="; font-size: 18px; ">Username: {{ following.username }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </ng-container>
+            <div class="col-3 w-100 pt-4 pr-0 pl-4">
+                <ul class="list-group shadow-lg">
+                    <li class="list-group-item"
+                        (click)="setInfo(ProfileInfo.ABOUT)"
+                        [class.active]="ProfileInfo.ABOUT === this.info"
+                    >About
+                    </li>
+                    <li class="list-group-item"
+                        (click)="setInfo(ProfileInfo.PHOTO)"
+                        [class.active]="ProfileInfo.PHOTO === this.info"
+                    >Edit Photo
+                    </li>
+                    <li class="list-group-item"
+                        (click)="setInfo(ProfileInfo.CLASSES)"
+                        [class.active]="ProfileInfo.CLASSES === this.info"
+                    >Language Classes
+                    </li>
+                    <li class="list-group-item"
+                        (click)="setInfo(ProfileInfo.FOLLOWERS)"
+                        [class.active]="ProfileInfo.FOLLOWERS === this.info"
+                    >Followers
+                    </li>
+                    <li class="list-group-item"
+                        (click)="setInfo(ProfileInfo.FOLLOWINGS)"
+                        [class.active]="ProfileInfo.FOLLOWINGS === this.info"
+                    >Followings
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,200 @@
+<div class="mt-5">
+    <div *ngIf="trainingClass" class="pt-5 container">
+        <div class="row">
+            <section class="col-8">
+                <div class="d-flex justify-content-between align-items-center pb-2 flex-column">
+                    <div class="card text-white shadow-lg">
+                        <img class="card-img" [src]="getFlagImg(trainingClass.category)" alt="Card image">
+                        <div class="card-img-overlay pb-5 mb-5 justify-content-end d-flex flex-column">
+                            <div class="card" style="background-color: #000; opacity: 0.85;">
+                                <div class="card-body" style="color: aliceblue">
+                                    <h3 class="card-title">{{trainingClass.title}}
+                                        {{totalSpotsLeft()}}</h3>
+                                    <p class="card-text">Every {{getDaysOfWeekWords(trainingClass.dayOfWeek)}}
+                                        at {{trainingClass.time}}</p>
+                                    <p class="card-text">Hosted By <a style="cursor: pointer; color: #48b0f7"
+                                                                      (click)="goToProfile(trainingClass.hostUserName)">{{trainingClass.hostName}}</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-end">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <button
+                                            type="button"
+                                            class="btn btn-primary"
+                                            style="background-color: #0cabba"
+                                            [routerLink]="'/' + _client_training_classes + '/' + trainingClass.id + '/edit'"
+                                    >Manage Class
+                                    </button>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card shadow-lg mt-3 w-100">
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex align-items-center">
+                                <i class="fas fa-info-circle mr-3 icon"></i>
+                                {{trainingClass.description}}</li>
+                            <li class="list-group-item d-flex align-items-center">
+                                <i class="fas fa-calendar mr-3 icon"></i>
+                                Every {{getDaysOfWeekWords(trainingClass.dayOfWeek)}} at {{trainingClass.time}}</li>
+                            <li class="list-group-item bg-light d-flex align-items-center">
+                                <i class="fas fa-map-marker mr-3 icon"></i>
+                                {{trainingClass.address}} {{trainingClass.city}}
+                                , {{trainingClass.country}} {{trainingClass.postalCode}}
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card shadow-lg mt-3 mb-5 w-100">
+                        <div class="card-header d-flex px-auto py-1"
+                             style='font-size:20px; text-align: center; background-color: #0cabba; color: white'>
+                            <div class="d-flex flex-grow-1 justify-content-center align-items-center">
+                                <button class="btn btn-link"
+                                        style="text-decoration: none; font-size: 24px; color: #fff">
+                                    Chat messages
+                                </button>
+                                <div class="d-flex flex-row align-items-center">
+                                </div>
+                            </div>
+                        </div>
+                        <div >
+                            <div
+                                    class="card-body scroll"
+                                    data-mdb-perfect-scrollbar="true"
+                                    style="position: relative; height: 400px; font-size: 20px">
+                                <div *ngFor="let ms of msg$ | async; index as i">
+                                    <ng-container *ngIf="this.user?.userName === ms.userName">
+                                        <div class="d-flex mt-2 flex-row align-items-center">
+                                            <strong class=" mr-3"
+                                                    style="margin-bottom: 0; font-size: 18px; color: #0cabba"
+                                            >{{ ms.fullName }}</strong>
+                                            <small class="text-muted" style="margin-bottom: 0; font-size: 14px"
+                                            >{{ms.createdAt | date:'d.MM.Y' + ' HH:mm' }}</small>
+                                        </div>
+                                        <div class="d-flex flex-row justify-content-start">
+                                            <ng-container
+                                                    *ngIf="ms.body.includes('left the chat') || ms.body.includes('joined the chat')">
+                                                <p class="small p-2 mb-3 rounded-3 alert alert-warning w-100"
+                                                   style="border-radius: 7px;">
+                                                    {{ ms.body }}
+                                                </p>
+                                            </ng-container>
+                                            <ng-container
+                                                    *ngIf="!ms.body.includes('left the chat') || !ms.body.includes('joined the chat')">
+                                                <img class="rounded-circle"
+                                                     [src]="ms.image | authenticate"
+                                                     handleImageError
+                                                     alt="avatar 1" style="width: 45px; height: 100%;">
+                                                <div>
+                                                    <p class="small p-2 ms-3 mb-3 rounded-3 ml-3"
+                                                       style="background-color: #f5f6f7;border-radius: 7px;">
+                                                        {{ ms.body }}
+                                                    </p>
+                                                </div>
+                                            </ng-container>
+
+
+                                        </div>
+                                    </ng-container>
+                                    <ng-container *ngIf="this.user?.userName !== ms.userName">
+                                        <div class="d-flex mt-2 flex-row align-items-center">
+                                            <strong class=" mr-3"
+                                                    style="margin-bottom: 0; font-size: 18px; color: #0cabba"
+                                            >{{ ms.fullName }}</strong>
+                                            <small class="text-muted" style="margin-bottom: 0; font-size: 14px"
+                                            >{{ms.createdAt | date:'d.MM.Y' + ' HH:mm' }}</small>
+                                        </div>
+                                        <div class="d-flex flex-row justify-content-start">
+                                            <ng-container
+                                                    *ngIf="ms.body.includes('left the chat') || ms.body.includes('joined the chat')">
+                                                <p class="small py-2 ms-3 rounded-3 alert alert-warning w-100"
+                                                   style="border-radius: 7px;">
+                                                    {{ ms.body }}
+                                                </p>
+                                            </ng-container>
+                                            <ng-container
+                                                    *ngIf="!ms.body.includes('left the chat') && !ms.body.includes('joined the chat')">
+                                                <img
+                                                        class="rounded-circle"
+                                                        [src]="ms.image | authenticate"
+                                                        handleImageError
+                                                        alt="avatar 1"
+                                                        style="width: 45px; height: 100%;">
+                                                <div>
+                                                    <p class="small p-2 ms-3 mb-3 text-white rounded-3 ml-3"
+                                                       style="background-color: #48b0f7;;border-radius: 7px;">
+                                                        {{ ms.body }}
+                                                    </p>
+                                                </div>
+                                            </ng-container>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                            <div class="card-footer text-muted">
+                                <form [formGroup]="addComment" (ngSubmit)="submitFunc()" class="d-flex w-100">
+                                    <div class="flex-grow-1">
+                                        <div class="form-group">
+                                            <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    placeholder="Type message"
+                                                    aria-label="Recipient's username"
+                                                    aria-describedby="button-addon2"
+                                                    formControlName="description"
+                                            />
+                                            <div class="invalid-feedback">
+                                                Please enter a description
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <button
+                                                class="btn btn-warning btn-md float-right"
+                                                type="submit"
+                                                id="button-addon2"
+                                                [disabled]="!addComment.valid"
+                                                style="background-color: #0cabba; color: #fff; border: none"
+                                        >Send
+                                        </button>
+                                    </div>
+                                </form>
+                                <small class="red-text">{{ (connectedUsers$ | async)?.length + " users online: "}}</small>
+                                <small class="red-text"
+                                       *ngFor="let user of (connectedUsers$ | async)">{{user.fullName + ", "}}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="col-4">
+                <div class="card shadow-lg">
+                    <ul class="list-group">
+                        <li class="list-group-item"
+                            style='font-size:16px; text-align: center; background-color: #0cabba; color: white'>
+                            {{ trainingClass.userTrainingClasses.length}} people are going
+                        </li>
+                        <li class="list-group-item" *ngFor="let attendee of trainingClass.userTrainingClasses">
+                            <div class="row">
+                                <div class="ribbon" *ngIf="attendee.host"><span>HOST</span></div>
+                                <div class="col-md-4 pl-2 pr-1">
+                                    <img
+                                            class="py-1 "
+                                            [src]="attendee.image | authenticate"
+                                            handleImageError
+                                            alt="image cap"
+                                            style="width: 100%">
+                                </div>
+                                <div class="col-md-8 pl-1">
+                                    <p style="color: #48b0f7; font-size: 18px; font-weight: bold; cursor: pointer"
+                                       (click)="goToProfile(attendee.userName)">{{ attendee.fullName }}</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>

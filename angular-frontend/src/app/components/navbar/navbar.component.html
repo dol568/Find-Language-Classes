@@ -1,0 +1,44 @@
+<nav class="fixed-top navbar navbar-dark bg-primary d-flex
+         flex-column flex-sm-row align-items-center justify-content-between mb-3 border-bottom shadow-md">
+  <div class="d-flex flex-column flex-sm-row align-items-center">
+    <h3 class="logo text-light mr-3 cursor-pointer" (click)="goToClasses()">Find Language Classes</h3>
+    <button
+      type="button"
+      class="btn mr-3 btn-primary active width-120px"
+      (click)="goToClasses()"
+    >Classes
+    </button>
+    <button
+      type="button"
+      class="btn btn-success shadow-md width-120px"
+      [routerLink]="add_class"
+    >Create Class
+    </button>
+  </div>
+  <div class="dropdown">
+    <a class="dropdown-toggle text-white" id="dropdownMenuButton"
+       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <img
+        class="rounded-circle width-30px"
+        [src]="photoUrl"
+        handleImageError
+        alt="user photo"
+      >
+      {{ currentUser?.fullName }}
+    </a>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <a
+        class="dropdown-item"
+        [routerLink]="['profiles/', currentUser?.userName]"
+      ><i class="fas fa-archive"></i>
+        My profile
+      </a>
+      <a
+        class="dropdown-item"
+        (click)="logout()"
+      ><i class="fas fa-sign-out-alt"></i>
+        Logout
+      </a>
+    </div>
+  </div>
+</nav>
