@@ -2,6 +2,9 @@ server:
   port: 9000
 
 spring:
+  web:
+    resources:
+      static-locations: classpath:/static/angular-frontend/browser
   profiles:
     active: dev
   servlet:

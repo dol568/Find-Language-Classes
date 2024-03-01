@@ -18,6 +18,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher.Builder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -37,8 +38,8 @@ public class SecurityConfig {
     private final JWTAccessDeniedHandler jwtAccessDeniedHandler;
     private final JWTAuthorizationFilter jwtAuthorizationFilter;
     private final JWTForbiddenEntryPoint jwtForbiddenEntryPoint;
-    private final Builder mvc;
     private final PasswordEncoder passwordEncoder;
+    private final SpaWebFilter spaWebFilter;
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -62,22 +63,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/favicon.ico")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/*/*.png")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/*/*.gif")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/*/*.svg")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/*/*.jpg")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/*/*.html")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/*/*.css")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/*/*.js")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/login")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/register")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/ws/**")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("ws")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("ws/**")).permitAll()
+                        .requestMatchers("/h2-console/**", "/favicon.ico", "*.png", "*.gif", "*.svg",
+                                "*.jpg", "*.html", "*.css", "*.js", "/static/**", "/api/login",
+                                "/api/register", "/", "/ws/**", "ws", "ws/**", "/assets/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(spaWebFilter, BasicAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtForbiddenEntryPoint))
                 .exceptionHandling(exception -> exception.accessDeniedHandler(jwtAccessDeniedHandler))
                 .authenticationProvider(authenticationProvider())
