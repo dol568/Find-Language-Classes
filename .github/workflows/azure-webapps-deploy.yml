@@ -40,7 +40,7 @@ jobs:
       - name: Build and push container image to registry
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./spring-boot-backend
           push: true
           tags: ghcr.io/${{ env.REPO }}:${{ github.sha }}
           file: ./spring-boot-backend/Dockerfile
