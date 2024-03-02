@@ -1,6 +1,6 @@
 FROM eclipse-temurin:17-jre as builder
 WORKDIR application
-ARG JAR_FILE=target/spring-boot-backend-0.0.1-SNAPSHOT.jar
+ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} application.jar
 RUN java -Djarmode=layertools -jar application.jar extract
 
@@ -12,4 +12,4 @@ COPY --from=builder application/snapshot-dependencies/ ./
 COPY --from=builder application/application/ ./
 ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
 
-EXPOSE 8080
+EXPOSE 80
