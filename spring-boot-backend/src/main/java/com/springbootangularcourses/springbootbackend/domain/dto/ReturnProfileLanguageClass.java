@@ -9,10 +9,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReturnUserTrainingClass {
+public class ReturnProfileLanguageClass {
 
-    private String userName;
-    private String fullName;
-    private String image;
-    private boolean isHost;
+    private Long id;
+    private String category;
+    private int dayOfWeek;
+    private String time;
+    private String title;
+    private String hostUserName;
 }

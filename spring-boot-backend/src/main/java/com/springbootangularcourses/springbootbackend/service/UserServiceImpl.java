@@ -96,7 +96,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void followUser(String userName, String email) {
+    public User followUser(String userName, String email) {
         User fromUser = this.findByEmail(email);
         User toUser = this.findByUserName(userName);
 
@@ -116,11 +116,12 @@ public class UserServiceImpl implements UserService {
         fromUser.addFollowing(userFollowing);
         toUser.addFollower(userFollowing);
 
-        this.userRepository.saveAll(List.of(fromUser, toUser));
+        this.userRepository.save(fromUser);
+        return this.userRepository.save(toUser);
     }
 
     @Override
-    public void unfollowUser(String userName, String email) {
+    public User unfollowUser(String userName, String email) {
         User fromUser = this.findByEmail(email);
         User toUser = this.findByUserName(userName);
 
@@ -141,7 +142,8 @@ public class UserServiceImpl implements UserService {
         fromUser.removeFollowing(followed);
         toUser.removeFollower(follower);
 
-        this.userRepository.saveAll(List.of(fromUser, toUser));
+        this.userRepository.save(fromUser);
+        return this.userRepository.save(toUser);
     }
 
     private void checkDuplicateEmail(String email, String username) {
@@ -198,17 +200,4 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Unable to save image");
         }
     };
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

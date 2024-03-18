@@ -19,5 +19,5 @@ public class ReturnComment {
     private String userName;
     private String fullName;
     private String image;
-    private String trainingClassId;
+    private String languageClassId;
 }

@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TrainingClassDTO {
+public class LanguageClassDTO {
 
     @NotBlank(message = "Title is required")
     private String title;

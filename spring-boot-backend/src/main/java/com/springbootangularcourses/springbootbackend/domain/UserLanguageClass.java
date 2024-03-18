@@ -21,7 +21,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 @Getter
 @Setter
 @JsonInclude(NON_DEFAULT)
-public class UserTrainingClass {
+public class UserLanguageClass {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,9 +36,9 @@ public class UserTrainingClass {
     private User user;
 
     @ManyToOne()
-    @JoinColumn(name = "training_class")
+    @JoinColumn(name = "Language_class")
     @JsonIgnore
-    private TrainingClass trainingClass;
+    private LanguageClass languageClass;
 
     @PrePersist
     protected void onCreate() {
@@ -46,12 +46,12 @@ public class UserTrainingClass {
     }
 
     public void removeFromUser() {
-        this.user.getUserTrainingClasses().remove(this);
+        this.user.getUserLanguageClasses().remove(this);
         this.user = null;
     }
 
-    public void removeFromTrainingClass() {
-        this.trainingClass.getUserTrainingClasses().remove(this);
-        this.trainingClass = null;
+    public void removeFromLanguageClass() {
+        this.languageClass.getUserLanguageClasses().remove(this);
+        this.languageClass = null;
     }
 }

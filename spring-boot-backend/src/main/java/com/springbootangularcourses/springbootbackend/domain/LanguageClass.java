@@ -22,7 +22,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 @Getter
 @Setter
 @JsonInclude(NON_DEFAULT)
-public class TrainingClass {
+public class LanguageClass {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -49,35 +49,36 @@ public class TrainingClass {
     @NotNull(message = "Total spots is required")
     private int totalSpots;
 
-    @OneToMany(mappedBy = "trainingClass", cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.PERSIST}  , orphanRemoval = true)
-    private List<UserTrainingClass> userTrainingClasses = new ArrayList<>();
+    @OneToMany(mappedBy = "languageClass", cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.PERSIST}  , orphanRemoval = true)
+    private List<UserLanguageClass> userLanguageClasses = new ArrayList<>();
 
-    @OneToMany(mappedBy = "trainingClass", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "languageClass", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "trainingClass",cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH}, orphanRemoval = true,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "languageClass",cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH}, orphanRemoval = true,fetch = FetchType.EAGER)
     private List<ChatRoomUser> connectedUsers = new ArrayList<>();
 
     public void addUser(ChatRoomUser user) {
         this.connectedUsers.add(user);
-        user.setTrainingClass(this);
+        user.setLanguageClass(this);
     }
     public void removeUser(ChatRoomUser user) {
-        user.setTrainingClass(null);
+        user.setLanguageClass(null);
         this.connectedUsers.remove(user);
     }
+
     public int getNumberOfConnectedUsers(){
         return this.connectedUsers.size();
     }
 
-    public void addUserTrainingClass(UserTrainingClass userTrainingClass) {
-        userTrainingClasses.add(userTrainingClass);
-        userTrainingClass.setTrainingClass(this);
+    public void addUserLanguageClass(UserLanguageClass userLanguageClass) {
+        userLanguageClasses.add(userLanguageClass);
+        userLanguageClass.setLanguageClass(this);
     }
 
-    public void removeUserTrainingClass(UserTrainingClass userTrainingClass) {
-        userTrainingClass.setTrainingClass(null);
-        userTrainingClasses.remove(userTrainingClass);
+    public void removeUserLanguageClass(UserLanguageClass userLanguageClass) {
+        userLanguageClass.setLanguageClass(null);
+        userLanguageClasses.remove(userLanguageClass);
     }
 
 }

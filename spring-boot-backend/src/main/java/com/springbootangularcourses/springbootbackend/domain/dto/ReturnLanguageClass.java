@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReturnTrainingClass {
+public class ReturnLanguageClass {
 
     private String address;
     private String category;
@@ -25,7 +25,7 @@ public class ReturnTrainingClass {
     private String province;
     private String title;
     private int totalSpots;
-    private List<ReturnUserTrainingClass> userTrainingClasses;
+    private List<ReturnUserLanguageClass> userLanguageClasses;
     private String hostName;
     private String hostUserName;
     private String hostImage;

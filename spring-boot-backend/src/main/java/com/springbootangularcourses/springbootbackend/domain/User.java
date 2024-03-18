@@ -69,7 +69,7 @@ public class User {
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<UserTrainingClass> userTrainingClasses = new ArrayList<>();
+    private List<UserLanguageClass> userLanguageClasses = new ArrayList<>();
 
     public void addRole(Role role) {
         this.roles.add(role);

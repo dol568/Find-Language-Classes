@@ -1,7 +1,7 @@
-package com.springbootangularcourses.springbootbackend.training_class;
+package com.springbootangularcourses.springbootbackend.Language_class;
 
-import com.springbootangularcourses.springbootbackend.domain.TrainingClass;
-import com.springbootangularcourses.springbootbackend.domain.dto.ReturnTrainingClass;
+import com.springbootangularcourses.springbootbackend.domain.LanguageClass;
+import com.springbootangularcourses.springbootbackend.domain.dto.ReturnLanguageClass;
 import com.springbootangularcourses.springbootbackend.domain.dto.ReturnUser;
 import com.springbootangularcourses.springbootbackend.system.HttpResponse;
 import org.json.JSONObject;
@@ -18,14 +18,14 @@ import java.util.List;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class TrainingClassControllerIntegrationTest {
+class LanguageClassControllerIntegrationTest {
 
     @Autowired
     private TestRestTemplate testRestTemplate;
 
     private String authorizationToken;
 
-    private final String baseUrl = "/api/trainingClasses";
+    private final String baseUrl = "/api/LanguageClasses";
 
     @Test
     @DisplayName("/login works")
@@ -58,99 +58,99 @@ class TrainingClassControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Check addTrainingClass with valid input (POST)")
+    @DisplayName("Check addLanguageClass with valid input (POST)")
     @Order(2)
-    void testAddTrainingClassSuccess() throws Exception {
+    void testAddLanguageClassSuccess() throws Exception {
         // Arrange
-        JSONObject newTrainingClass = new JSONObject();
-        newTrainingClass.put("title", "Beginner French Class");
-        newTrainingClass.put("time", "11:00");
-        newTrainingClass.put("description", "Class for beginners");
-        newTrainingClass.put("category", "French");
-        newTrainingClass.put("dayOfWeek", 1);
-        newTrainingClass.put("city", "Warsaw");
-        newTrainingClass.put("address", "271 Street");
-        newTrainingClass.put("postalCode", "V1 712L");
-        newTrainingClass.put("province", "MB");
-        newTrainingClass.put("country", "Poland");
-        newTrainingClass.put("totalSpots", 10);
+        JSONObject newLanguageClass = new JSONObject();
+        newLanguageClass.put("title", "Beginner French Class");
+        newLanguageClass.put("time", "11:00");
+        newLanguageClass.put("description", "Class for beginners");
+        newLanguageClass.put("category", "French");
+        newLanguageClass.put("dayOfWeek", 1);
+        newLanguageClass.put("city", "Warsaw");
+        newLanguageClass.put("address", "271 Street");
+        newLanguageClass.put("postalCode", "V1 712L");
+        newLanguageClass.put("province", "MB");
+        newLanguageClass.put("country", "Poland");
+        newLanguageClass.put("totalSpots", 10);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(authorizationToken);
 
-        HttpEntity<String> request = new HttpEntity<>(newTrainingClass.toString(), headers);
+        HttpEntity<String> request = new HttpEntity<>(newLanguageClass.toString(), headers);
 
         // Act
-        ResponseEntity<HttpResponse<ReturnTrainingClass>> response = testRestTemplate.exchange(this.baseUrl,
+        ResponseEntity<HttpResponse<ReturnLanguageClass>> response = testRestTemplate.exchange(this.baseUrl,
                 HttpMethod.POST,
                 request,
                 new ParameterizedTypeReference<>(){});
 
-        ReturnTrainingClass returnTrainingClass = response.getBody().getData();
+        ReturnLanguageClass returnLanguageClass = response.getBody().getData();
 
         // Assert
         Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode(),
                 "HTTP Status code should be 200");
-        Assertions.assertNotNull(returnTrainingClass.getId(),
+        Assertions.assertNotNull(returnLanguageClass.getId(),
                 "Response should contain UserID in a response header");
-        Assertions.assertEquals(newTrainingClass.get("title"), returnTrainingClass.getTitle(),
-                "Size of retrieved training classes seems to be incorrect");
-        Assertions.assertEquals(newTrainingClass.get("description"), returnTrainingClass.getDescription(),
-                "Size of retrieved training classes seems to be incorrect");
-        Assertions.assertEquals(newTrainingClass.get("totalSpots"), returnTrainingClass.getTotalSpots(),
-                "Size of retrieved training classes seems to be incorrect");
+        Assertions.assertEquals(newLanguageClass.get("title"), returnLanguageClass.getTitle(),
+                "Size of retrieved Language classes seems to be incorrect");
+        Assertions.assertEquals(newLanguageClass.get("description"), returnLanguageClass.getDescription(),
+                "Size of retrieved Language classes seems to be incorrect");
+        Assertions.assertEquals(newLanguageClass.get("totalSpots"), returnLanguageClass.getTotalSpots(),
+                "Size of retrieved Language classes seems to be incorrect");
     }
 
     @Test
-    @DisplayName("Check addTrainingClass with invalid input (POST)")
+    @DisplayName("Check addLanguageClass with invalid input (POST)")
     @Order(3)
-    void testAddTrainingClassErrorWithInvalidInput() throws Exception {
+    void testAddLanguageClassErrorWithInvalidInput() throws Exception {
         // Arrange
-        JSONObject newTrainingClass = new JSONObject();
-        newTrainingClass.put("title", "");
-        newTrainingClass.put("time", "");
-        newTrainingClass.put("description", "");
-        newTrainingClass.put("category", "French");
-        newTrainingClass.put("dayOfWeek", 1);
-        newTrainingClass.put("city", "Warsaw");
-        newTrainingClass.put("address", "271 Street");
-        newTrainingClass.put("postalCode", "V1 712L");
-        newTrainingClass.put("province", "MB");
-        newTrainingClass.put("country", "Poland");
-        newTrainingClass.put("totalSpots", 10);
+        JSONObject newLanguageClass = new JSONObject();
+        newLanguageClass.put("title", "");
+        newLanguageClass.put("time", "");
+        newLanguageClass.put("description", "");
+        newLanguageClass.put("category", "French");
+        newLanguageClass.put("dayOfWeek", 1);
+        newLanguageClass.put("city", "Warsaw");
+        newLanguageClass.put("address", "271 Street");
+        newLanguageClass.put("postalCode", "V1 712L");
+        newLanguageClass.put("province", "MB");
+        newLanguageClass.put("country", "Poland");
+        newLanguageClass.put("totalSpots", 10);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(authorizationToken);
 
-        HttpEntity<String> request = new HttpEntity<>(newTrainingClass.toString(), headers);
+        HttpEntity<String> request = new HttpEntity<>(newLanguageClass.toString(), headers);
 
         // Act
-        ResponseEntity<HttpResponse<ReturnTrainingClass>> response = testRestTemplate.exchange(this.baseUrl,
+        ResponseEntity<HttpResponse<ReturnLanguageClass>> response = testRestTemplate.exchange(this.baseUrl,
                 HttpMethod.POST,
                 request,
                 new ParameterizedTypeReference<>(){});
 
-        ReturnTrainingClass returnTrainingClass = response.getBody().getData();
+        ReturnLanguageClass returnLanguageClass = response.getBody().getData();
 
         // Assert
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(),
                 "HTTP Status code should be 400");
-        Assertions.assertEquals("Title is required", returnTrainingClass.getTitle(),
+        Assertions.assertEquals("Title is required", returnLanguageClass.getTitle(),
                 "Returned user's full name seems to be incorrect");
-        Assertions.assertEquals("Description is required", returnTrainingClass.getDescription(),
+        Assertions.assertEquals("Description is required", returnLanguageClass.getDescription(),
                 "Returned user's full name seems to be incorrect");
-        Assertions.assertEquals("Time is required", returnTrainingClass.getTime(),
+        Assertions.assertEquals("Time is required", returnLanguageClass.getTime(),
                 "Returned user's full name seems to be incorrect");
     }
 
     @Test
-    @DisplayName("Check getTrainingClasses (GET)")
+    @DisplayName("Check getLanguageClasses (GET)")
     @Order(4)
-    void testGetTrainingClassesSuccess() {
+    void testGetLanguageClassesSuccess() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -159,24 +159,24 @@ class TrainingClassControllerIntegrationTest {
         HttpEntity request = new HttpEntity(headers);
 
         // Act
-        ResponseEntity<HttpResponse<List<TrainingClass>>> response = testRestTemplate.exchange(this.baseUrl,
+        ResponseEntity<HttpResponse<List<LanguageClass>>> response = testRestTemplate.exchange(this.baseUrl,
                 HttpMethod.GET,
                 request,
                 new ParameterizedTypeReference<>() {
                 });
-        List<TrainingClass> trainingClasses = response.getBody().getData();
+        List<LanguageClass> languageClasses = response.getBody().getData();
 
         // Assert
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
                 "HTTP Status code should be 200");
-        Assertions.assertTrue(trainingClasses.size() == 3,
-                "Size of retrieved training classes seems to be incorrect");
+        Assertions.assertTrue(languageClasses.size() == 3,
+                "Size of retrieved Language classes seems to be incorrect");
     }
 
     @Test
-    @DisplayName("Check getTrainingClass (GET)")
+    @DisplayName("Check getLanguageClass (GET)")
     @Order(5)
-    void testGetTrainingClassSuccess() {
+    void testGetLanguageClassSuccess() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -185,28 +185,28 @@ class TrainingClassControllerIntegrationTest {
         HttpEntity request = new HttpEntity(headers);
 
         // Act
-        ResponseEntity<HttpResponse<TrainingClass>> response = testRestTemplate.exchange(this.baseUrl + "/3",
+        ResponseEntity<HttpResponse<LanguageClass>> response = testRestTemplate.exchange(this.baseUrl + "/3",
                 HttpMethod.GET,
                 request,
                 new ParameterizedTypeReference<>() {
                 });
-        TrainingClass trainingClasses = response.getBody().getData();
+        LanguageClass languageClasses = response.getBody().getData();
 
         // Assert
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
                 "HTTP Status code should be 200");
-        Assertions.assertEquals(3, trainingClasses.getId(),
-                "Size of retrieved training classes seems to be incorrect");
-        Assertions.assertEquals("Beginner French Class", trainingClasses.getTitle(),
-                "Size of retrieved training classes seems to be incorrect");
-        Assertions.assertEquals(1, trainingClasses.getUserTrainingClasses().size(),
-                "Size of retrieved training classes seems to be incorrect");
+        Assertions.assertEquals(3, languageClasses.getId(),
+                "Size of retrieved Language classes seems to be incorrect");
+        Assertions.assertEquals("Beginner French Class", languageClasses.getTitle(),
+                "Size of retrieved Language classes seems to be incorrect");
+        Assertions.assertEquals(1, languageClasses.getUserLanguageClasses().size(),
+                "Size of retrieved Language classes seems to be incorrect");
     }
 
     @Test
-    @DisplayName("Check getTrainingClass with non-existent id (GET)")
+    @DisplayName("Check getLanguageClass with non-existent id (GET)")
     @Order(6)
-    void testGetTrainingClassErrorIdNotFound() {
+    void testGetLanguageClassErrorIdNotFound() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -215,12 +215,12 @@ class TrainingClassControllerIntegrationTest {
         HttpEntity request = new HttpEntity(headers);
 
         // Act
-        ResponseEntity<HttpResponse<TrainingClass>> response = testRestTemplate.exchange(this.baseUrl + "/15",
+        ResponseEntity<HttpResponse<LanguageClass>> response = testRestTemplate.exchange(this.baseUrl + "/15",
                 HttpMethod.GET,
                 request,
                 new ParameterizedTypeReference<>() {
                 });
-        TrainingClass trainingClasses = response.getBody().getData();
+        LanguageClass languageClasses = response.getBody().getData();
 
         // Assert
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(),
@@ -228,85 +228,85 @@ class TrainingClassControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Check editTrainingClass with valid input (PUT)")
+    @DisplayName("Check editLanguageClass with valid input (PUT)")
     @Order(7)
-    void testEditTrainingClassSuccess() throws Exception {
+    void testEditLanguageClassSuccess() throws Exception {
         // Arrange
-        JSONObject updatedTrainingClass = new JSONObject();
-        updatedTrainingClass.put("title", "Updated Title");
-        updatedTrainingClass.put("time", "11:00");
-        updatedTrainingClass.put("description", "Updated Description");
-        updatedTrainingClass.put("category", "French");
-        updatedTrainingClass.put("dayOfWeek", 1);
-        updatedTrainingClass.put("city", "Warsaw");
-        updatedTrainingClass.put("address", "271 Street");
-        updatedTrainingClass.put("postalCode", "V1 712L");
-        updatedTrainingClass.put("province", "MB");
-        updatedTrainingClass.put("country", "Updated Country");
-        updatedTrainingClass.put("totalSpots", 10);
+        JSONObject updatedLanguageClass = new JSONObject();
+        updatedLanguageClass.put("title", "Updated Title");
+        updatedLanguageClass.put("time", "11:00");
+        updatedLanguageClass.put("description", "Updated Description");
+        updatedLanguageClass.put("category", "French");
+        updatedLanguageClass.put("dayOfWeek", 1);
+        updatedLanguageClass.put("city", "Warsaw");
+        updatedLanguageClass.put("address", "271 Street");
+        updatedLanguageClass.put("postalCode", "V1 712L");
+        updatedLanguageClass.put("province", "MB");
+        updatedLanguageClass.put("country", "Updated Country");
+        updatedLanguageClass.put("totalSpots", 10);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(authorizationToken);
 
-        HttpEntity<String> request = new HttpEntity<>(updatedTrainingClass.toString(), headers);
+        HttpEntity<String> request = new HttpEntity<>(updatedLanguageClass.toString(), headers);
 
         // Act
-        ResponseEntity<HttpResponse<ReturnTrainingClass>> response = testRestTemplate.exchange(this.baseUrl + "/1",
+        ResponseEntity<HttpResponse<ReturnLanguageClass>> response = testRestTemplate.exchange(this.baseUrl + "/1",
                 HttpMethod.PUT,
                 request,
                 new ParameterizedTypeReference<>(){});
 
-        ReturnTrainingClass returnTrainingClass = response.getBody().getData();
+        ReturnLanguageClass returnLanguageClass = response.getBody().getData();
 
         // Assert
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
                 "HTTP Status code should be 200");
-        Assertions.assertNotNull(returnTrainingClass.getId(),
+        Assertions.assertNotNull(returnLanguageClass.getId(),
                 "Response should contain UserID in a response header");
-        Assertions.assertEquals(1, returnTrainingClass.getId(),
-                "Size of retrieved training classes seems to be incorrect");
-        Assertions.assertEquals(updatedTrainingClass.get("title"), returnTrainingClass.getTitle(),
-                "Size of retrieved training classes seems to be incorrect");
-        Assertions.assertEquals(updatedTrainingClass.get("description"), returnTrainingClass.getDescription(),
-                "Size of retrieved training classes seems to be incorrect");
-        Assertions.assertEquals(updatedTrainingClass.get("totalSpots"), returnTrainingClass.getTotalSpots(),
-                "Size of retrieved training classes seems to be incorrect");
+        Assertions.assertEquals(1, returnLanguageClass.getId(),
+                "Size of retrieved Language classes seems to be incorrect");
+        Assertions.assertEquals(updatedLanguageClass.get("title"), returnLanguageClass.getTitle(),
+                "Size of retrieved Language classes seems to be incorrect");
+        Assertions.assertEquals(updatedLanguageClass.get("description"), returnLanguageClass.getDescription(),
+                "Size of retrieved Language classes seems to be incorrect");
+        Assertions.assertEquals(updatedLanguageClass.get("totalSpots"), returnLanguageClass.getTotalSpots(),
+                "Size of retrieved Language classes seems to be incorrect");
     }
 
     @Test
-    @DisplayName("Check editTrainingClass with non-existent id (PUT)")
+    @DisplayName("Check editLanguageClass with non-existent id (PUT)")
     @Order(8)
-    void testEditTrainingClassErrorWithNonExistentId() throws Exception {
+    void testEditLanguageClassErrorWithNonExistentId() throws Exception {
         // Arrange
-        JSONObject updatedTrainingClass = new JSONObject();
-        updatedTrainingClass.put("title", "Updated Title");
-        updatedTrainingClass.put("time", "11:00");
-        updatedTrainingClass.put("description", "Updated Description");
-        updatedTrainingClass.put("category", "French");
-        updatedTrainingClass.put("dayOfWeek", 1);
-        updatedTrainingClass.put("city", "Warsaw");
-        updatedTrainingClass.put("address", "271 Street");
-        updatedTrainingClass.put("postalCode", "V1 712L");
-        updatedTrainingClass.put("province", "MB");
-        updatedTrainingClass.put("country", "Updated Country");
-        updatedTrainingClass.put("totalSpots", 10);
+        JSONObject updatedLanguageClass = new JSONObject();
+        updatedLanguageClass.put("title", "Updated Title");
+        updatedLanguageClass.put("time", "11:00");
+        updatedLanguageClass.put("description", "Updated Description");
+        updatedLanguageClass.put("category", "French");
+        updatedLanguageClass.put("dayOfWeek", 1);
+        updatedLanguageClass.put("city", "Warsaw");
+        updatedLanguageClass.put("address", "271 Street");
+        updatedLanguageClass.put("postalCode", "V1 712L");
+        updatedLanguageClass.put("province", "MB");
+        updatedLanguageClass.put("country", "Updated Country");
+        updatedLanguageClass.put("totalSpots", 10);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(authorizationToken);
 
-        HttpEntity<String> request = new HttpEntity<>(updatedTrainingClass.toString(), headers);
+        HttpEntity<String> request = new HttpEntity<>(updatedLanguageClass.toString(), headers);
 
         // Act
-        ResponseEntity<HttpResponse<ReturnTrainingClass>> response = testRestTemplate.exchange(this.baseUrl + "/15",
+        ResponseEntity<HttpResponse<ReturnLanguageClass>> response = testRestTemplate.exchange(this.baseUrl + "/15",
                 HttpMethod.PUT,
                 request,
                 new ParameterizedTypeReference<>(){});
 
-        ReturnTrainingClass returnTrainingClass = response.getBody().getData();
+        ReturnLanguageClass returnLanguageClass = response.getBody().getData();
 
         // Assert
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(),
@@ -314,53 +314,53 @@ class TrainingClassControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Check editTrainingClass with invalid input (PUT)")
+    @DisplayName("Check editLanguageClass with invalid input (PUT)")
     @Order(9)
-    void testEditTrainingClassErrorWithInvalidInput() throws Exception {
+    void testEditLanguageClassErrorWithInvalidInput() throws Exception {
         // Arrange
-        JSONObject updatedTrainingClass = new JSONObject();
-        updatedTrainingClass.put("title", "");
-        updatedTrainingClass.put("time", "11:00");
-        updatedTrainingClass.put("description", "");
-        updatedTrainingClass.put("category", "French");
-        updatedTrainingClass.put("dayOfWeek", 1);
-        updatedTrainingClass.put("city", "Warsaw");
-        updatedTrainingClass.put("address", "271 Street");
-        updatedTrainingClass.put("postalCode", "V1 712L");
-        updatedTrainingClass.put("province", "MB");
-        updatedTrainingClass.put("country", "");
-        updatedTrainingClass.put("totalSpots", 10);
+        JSONObject updatedLanguageClass = new JSONObject();
+        updatedLanguageClass.put("title", "");
+        updatedLanguageClass.put("time", "11:00");
+        updatedLanguageClass.put("description", "");
+        updatedLanguageClass.put("category", "French");
+        updatedLanguageClass.put("dayOfWeek", 1);
+        updatedLanguageClass.put("city", "Warsaw");
+        updatedLanguageClass.put("address", "271 Street");
+        updatedLanguageClass.put("postalCode", "V1 712L");
+        updatedLanguageClass.put("province", "MB");
+        updatedLanguageClass.put("country", "");
+        updatedLanguageClass.put("totalSpots", 10);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(authorizationToken);
 
-        HttpEntity<String> request = new HttpEntity<>(updatedTrainingClass.toString(), headers);
+        HttpEntity<String> request = new HttpEntity<>(updatedLanguageClass.toString(), headers);
 
         // Act
-        ResponseEntity<HttpResponse<ReturnTrainingClass>> response = testRestTemplate.exchange(this.baseUrl + "/1",
+        ResponseEntity<HttpResponse<ReturnLanguageClass>> response = testRestTemplate.exchange(this.baseUrl + "/1",
                 HttpMethod.PUT,
                 request,
                 new ParameterizedTypeReference<>(){});
 
-        ReturnTrainingClass returnTrainingClass = response.getBody().getData();
+        ReturnLanguageClass returnLanguageClass = response.getBody().getData();
 
         // Assert
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(),
                 "HTTP Status code should be 400");
-        Assertions.assertEquals("Title is required", returnTrainingClass.getTitle(),
+        Assertions.assertEquals("Title is required", returnLanguageClass.getTitle(),
                 "Returned user's full name seems to be incorrect");
-        Assertions.assertEquals("Description is required", returnTrainingClass.getDescription(),
+        Assertions.assertEquals("Description is required", returnLanguageClass.getDescription(),
                 "Returned user's full name seems to be incorrect");
-        Assertions.assertEquals("Country is required", returnTrainingClass.getCountry(),
+        Assertions.assertEquals("Country is required", returnLanguageClass.getCountry(),
                 "Returned user's full name seems to be incorrect");
     }
 
     @Test
-    @DisplayName("Check deleteTrainingClass with valid input (DELETE)")
+    @DisplayName("Check deleteLanguageClass with valid input (DELETE)")
     @Order(10)
-    void testDeleteTrainingClassSuccess() {
+    void testDeleteLanguageClassSuccess() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -381,9 +381,9 @@ class TrainingClassControllerIntegrationTest {
         }
 
     @Test
-    @DisplayName("Check deleteTrainingClass with non-existent id (DELETE)")
+    @DisplayName("Check deleteLanguageClass with non-existent id (DELETE)")
     @Order(11)
-    void testDeleteTrainingClassErrorWithNonExistentId() {
+    void testDeleteLanguageClassErrorWithNonExistentId() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -404,9 +404,9 @@ class TrainingClassControllerIntegrationTest {
      }
 
     @Test
-    @DisplayName("Check attendTrainingClass with valid input (POST)")
+    @DisplayName("Check attendLanguageClass with valid input (POST)")
     @Order(12)
-    void testAttendTrainingClassSuccess() {
+    void testAttendLanguageClassSuccess() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -427,9 +427,9 @@ class TrainingClassControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Check attendTrainingClass with non-existent id (POST)")
+    @DisplayName("Check attendLanguageClass with non-existent id (POST)")
     @Order(13)
-    void testAttendTrainingClassErrorWithNonExistentId() {
+    void testAttendLanguageClassErrorWithNonExistentId() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -450,9 +450,9 @@ class TrainingClassControllerIntegrationTest {
         }
 
     @Test
-    @DisplayName("Check attendTrainingClass already attending (POST)")
+    @DisplayName("Check attendLanguageClass already attending (POST)")
     @Order(14)
-    void testAttendTrainingClassErrorAlreadyAttending() {
+    void testAttendLanguageClassErrorAlreadyAttending() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -473,9 +473,9 @@ class TrainingClassControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Check abandonTrainingClass with valid input (DELETE)")
+    @DisplayName("Check abandonLanguageClass with valid input (DELETE)")
     @Order(15)
-    void testAbandonTrainingClassSuccess() {
+    void testAbandonLanguageClassSuccess() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -496,9 +496,9 @@ class TrainingClassControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Check abandonTrainingClass with non-existent id (DELETE)")
+    @DisplayName("Check abandonLanguageClass with non-existent id (DELETE)")
     @Order(16)
-    void testAbandonTrainingClassErrorWithNonExistentId() {
+    void testAbandonLanguageClassErrorWithNonExistentId() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -519,9 +519,9 @@ class TrainingClassControllerIntegrationTest {
         }
 
     @Test
-    @DisplayName("Check abandonTrainingClass not attending (DELETE)")
+    @DisplayName("Check abandonLanguageClass not attending (DELETE)")
     @Order(17)
-    void testAttendTrainingClassErrorNotAttending() {
+    void testAttendLanguageClassErrorNotAttending() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -542,9 +542,9 @@ class TrainingClassControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Check abandonTrainingClass hosted (DELETE)")
+    @DisplayName("Check abandonLanguageClass hosted (DELETE)")
     @Order(18)
-    void testAttendTrainingClassErrorHosted() throws Exception {
+    void testAttendLanguageClassErrorHosted() throws Exception {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

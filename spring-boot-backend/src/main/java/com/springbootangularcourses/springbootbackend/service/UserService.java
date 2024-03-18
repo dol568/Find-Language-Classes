@@ -19,9 +19,9 @@ public interface UserService {
 
     User updateProfile(ProfileDTO profileDTO, String userName, String email);
 
-    void followUser(String userName, String email);
+    User followUser(String userName, String email);
 
-    void unfollowUser(String userName, String email);
+    User unfollowUser(String userName, String email);
 
     User authenticate(LoginDTO request);
 

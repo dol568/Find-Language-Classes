@@ -1,8 +1,8 @@
 package com.springbootangularcourses.springbootbackend.chat;
 
 import com.springbootangularcourses.springbootbackend.domain.ChatRoomUser;
-import com.springbootangularcourses.springbootbackend.domain.TrainingClass;
-import com.springbootangularcourses.springbootbackend.service.TrainingClassServiceImpl;
+import com.springbootangularcourses.springbootbackend.domain.LanguageClass;
+import com.springbootangularcourses.springbootbackend.service.LanguageClassServiceImpl;
 import com.springbootangularcourses.springbootbackend.service.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -15,7 +15,7 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 @RequiredArgsConstructor
 public class WebSocketEvents {
 
-    private final TrainingClassServiceImpl trainingClassService;
+    private final LanguageClassServiceImpl LanguageClassService;
     private final UserServiceImpl userService;
 
     @EventListener
@@ -26,17 +26,17 @@ public class WebSocketEvents {
         ChatRoomUser joiningUser = new ChatRoomUser(event.getUser().getName());
         joiningUser.setFullName(userService.findByEmail(event.getUser().getName()).getFullName());
 
-        trainingClassService.join(joiningUser, trainingClassService.getTrainingClass(Long.valueOf(chatRoomId)));
+        LanguageClassService.join(joiningUser, LanguageClassService.getLanguageClass(Long.valueOf(chatRoomId)));
     }
 
     @EventListener
     private void handleSessionDisconnect(SessionDisconnectEvent event) {
         SimpMessageHeaderAccessor headers = SimpMessageHeaderAccessor.wrap(event.getMessage());
         String chatRoomId = headers.getSessionAttributes().get("chatRoomId").toString();
-        TrainingClass trainingClass = trainingClassService.getTrainingClass(Long.valueOf(chatRoomId));
-        ChatRoomUser leavingUser = trainingClass.getConnectedUsers().stream()
+        LanguageClass languageClass = LanguageClassService.getLanguageClass(Long.valueOf(chatRoomId));
+        ChatRoomUser leavingUser = languageClass.getConnectedUsers().stream()
                 .filter(user -> user.getUsername().equals(event.getUser().getName())).findFirst().orElse(null);
 
-        trainingClassService.leave(leavingUser, trainingClass);
+        LanguageClassService.leave(leavingUser, languageClass);
     }
 }

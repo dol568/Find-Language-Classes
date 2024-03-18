@@ -22,7 +22,7 @@ public class ReturnProfile {
     private String username;
     private String bio;
     private String photoUrl;
-    private List<ReturnProfileTrainingClass> profileTrainingClasses;
+    private List<ReturnProfileLanguageClass> profileLanguageClasses;
     private List<ReturnUserFollowing> followings;
     private List<ReturnUserFollowing> followers;
 }

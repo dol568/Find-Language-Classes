@@ -1,15 +1,15 @@
-package com.springbootangularcourses.springbootbackend.training_class;
+package com.springbootangularcourses.springbootbackend.Language_class;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.springbootangularcourses.springbootbackend.domain.TrainingClass;
-import com.springbootangularcourses.springbootbackend.resource.TrainingClassController;
-import com.springbootangularcourses.springbootbackend.service.TrainingClassService;
+import com.springbootangularcourses.springbootbackend.domain.LanguageClass;
+import com.springbootangularcourses.springbootbackend.resource.LanguageClassController;
+import com.springbootangularcourses.springbootbackend.service.LanguageClassService;
 import com.springbootangularcourses.springbootbackend.system.exceptions.CustomResponseEntityExceptionHandler;
 import com.springbootangularcourses.springbootbackend.system.exceptions.ObjectNotFoundException;
-import com.springbootangularcourses.springbootbackend.utils.converter.TrainingClassToReturnTrainingClassConverter;
-import com.springbootangularcourses.springbootbackend.utils.converter.TrainingClassesToReturnTrainingClassesConverter;
-import com.springbootangularcourses.springbootbackend.domain.dto.ReturnTrainingClass;
-import com.springbootangularcourses.springbootbackend.domain.dto.TrainingClassDTO;
+import com.springbootangularcourses.springbootbackend.utils.converter.LanguageClassToReturnLanguageClassConverter;
+import com.springbootangularcourses.springbootbackend.utils.converter.LanguageClassesToReturnLanguageClassesConverter;
+import com.springbootangularcourses.springbootbackend.domain.dto.ReturnLanguageClass;
+import com.springbootangularcourses.springbootbackend.domain.dto.LanguageClassDTO;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,21 +35,21 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @WebMvcTest(excludeAutoConfiguration = SecurityAutoConfiguration.class)
-@ContextConfiguration(classes = TrainingClassController.class)
+@ContextConfiguration(classes = LanguageClassController.class)
 @Import(CustomResponseEntityExceptionHandler.class)
-class TrainingClassControllerTest {
+class LanguageClassControllerTest {
 
     @Autowired
     MockMvc mockMvc;
 
     @MockBean
-    TrainingClassService trainingClassService;
+    LanguageClassService languageClassService;
 
     @MockBean
-    TrainingClassToReturnTrainingClassConverter trainingClassToReturnTrainingClass;
+    LanguageClassToReturnLanguageClassConverter LanguageClassToReturnLanguageClass;
 
     @MockBean
-    TrainingClassesToReturnTrainingClassesConverter trainingClassesToReturnTrainingClassesConverter;
+    LanguageClassesToReturnLanguageClassesConverter LanguageClassesToReturnLanguageClassesConverter;
 
     @MockBean
     Principal mockPrincipal;
@@ -57,21 +57,21 @@ class TrainingClassControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    String baseUrl = "/api/trainingClasses";
+    String baseUrl = "/api/LanguageClasses";
 
     ModelMapper modelMapper;
 
-    List<TrainingClass> trainingClasses;
-    List<ReturnTrainingClass> returnTrainingClasses;
+    List<LanguageClass> languageClasses;
+    List<ReturnLanguageClass> returnLanguageClasses;
 
-    ReturnTrainingClass tcr1;
-    ReturnTrainingClass tcr2;
-    TrainingClass tc1;
-    TrainingClass tc2;
+    ReturnLanguageClass tcr1;
+    ReturnLanguageClass tcr2;
+    LanguageClass tc1;
+    LanguageClass tc2;
 
     @BeforeEach
     void setUp() {
-        this.tc1 = new TrainingClass();
+        this.tc1 = new LanguageClass();
         this.tc1.setId(1L);
         this.tc1.setTitle("Beginner English Class");
         this.tc1.setTime("11:00");
@@ -85,7 +85,7 @@ class TrainingClassControllerTest {
         this.tc1.setCountry("Poland");
         this.tc1.setTotalSpots(20);
 
-        this.tc2 = new TrainingClass();
+        this.tc2 = new LanguageClass();
         this.tc2.setId(2L);
         this.tc2.setTitle("Beginner French Class");
         this.tc2.setTime("14:00");
@@ -100,14 +100,14 @@ class TrainingClassControllerTest {
         this.tc2.setTotalSpots(15);
 
         modelMapper = new ModelMapper();
-        this.trainingClasses = new ArrayList<>();
-        this.returnTrainingClasses = new ArrayList<>();
-        this.trainingClasses.add(tc1);
-        this.trainingClasses.add(tc2);
-        tcr1 = modelMapper.map(tc1, ReturnTrainingClass.class);
-        tcr2 = modelMapper.map(tc2, ReturnTrainingClass.class);
-        this.returnTrainingClasses.add(tcr1);
-        this.returnTrainingClasses.add(tcr2);
+        this.languageClasses = new ArrayList<>();
+        this.returnLanguageClasses = new ArrayList<>();
+        this.languageClasses.add(tc1);
+        this.languageClasses.add(tc2);
+        tcr1 = modelMapper.map(tc1, ReturnLanguageClass.class);
+        tcr2 = modelMapper.map(tc2, ReturnLanguageClass.class);
+        this.returnLanguageClasses.add(tcr1);
+        this.returnLanguageClasses.add(tcr2);
     }
 
     @AfterEach
@@ -115,19 +115,19 @@ class TrainingClassControllerTest {
     }
 
     @Test
-    void testGetTrainingClassesSuccess() throws Exception {
+    void testGetLanguageClassesSuccess() throws Exception {
         // Given
-        given(this.trainingClassService.getAllTrainingClasses()).willReturn(this.trainingClasses);
-        given(this.trainingClassesToReturnTrainingClassesConverter.convert(this.trainingClasses))
-                .willReturn(this.returnTrainingClasses);
+        given(this.languageClassService.getAllLanguageClasses()).willReturn(this.languageClasses);
+        given(this.LanguageClassesToReturnLanguageClassesConverter.convert(this.languageClasses))
+                .willReturn(this.returnLanguageClasses);
 
         // When and then
         this.mockMvc.perform(get(this.baseUrl)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.statusCode").value(200))
-                .andExpect(jsonPath("$.message").value("Training classes retrieved"))
-                .andExpect(jsonPath("$.data", Matchers.hasSize(this.trainingClasses.size())))
+                .andExpect(jsonPath("$.message").value("Language classes retrieved"))
+                .andExpect(jsonPath("$.data", Matchers.hasSize(this.languageClasses.size())))
                 .andExpect(jsonPath("$.data[0].id").value(1L))
                 .andExpect(jsonPath("$.data[0].title").value("Beginner English Class"))
                 .andExpect(jsonPath("$.data[1].id").value(2L))
@@ -135,50 +135,50 @@ class TrainingClassControllerTest {
     }
 
     @Test
-    void testGetTrainingClassSuccess() throws Exception {
+    void testGetLanguageClassSuccess() throws Exception {
 
         // Given
-        given(this.trainingClassService.getTrainingClass(1L)).willReturn(this.trainingClasses.get(0));
-        given(this.trainingClassToReturnTrainingClass.convert(this.trainingClasses.get(0))).willReturn(tcr1);
+        given(this.languageClassService.getLanguageClass(1L)).willReturn(this.languageClasses.get(0));
+        given(this.LanguageClassToReturnLanguageClass.convert(this.languageClasses.get(0))).willReturn(tcr1);
 
         // When and then
         this.mockMvc.perform(get(this.baseUrl + "/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.statusCode").value(200))
-                .andExpect(jsonPath("$.message").value("Training class with id '1' retrieved"))
+                .andExpect(jsonPath("$.message").value("Language class with id '1' retrieved"))
                 .andExpect(jsonPath("$.data.id").value(1L))
                 .andExpect(jsonPath("$.data.title").value("Beginner English Class"));
     }
 
     @Test
-    void testGetTrainingClassNotFound() throws Exception {
+    void testGetLanguageClassNotFound() throws Exception {
         // Given
-        given(this.trainingClassService.getTrainingClass(1L))
-                .willThrow(new ObjectNotFoundException("training class", 1L));
+        given(this.languageClassService.getLanguageClass(1L))
+                .willThrow(new ObjectNotFoundException("Language class", 1L));
 
         // When and then
         this.mockMvc.perform(get(this.baseUrl + "/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value("NOT_FOUND"))
                 .andExpect(jsonPath("$.statusCode").value(404))
-                .andExpect(jsonPath("$.message").value("Could not find training class with Id 1"));
+                .andExpect(jsonPath("$.message").value("Could not find Language class with Id 1"));
     }
 
     @Test
-    void testAddTrainingClassSuccess() throws Exception {
+    void testAddLanguageClassSuccess() throws Exception {
         // Given
-        TrainingClassDTO tcDTO = modelMapper.map(tc1, TrainingClassDTO.class);
+        LanguageClassDTO tcDTO = modelMapper.map(tc1, LanguageClassDTO.class);
 
         String json = this.objectMapper.writeValueAsString(tcDTO);
 
         given(mockPrincipal.getName()).willReturn("me");
 
-        given(this.trainingClassService
-                .saveTrainingClass(Mockito.any(TrainingClassDTO.class), Mockito.any(String.class)))
+        given(this.languageClassService
+                .saveLanguageClass(Mockito.any(LanguageClassDTO.class), Mockito.any(String.class)))
                 .willReturn(tc1);
 
-        given(this.trainingClassToReturnTrainingClass.convert(tc1)).willReturn(tcr1);
+        given(this.LanguageClassToReturnLanguageClass.convert(tc1)).willReturn(tcr1);
 
         // When and then
         this.mockMvc.perform(post(this.baseUrl)
@@ -188,7 +188,7 @@ class TrainingClassControllerTest {
                         .principal(mockPrincipal))
                 .andExpect(jsonPath("$.status").value("CREATED"))
                 .andExpect(jsonPath("$.statusCode").value(201))
-                .andExpect(jsonPath("$.message").value("Training class created"))
+                .andExpect(jsonPath("$.message").value("Language class created"))
                 .andExpect(jsonPath("$.data.id").isNotEmpty())
                 .andExpect(jsonPath("$.data.title").value(tcDTO.getTitle()))
                 .andExpect(jsonPath("$.data.description").value(tcDTO.getDescription()))
@@ -196,9 +196,9 @@ class TrainingClassControllerTest {
     }
 
     @Test
-    void testEditTrainingClassSuccess() throws Exception {
+    void testEditLanguageClassSuccess() throws Exception {
         // Given
-        TrainingClassDTO tcDTO = new TrainingClassDTO();
+        LanguageClassDTO tcDTO = new LanguageClassDTO();
         tcDTO.setTitle("Beginner English Class Updated");
         tcDTO.setTime("15:00");
         tcDTO.setDescription("Class for beginners");
@@ -211,15 +211,15 @@ class TrainingClassControllerTest {
         tcDTO.setCountry("Poland");
         tcDTO.setTotalSpots(20);
 
-        TrainingClass update = modelMapper.map(tcDTO, TrainingClass.class);
+        LanguageClass update = modelMapper.map(tcDTO, LanguageClass.class);
         update.setId(1L);
 
-        ReturnTrainingClass rtc1 = modelMapper.map(update, ReturnTrainingClass.class);
+        ReturnLanguageClass rtc1 = modelMapper.map(update, ReturnLanguageClass.class);
 
         String json = this.objectMapper.writeValueAsString(tcDTO);
 
-        given(this.trainingClassService.editTrainingClass(Mockito.any(TrainingClassDTO.class), eq(1L))).willReturn(update);
-        given(this.trainingClassToReturnTrainingClass.convert(Mockito.any(TrainingClass.class)))
+        given(this.languageClassService.editLanguageClass(Mockito.any(LanguageClassDTO.class), eq(1L))).willReturn(update);
+        given(this.LanguageClassToReturnLanguageClass.convert(Mockito.any(LanguageClass.class)))
                 .willReturn(rtc1);
 
         // When and then
@@ -229,7 +229,7 @@ class TrainingClassControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.statusCode").value(200))
-                .andExpect(jsonPath("$.message").value("Training class updated"))
+                .andExpect(jsonPath("$.message").value("Language class updated"))
                 .andExpect(jsonPath("$.data.id").isNotEmpty())
                 .andExpect(jsonPath("$.data.title").value(tcDTO.getTitle()))
                 .andExpect(jsonPath("$.data.description").value(tcDTO.getDescription()))
@@ -237,9 +237,9 @@ class TrainingClassControllerTest {
     }
 
     @Test
-    void testEditTrainingClassErrorWithNonExistentId() throws Exception {
+    void testEditLanguageClassErrorWithNonExistentId() throws Exception {
         // Given
-        TrainingClassDTO tcDTO = new TrainingClassDTO();
+        LanguageClassDTO tcDTO = new LanguageClassDTO();
         tcDTO.setTitle("Beginner English Class Updated");
         tcDTO.setTime("15:00");
         tcDTO.setDescription("Class for beginners");
@@ -254,8 +254,8 @@ class TrainingClassControllerTest {
 
         String json = this.objectMapper.writeValueAsString(tcDTO);
 
-        given(this.trainingClassService.editTrainingClass(Mockito.any(TrainingClassDTO.class), eq(1L)))
-                .willThrow(new ObjectNotFoundException("training class", 1L));
+        given(this.languageClassService.editLanguageClass(Mockito.any(LanguageClassDTO.class), eq(1L)))
+                .willThrow(new ObjectNotFoundException("Language class", 1L));
 
         // When and then
         this.mockMvc.perform(put(this.baseUrl + "/1")
@@ -264,35 +264,35 @@ class TrainingClassControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value("NOT_FOUND"))
                 .andExpect(jsonPath("$.statusCode").value(404))
-                .andExpect(jsonPath("$.message").value("Could not find training class with Id 1"));
+                .andExpect(jsonPath("$.message").value("Could not find Language class with Id 1"));
     }
 
     @Test
-    void testDeleteTrainingClassSuccess() throws Exception {
+    void testDeleteLanguageClassSuccess() throws Exception {
         // Given
-        doNothing().when(this.trainingClassService).deleteTrainingClass(1L);
+        doNothing().when(this.languageClassService).deleteLanguageClass(1L);
 
         // When and then
         this.mockMvc.perform(delete(this.baseUrl + "/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.statusCode").value(200))
-                .andExpect(jsonPath("$.message").value("Training class deleted"))
+                .andExpect(jsonPath("$.message").value("Language class deleted"))
                 .andExpect(jsonPath("$.data").doesNotExist());
     }
 
     @Test
-    void testDeleteTrainingClassErrorWithNonExistentId() throws Exception {
+    void testDeleteLanguageClassErrorWithNonExistentId() throws Exception {
         // Given
-        doThrow(new ObjectNotFoundException("training class", 1L))
-                .when(this.trainingClassService).deleteTrainingClass(1L);
+        doThrow(new ObjectNotFoundException("Language class", 1L))
+                .when(this.languageClassService).deleteLanguageClass(1L);
 
         // When and then
         this.mockMvc.perform(delete(this.baseUrl + "/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value("NOT_FOUND"))
                 .andExpect(jsonPath("$.statusCode").value(404))
-                .andExpect(jsonPath("$.message").value("Could not find training class with Id 1"));
+                .andExpect(jsonPath("$.message").value("Could not find Language class with Id 1"));
     }
 
     @Test
@@ -300,7 +300,7 @@ class TrainingClassControllerTest {
         // Given
         given(mockPrincipal.getName()).willReturn("me");
 
-        doNothing().when(this.trainingClassService).attendClass(eq(1L), Mockito.any(String.class));
+        doNothing().when(this.languageClassService).attendClass(eq(1L), Mockito.any(String.class));
 
         // When and then
         this.mockMvc.perform(post(this.baseUrl + "/1/attend")
@@ -308,7 +308,7 @@ class TrainingClassControllerTest {
                         .principal(mockPrincipal))
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.statusCode").value(200))
-                .andExpect(jsonPath("$.message").value("Training class attended"))
+                .andExpect(jsonPath("$.message").value("Language class attended"))
                 .andExpect(jsonPath("$.data").doesNotExist());
     }
 
@@ -317,8 +317,8 @@ class TrainingClassControllerTest {
         // Given
         given(mockPrincipal.getName()).willReturn("me");
 
-        doThrow(new ObjectNotFoundException("training class", 1L))
-                .when(this.trainingClassService).attendClass(eq(1L), Mockito.any(String.class));
+        doThrow(new ObjectNotFoundException("Language class", 1L))
+                .when(this.languageClassService).attendClass(eq(1L), Mockito.any(String.class));
 
         // When and then
         this.mockMvc.perform(post(this.baseUrl + "/1/attend")
@@ -326,7 +326,7 @@ class TrainingClassControllerTest {
                         .principal(mockPrincipal))
                 .andExpect(jsonPath("$.status").value("NOT_FOUND"))
                 .andExpect(jsonPath("$.statusCode").value(404))
-                .andExpect(jsonPath("$.message").value("Could not find training class with Id 1"));
+                .andExpect(jsonPath("$.message").value("Could not find Language class with Id 1"));
     }
 
     @Test
@@ -334,7 +334,7 @@ class TrainingClassControllerTest {
         // Given
         given(mockPrincipal.getName()).willReturn("me");
 
-        doNothing().when(this.trainingClassService)
+        doNothing().when(this.languageClassService)
                 .abandonClass(eq(1L), Mockito.any(String.class));
 
         // When and then
@@ -343,7 +343,7 @@ class TrainingClassControllerTest {
                         .principal(mockPrincipal))
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.statusCode").value(200))
-                .andExpect(jsonPath("$.message").value("Training class abandoned"))
+                .andExpect(jsonPath("$.message").value("Language class abandoned"))
                 .andExpect(jsonPath("$.data").doesNotExist());
     }
 
@@ -352,8 +352,8 @@ class TrainingClassControllerTest {
         // Given
         given(mockPrincipal.getName()).willReturn("me");
 
-        doThrow(new ObjectNotFoundException("training class", 1L))
-                .when(this.trainingClassService)
+        doThrow(new ObjectNotFoundException("Language class", 1L))
+                .when(this.languageClassService)
                 .abandonClass(eq(1L), Mockito.any(String.class));
 
         // When and then
@@ -362,6 +362,6 @@ class TrainingClassControllerTest {
                         .principal(mockPrincipal))
                 .andExpect(jsonPath("$.status").value("NOT_FOUND"))
                 .andExpect(jsonPath("$.statusCode").value(404))
-                .andExpect(jsonPath("$.message").value("Could not find training class with Id 1"));
+                .andExpect(jsonPath("$.message").value("Could not find Language class with Id 1"));
     }
 }

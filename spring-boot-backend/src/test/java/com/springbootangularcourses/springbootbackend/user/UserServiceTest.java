@@ -276,7 +276,8 @@ class UserServiceTest {
         assertThat(user2.getFollowers().size()).isEqualTo(1);
         verify(this.userRepository, times(1)).findByEmail("joe@gmail.com");
         verify(this.userRepository, times(1)).findByUserName("thomyorke123");
-        verify(this.userRepository, times(1)).saveAll(List.of(user1, user2));
+        verify(this.userRepository, times(1)).save(user1);
+        verify(this.userRepository, times(1)).save(user2);
     }
 
     @Test
@@ -378,7 +379,8 @@ class UserServiceTest {
         assertThat(user2.getFollowers().size()).isEqualTo(0);
         verify(this.userRepository, times(1)).findByEmail("joe@gmail.com");
         verify(this.userRepository, times(1)).findByUserName("thomyorke123");
-        verify(this.userRepository, times(1)).saveAll(List.of(user1, user2));
+        verify(this.userRepository, times(1)).save(user1);
+        verify(this.userRepository, times(1)).save(user2);
     }
 
     @Test
