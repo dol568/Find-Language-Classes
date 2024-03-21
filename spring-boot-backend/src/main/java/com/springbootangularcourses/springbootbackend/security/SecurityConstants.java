@@ -8,5 +8,4 @@ public class SecurityConstants {
     public static final String TOKEN_CANNOT_BE_VERIFIED = "Token cannot be verified";
     public static final String TOKEN_REQUIRED = "Token is required";
     public static final String SUBJECT_REQUIRED = "Subject is required";
-    public static final String HEADER_STRING = "Authorization";
 }

@@ -2,7 +2,6 @@ package com.springbootangularcourses.springbootbackend.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.springbootangularcourses.springbootbackend.domain.TrainingClass;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,8 +33,7 @@ public class ChatRoomUser {
     }
 
     @ManyToOne()
-    @JoinColumn(name = "training_class")
+    @JoinColumn(name = "language_class")
     @JsonIgnore
-    private TrainingClass trainingClass;
-
+    private LanguageClass languageClass;
 }

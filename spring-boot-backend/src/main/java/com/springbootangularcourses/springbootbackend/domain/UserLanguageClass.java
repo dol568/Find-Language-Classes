@@ -1,5 +1,6 @@
 package com.springbootangularcourses.springbootbackend.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
@@ -20,25 +21,37 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 @Getter
 @Setter
 @JsonInclude(NON_DEFAULT)
-public class Comment {
+public class UserLanguageClass {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String body;
-    private Date createdAt;
+    @JsonFormat(pattern = "yyyy-mm-dd")
+    @Column(updatable = false)
+    private Date dateJoined;
+    private boolean isHost;
 
     @ManyToOne()
-    @JoinColumn(name = "author_user")
+    @JoinColumn(name = "USER")
     @JsonIgnore
-    private User author;
+    private User user;
 
     @ManyToOne()
-    @JoinColumn(name = "language_class")
+    @JoinColumn(name = "Language_class")
     @JsonIgnore
     private LanguageClass languageClass;
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = new Date();
+        this.dateJoined = new Date();
+    }
+
+    public void removeFromUser() {
+        this.user.getUserLanguageClasses().remove(this);
+        this.user = null;
+    }
+
+    public void removeFromLanguageClass() {
+        this.languageClass.getUserLanguageClasses().remove(this);
+        this.languageClass = null;
     }
 }

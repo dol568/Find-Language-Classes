@@ -202,7 +202,7 @@ class AuthControllerIntegrationTest {
                 "Returned user's full name seems to be incorrect");
         Assertions.assertTrue(Arrays.asList("Password is required", "Password must be at least 8 characters in length.,Password must contain at least 1 uppercase characters.,Password must contain at least 1 lowercase characters.,Password must contain at least 1 digit characters.,Password must contain at least 1 special characters.").contains(user.getPassword()),
                 "Returned user's bio seems to be incorrect");
-        Assertions.assertTrue(Arrays.asList("Full name is required", "Full name must have between 8-45 characters").contains(user.getFullName()),
+        Assertions.assertTrue(Arrays.asList("Full name is required", "Full name must have between 2-45 characters").contains(user.getFullName()),
                 "Returned user's bio seems to be incorrect");
     }
 

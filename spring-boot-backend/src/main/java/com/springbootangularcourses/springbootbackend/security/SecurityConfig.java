@@ -39,7 +39,7 @@ public class SecurityConfig {
     private final JWTAuthorizationFilter jwtAuthorizationFilter;
     private final JWTForbiddenEntryPoint jwtForbiddenEntryPoint;
     private final PasswordEncoder passwordEncoder;
-    private final SpaWebFilter spaWebFilter;
+//    private final SpaWebFilter spaWebFilter;
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -65,10 +65,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers("/h2-console/**", "/favicon.ico", "*.png", "*.gif", "*.svg",
                                 "*.jpg", "*.html", "*.css", "*.js", "/static/**", "/api/login",
-                                "/api/register", "/", "/ws/**", "ws", "ws/**", "/assets/**").permitAll()
+                                "/api/register", "/", "/assets/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(spaWebFilter, BasicAuthenticationFilter.class)
+//                .addFilterAfter(spaWebFilter, BasicAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtForbiddenEntryPoint))
                 .exceptionHandling(exception -> exception.accessDeniedHandler(jwtAccessDeniedHandler))
                 .authenticationProvider(authenticationProvider())

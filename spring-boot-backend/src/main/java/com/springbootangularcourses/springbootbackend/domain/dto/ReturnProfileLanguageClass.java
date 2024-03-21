@@ -5,18 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReturnComment {
+public class ReturnProfileLanguageClass {
+
     private Long id;
-    private Date createdAt;
-    private String body;
-    private String userName;
-    private String fullName;
-    private String image;
-    private String languageClassId;
+    private String category;
+    private int dayOfWeek;
+    private String time;
+    private String title;
+    private String hostUserName;
 }

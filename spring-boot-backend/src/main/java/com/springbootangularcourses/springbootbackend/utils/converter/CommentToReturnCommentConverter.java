@@ -18,7 +18,7 @@ public class CommentToReturnCommentConverter implements Converter<Comment, Retur
         returnComment.setUserName(source.getAuthor().getUserName());
         returnComment.setFullName(source.getAuthor().getFullName());
         returnComment.setCreatedAt(source.getCreatedAt());
-        returnComment.setTrainingClassId(String.valueOf(source.getTrainingClass().getId()));
+        returnComment.setLanguageClassId(String.valueOf(source.getLanguageClass().getId()));
 
         return returnComment;
     }

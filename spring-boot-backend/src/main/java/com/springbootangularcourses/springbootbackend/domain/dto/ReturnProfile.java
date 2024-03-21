@@ -16,13 +16,12 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 @AllArgsConstructor
 @JsonInclude(NON_DEFAULT)
 public class ReturnProfile {
-
     private String id;
     private String fullName;
     private String username;
     private String bio;
     private String photoUrl;
-    private List<ReturnProfileTrainingClass> profileTrainingClasses;
+    private List<ReturnProfileLanguageClass> profileLanguageClasses;
     private List<ReturnUserFollowing> followings;
     private List<ReturnUserFollowing> followers;
 }

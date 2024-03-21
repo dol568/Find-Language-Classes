@@ -1,10 +1,10 @@
 package com.springbootangularcourses.springbootbackend.utils.converter;
 
-import com.springbootangularcourses.springbootbackend.domain.UserTrainingClass;
+import com.springbootangularcourses.springbootbackend.domain.UserLanguageClass;
 import com.springbootangularcourses.springbootbackend.domain.User;
 import com.springbootangularcourses.springbootbackend.service.UserServiceImpl;
 import com.springbootangularcourses.springbootbackend.domain.dto.ReturnProfile;
-import com.springbootangularcourses.springbootbackend.domain.dto.ReturnProfileTrainingClass;
+import com.springbootangularcourses.springbootbackend.domain.dto.ReturnProfileLanguageClass;
 import com.springbootangularcourses.springbootbackend.domain.dto.ReturnUserFollowing;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.converter.Converter;
@@ -23,22 +23,22 @@ public class UserToReturnProfileConverter implements Converter<User, ReturnProfi
     @Override
     public ReturnProfile convert(User user) {
 
-        List<ReturnProfileTrainingClass> profileTrainingClasses = new ArrayList<>();
+        List<ReturnProfileLanguageClass> profileLanguageClasses = new ArrayList<>();
 
-        if (user.getUserTrainingClasses() != null) {
+        if (user.getUserLanguageClasses() != null) {
 
-            user.getUserTrainingClasses().forEach(tc -> {
-                ReturnProfileTrainingClass returnProfileTrainingClass = new ReturnProfileTrainingClass();
-                returnProfileTrainingClass.setId(tc.getTrainingClass().getId());
-                returnProfileTrainingClass.setTime(tc.getTrainingClass().getTime());
-                returnProfileTrainingClass.setCategory(tc.getTrainingClass().getCategory());
-                returnProfileTrainingClass.setTitle(tc.getTrainingClass().getTitle());
-                returnProfileTrainingClass.setDayOfWeek(tc.getTrainingClass().getDayOfWeek());
-                Optional<UserTrainingClass> findHosted = tc.getTrainingClass()
-                        .getUserTrainingClasses().stream().filter(UserTrainingClass::isHost).findFirst();
-                findHosted.ifPresent(userTrainingClass ->
-                        returnProfileTrainingClass.setHostUserName(userTrainingClass.getUser().getUserName()));
-                profileTrainingClasses.add(returnProfileTrainingClass);
+            user.getUserLanguageClasses().forEach(tc -> {
+                ReturnProfileLanguageClass returnProfileLanguageClass = new ReturnProfileLanguageClass();
+                returnProfileLanguageClass.setId(tc.getLanguageClass().getId());
+                returnProfileLanguageClass.setTime(tc.getLanguageClass().getTime());
+                returnProfileLanguageClass.setCategory(tc.getLanguageClass().getCategory());
+                returnProfileLanguageClass.setTitle(tc.getLanguageClass().getTitle());
+                returnProfileLanguageClass.setDayOfWeek(tc.getLanguageClass().getDayOfWeek());
+                Optional<UserLanguageClass> findHosted = tc.getLanguageClass()
+                        .getUserLanguageClasses().stream().filter(UserLanguageClass::isHost).findFirst();
+                findHosted.ifPresent(userLanguageClass ->
+                        returnProfileLanguageClass.setHostUserName(userLanguageClass.getUser().getUserName()));
+                profileLanguageClasses.add(returnProfileLanguageClass);
             });
         }
 
@@ -76,7 +76,7 @@ public class UserToReturnProfileConverter implements Converter<User, ReturnProfi
         returnProfile.setBio(user.getBio());
         returnProfile.setFollowings(followings);
         returnProfile.setFollowers(followers);
-        returnProfile.setProfileTrainingClasses(profileTrainingClasses);
+        returnProfile.setProfileLanguageClasses(profileLanguageClasses);
 
         return returnProfile;
     }

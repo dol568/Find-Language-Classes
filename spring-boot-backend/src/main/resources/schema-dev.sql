@@ -1,10 +1,10 @@
 DROP TABLE if EXISTS comment;
 DROP TABLE if EXISTS `role`;
-DROP TABLE if EXISTS training_class;
+DROP TABLE if EXISTS language_class;
 DROP TABLE if EXISTS `user`;
 DROP TABLE if EXISTS user_following;
 DROP TABLE if EXISTS users_roles;
-DROP TABLE if EXISTS user_training_class;
+DROP TABLE if EXISTS user_language_class;
 
 DROP TABLE if EXISTS chat_room_user;
 
@@ -13,7 +13,7 @@ CREATE TABLE chat_room_user
     date_joined    datetime(6),
     username       varchar(255),
     full_name      varchar(255),
-    training_class bigint,
+    language_class bigint,
     primary key (username)
 );
 
@@ -22,7 +22,7 @@ CREATE TABLE comment
     author_user    varchar(255),
     created_at     datetime(6),
     id             bigint not null auto_increment,
-    training_class bigint,
+    language_class bigint,
     body           varchar(255),
     primary key (id)
 );
@@ -34,7 +34,7 @@ CREATE TABLE `role`
     primary key (id)
 );
 
-CREATE TABLE training_class
+CREATE TABLE language_class
 (
     day_of_week integer not null,
     total_spots integer not null,
@@ -79,11 +79,11 @@ CREATE TABLE users_roles
     primary key (role_id, user_id)
 );
 
-CREATE TABLE `user_training_class`
+CREATE TABLE `user_language_class`
 (
     is_host        bit    not null,
     date_joined    datetime(6),
     id             bigint not null primary key auto_increment,
-    training_class bigint,
+    language_class bigint,
     `user`         varchar(255)
 );
