@@ -43,25 +43,13 @@ public class UserServiceImpl implements UserService {
     private final CustomUserDetailsService customUserDetailsService;
 
     @Override
-    public User saveUser(User newUser) {
-        checkDuplicateEmail(newUser.getEmail(), newUser.getUserName());
-        setUserDetails(newUser);
-        encodePassword(newUser);
-
-        return this.userRepository.save(newUser);
-    }
-
-    private void encodePassword(User newUser) {
-        String encodedPassword = this.passwordEncoder.encode(newUser.getPassword());
-        newUser.setPassword(encodedPassword);
-    }
-
-    private void setUserDetails(User newUser) {
-        newUser.setEnabled(true);
-        newUser.setNonLocked(true);
+    @Transactional(readOnly = true)
+    public List<User> getAllUsers() {
+        return this.userRepository.findAll();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public User findByEmail(String email) {
         User user = this.userRepository.findByEmail(email);
         if (user == null) {
@@ -71,14 +59,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public User findByUserName(String userName) {
         return this.userRepository.findByUserName(userName)
                 .orElseThrow(() -> new UsernameNotFoundException("User with username '" + userName + "' not found"));
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return this.userRepository.findAll();
+    @Transactional(readOnly = true)
+    public User getUserById(String id) {
+        return this.userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    @Override
+    public User saveUser(User newUser) {
+        checkDuplicateEmail(newUser.getEmail(), newUser.getUserName());
+        setUserDetails(newUser);
+        encodePassword(newUser);
+
+        return this.userRepository.save(newUser);
     }
 
     @Override
@@ -93,6 +92,17 @@ public class UserServiceImpl implements UserService {
         user.setBio(profileDTO.getBio());
 
         return this.userRepository.save(user);
+    }
+
+    @Override
+    public User authenticate(LoginDTO request) {
+        Authentication authentication = this.authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return this.findByEmail(request.getEmail());
     }
 
     @Override
@@ -146,33 +156,6 @@ public class UserServiceImpl implements UserService {
         return this.userRepository.save(toUser);
     }
 
-    private void checkDuplicateEmail(String email, String username) {
-        User userEmail = this.userRepository.findByEmail(email);
-        Optional<User> userUsername = this.userRepository.findByUserName(username);
-        if (userEmail != null) {
-            throw new UsernameAlreadyExistsException("User with email '" + email + "' already exists");
-        }
-        if (userUsername.isPresent()) {
-            throw new UsernameAlreadyExistsException("User with username '" + username + "' already exists");
-        }
-    }
-
-    @Override
-    public User authenticate(LoginDTO request) {
-        Authentication authentication = this.authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        return this.findByEmail(request.getEmail());
-    }
-
-    @Override
-    public User getUserById(String id) {
-        return this.userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-    }
-
     @Override
     public String uploadPhoto(String id, MultipartFile file) {
         User user = getUserById(id);
@@ -200,4 +183,25 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Unable to save image");
         }
     };
+
+    private void checkDuplicateEmail(String email, String username) {
+        User userEmail = this.userRepository.findByEmail(email);
+        Optional<User> userUsername = this.userRepository.findByUserName(username);
+        if (userEmail != null) {
+            throw new UsernameAlreadyExistsException("User with email '" + email + "' already exists");
+        }
+        if (userUsername.isPresent()) {
+            throw new UsernameAlreadyExistsException("User with username '" + username + "' already exists");
+        }
+    }
+
+    private void encodePassword(User newUser) {
+        String encodedPassword = this.passwordEncoder.encode(newUser.getPassword());
+        newUser.setPassword(encodedPassword);
+    }
+
+    private void setUserDetails(User newUser) {
+        newUser.setEnabled(true);
+        newUser.setNonLocked(true);
+    }
 }

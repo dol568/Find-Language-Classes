@@ -19,6 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Controller
@@ -26,26 +27,27 @@ import java.util.stream.Collectors;
 public class WebSocketController {
 
     private final UserRepository userRepository;
-    private final LanguageClassServiceImpl LanguageClassService;
+    private final LanguageClassServiceImpl languageClassService;
     private final CommentRepository commentRepository;
     private final CommentToReturnCommentConverter commentToReturnCommentConverter;
+    private final String CHAT_ROOM_ID = "chatRoomId";
 
     @RequestMapping("/chatroom/{chatRoomId}")
     public ModelAndView join(@PathVariable String chatRoomId, Principal principal) {
         ModelAndView modelAndView = new ModelAndView("chatroom");
-        modelAndView.addObject("chatRoom", LanguageClassService.getLanguageClass(Long.valueOf(chatRoomId)));
+        modelAndView.addObject("chatRoom", languageClassService.getLanguageClass(Long.valueOf(chatRoomId)));
         return modelAndView;
     }
 
     @SubscribeMapping("/connected.users")
     public List<ChatRoomUser> listChatRoomConnectedUsersOnSubscribe(SimpMessageHeaderAccessor headerAccessor) {
-        String chatRoomId = headerAccessor.getSessionAttributes().get("chatRoomId").toString();
-        return LanguageClassService.getLanguageClass(Long.valueOf(chatRoomId)).getConnectedUsers();
+        String chatRoomId = Objects.requireNonNull(headerAccessor.getSessionAttributes()).get(CHAT_ROOM_ID).toString();
+        return languageClassService.getLanguageClass(Long.valueOf(chatRoomId)).getConnectedUsers();
     }
 
     @SubscribeMapping("/old.messages")
     public List<ReturnComment> listOldMessagesFromUserOnSubscribe(SimpMessageHeaderAccessor headerAccessor) {
-        String chatRoomId = headerAccessor.getSessionAttributes().get("chatRoomId").toString();
+        String chatRoomId = Objects.requireNonNull(headerAccessor.getSessionAttributes()).get(CHAT_ROOM_ID).toString();
         List<Comment> comments = commentRepository.findCommentsByLanguageClass_Id(Long.valueOf(chatRoomId));
         return comments.stream().map(commentToReturnCommentConverter::convert).collect(Collectors.toList());
     }
@@ -53,25 +55,18 @@ public class WebSocketController {
     @MessageMapping("/send.message")
     public void sendMessage(@Payload CommentDTO commentDTO, Principal principal,
                             SimpMessageHeaderAccessor headerAccessor) {
-        String chatRoomId = headerAccessor.getSessionAttributes().get("chatRoomId").toString();
+        String chatRoomId = Objects.requireNonNull(headerAccessor.getSessionAttributes()).get(CHAT_ROOM_ID).toString();
 
         Comment comment = Comment.builder()
                 .body(commentDTO.getBody())
                 .author(userRepository.findByEmail(principal.getName()))
-                .languageClass(LanguageClassService.getLanguageClass(Long.valueOf(chatRoomId)))
+                .languageClass(languageClassService.getLanguageClass(Long.valueOf(chatRoomId)))
                 .build();
 
         Comment saved = this.commentRepository.save(comment);
 
-        ReturnComment returnComment = new ReturnComment();
-        returnComment.setId(saved.getId());
-        returnComment.setBody(saved.getBody());
-        returnComment.setImage(saved.getAuthor().getPhotoUrl());
-        returnComment.setUserName(saved.getAuthor().getUserName());
-        returnComment.setFullName(saved.getAuthor().getFullName());
-        returnComment.setCreatedAt(saved.getCreatedAt());
-        returnComment.setLanguageClassId(String.valueOf(saved.getLanguageClass().getId()));
+        ReturnComment returnComment = this.commentToReturnCommentConverter.convert(saved);
 
-        LanguageClassService.sendPublicMessage(returnComment);
+        languageClassService.sendPublicMessage(returnComment);
     }
 }

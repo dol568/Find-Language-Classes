@@ -1,4 +1,4 @@
-package com.springbootangularcourses.springbootbackend.domain;
+package com.springbootangularcourses.springbootbackend.system;
 
 public class Destinations {
 

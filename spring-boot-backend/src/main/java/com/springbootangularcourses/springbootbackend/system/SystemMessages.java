@@ -1,4 +1,8 @@
-package com.springbootangularcourses.springbootbackend.domain;
+package com.springbootangularcourses.springbootbackend.system;
+
+import com.springbootangularcourses.springbootbackend.domain.Comment;
+import com.springbootangularcourses.springbootbackend.domain.LanguageClass;
+import com.springbootangularcourses.springbootbackend.domain.User;
 
 public class SystemMessages {
 

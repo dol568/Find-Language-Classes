@@ -9,6 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface LanguageClassRepository extends JpaRepository<LanguageClass, Long> {
-    Optional<LanguageClass> findById(Long classId);
     List<LanguageClass> findByOrderByTimeAsc();
 }

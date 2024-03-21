@@ -104,7 +104,7 @@ class LanguageClassServiceTest {
     @Test
     void getAllLanguageClassesSuccess() {
         // Given
-        given(this.LanguageClassRepository.findAll(Sort.by(Sort.Direction.ASC, "time")))
+        given(this.LanguageClassRepository.findByOrderByTimeAsc())
                 .willReturn(this.languageClasses);
 
         // When
@@ -112,7 +112,7 @@ class LanguageClassServiceTest {
 
         //Then
         assertThat(actualLanguageClasses.size()).isEqualTo(this.languageClasses.size());
-        verify(this.LanguageClassRepository, times(1)).findAll(Sort.by(Sort.Direction.ASC, "time"));
+        verify(this.LanguageClassRepository, times(1)).findByOrderByTimeAsc();
     }
 
     @Test

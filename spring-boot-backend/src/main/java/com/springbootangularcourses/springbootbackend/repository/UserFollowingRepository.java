@@ -7,5 +7,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserFollowingRepository extends JpaRepository<UserFollowing, Long> {
-    UserFollowing findByFromAndTo(User from, User to);
 }

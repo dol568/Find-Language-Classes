@@ -12,7 +12,6 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReturnComment {
-
     private Long id;
     private Date createdAt;
     private String body;

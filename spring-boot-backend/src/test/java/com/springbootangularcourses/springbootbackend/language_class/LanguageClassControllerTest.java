@@ -1,4 +1,4 @@
-package com.springbootangularcourses.springbootbackend.Language_class;
+package com.springbootangularcourses.springbootbackend.language_class;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springbootangularcourses.springbootbackend.domain.LanguageClass;
@@ -57,7 +57,7 @@ class LanguageClassControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    String baseUrl = "/api/LanguageClasses";
+    String baseUrl = "/api/languageClasses";
 
     ModelMapper modelMapper;
 

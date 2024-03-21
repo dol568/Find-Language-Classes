@@ -27,14 +27,14 @@ import static org.springframework.http.HttpStatus.OK;
 public class LanguageClassController {
 
     private final LanguageClassService languageClassService;
-    private final LanguageClassToReturnLanguageClassConverter LanguageClassToReturnLanguageClass;
-    private final LanguageClassesToReturnLanguageClassesConverter LanguageClassesToReturnLanguageClassesConverter;
+    private final LanguageClassToReturnLanguageClassConverter languageClassToReturnLanguageClass;
+    private final LanguageClassesToReturnLanguageClassesConverter languageClassesToReturnLanguageClassesConverter;
 
     @GetMapping("")
     public ResponseEntity<HttpResponse> getLanguageClasses() {
         List<LanguageClass> classes = this.languageClassService.getAllLanguageClasses();
 
-        List<ReturnLanguageClass> returnClasses = this.LanguageClassesToReturnLanguageClassesConverter.convert(classes);
+        List<ReturnLanguageClass> returnClasses = this.languageClassesToReturnLanguageClassesConverter.convert(classes);
 
         return ResponseEntity.ok().body(
                 HttpResponse.builder()
@@ -50,7 +50,7 @@ public class LanguageClassController {
     public ResponseEntity<HttpResponse> getLanguageClass(@PathVariable Long id) {
         LanguageClass foundClass = this.languageClassService.getLanguageClass(id);
 
-        ReturnLanguageClass returnLanguageClass = this.LanguageClassToReturnLanguageClass.convert(foundClass);
+        ReturnLanguageClass returnLanguageClass = this.languageClassToReturnLanguageClass.convert(foundClass);
 
         return ResponseEntity.ok().body(
                 HttpResponse.builder()
@@ -68,7 +68,7 @@ public class LanguageClassController {
 
         LanguageClass languageClass = this.languageClassService.saveLanguageClass(languageClassDTO, principal.getName());
 
-        ReturnLanguageClass returnLanguageClass = this.LanguageClassToReturnLanguageClass.convert(languageClass);
+        ReturnLanguageClass returnLanguageClass = this.languageClassToReturnLanguageClass.convert(languageClass);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(languageClass.getId()).toUri();
@@ -90,7 +90,7 @@ public class LanguageClassController {
         LanguageClass languageClass
                 = this.languageClassService.editLanguageClass(languageClassDTO, id);
 
-        ReturnLanguageClass returnLanguageClass = this.LanguageClassToReturnLanguageClass.convert(languageClass);
+        ReturnLanguageClass returnLanguageClass = this.languageClassToReturnLanguageClass.convert(languageClass);
 
         return ResponseEntity.ok().body(
                 HttpResponse.builder()
@@ -121,7 +121,7 @@ public class LanguageClassController {
 
         LanguageClass languageClass
                 = this.languageClassService.attendClass(id, principal.getName());
-        ReturnLanguageClass returnLanguageClass = this.LanguageClassToReturnLanguageClass.convert(languageClass);
+        ReturnLanguageClass returnLanguageClass = this.languageClassToReturnLanguageClass.convert(languageClass);
 
         return ResponseEntity.ok().body(
                 HttpResponse.builder()
@@ -138,7 +138,7 @@ public class LanguageClassController {
 
         LanguageClass languageClass
                 = this.languageClassService.abandonClass(id, principal.getName());
-        ReturnLanguageClass returnLanguageClass = this.LanguageClassToReturnLanguageClass.convert(languageClass);
+        ReturnLanguageClass returnLanguageClass = this.languageClassToReturnLanguageClass.convert(languageClass);
 
         return ResponseEntity.ok().body(
                 HttpResponse.builder()

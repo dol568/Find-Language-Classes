@@ -1,4 +1,4 @@
-package com.springbootangularcourses.springbootbackend.Language_class;
+package com.springbootangularcourses.springbootbackend.language_class;
 
 import com.springbootangularcourses.springbootbackend.domain.LanguageClass;
 import com.springbootangularcourses.springbootbackend.domain.dto.ReturnLanguageClass;
@@ -25,7 +25,7 @@ class LanguageClassControllerIntegrationTest {
 
     private String authorizationToken;
 
-    private final String baseUrl = "/api/LanguageClasses";
+    private final String baseUrl = "/api/languageClasses";
 
     @Test
     @DisplayName("/login works")

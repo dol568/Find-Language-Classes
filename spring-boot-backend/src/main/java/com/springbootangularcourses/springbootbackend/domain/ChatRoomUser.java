@@ -36,5 +36,4 @@ public class ChatRoomUser {
     @JoinColumn(name = "language_class")
     @JsonIgnore
     private LanguageClass languageClass;
-
 }

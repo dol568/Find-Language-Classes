@@ -15,17 +15,17 @@ public interface UserService {
 
     User findByUserName(String userName);
 
+    User getUserById(String id);
+
     User saveUser(User newUser);
 
     User updateProfile(ProfileDTO profileDTO, String userName, String email);
 
+    User authenticate(LoginDTO request);
+
     User followUser(String userName, String email);
 
     User unfollowUser(String userName, String email);
-
-    User authenticate(LoginDTO request);
-
-    User getUserById(String id);
 
     String uploadPhoto(String id, MultipartFile file);
 }
