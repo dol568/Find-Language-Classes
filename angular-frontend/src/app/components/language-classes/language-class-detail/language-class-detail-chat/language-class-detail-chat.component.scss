@@ -1,0 +1,24 @@
+.red-text {
+  color: #dc4c64;
+}
+
+.scroll {
+  position: relative;
+  min-height: 100px;
+  max-height: 400px;
+  font-size: 20px;
+  overflow-y: auto;
+}
+
+.title {
+  text-align: center;
+  background-color: #0cabba;
+  color: #fff;
+  font-size: 24px;
+}
+
+.btn-send {
+  background-color: #0cabba;
+  color: #fff;
+  border: none;
+}

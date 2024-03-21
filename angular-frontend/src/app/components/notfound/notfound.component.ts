@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {_client_home, _client_training_classes} from "../../shared/_constVars/_client_consts";
+import {_client_home} from "../../shared/_constVars/_client_consts";
 import {RouterModule} from "@angular/router";
 
 @Component({

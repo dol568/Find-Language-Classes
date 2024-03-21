@@ -1,160 +1,134 @@
-import {Component, inject, OnDestroy, OnInit} from '@angular/core';
-import {AccountService} from "../../core/_services/account.service";
-import {ActivatedRoute, Router} from "@angular/router";
-import {IProfile, ProfileInfo} from "../../shared/_models/IProfile";
-import {Observable, Subscription} from "rxjs";
-import {IUser} from "../../shared/_models/IUser";
-import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {ProfileService} from "../../core/_services/profile.service";
-import {FollowService} from "../../core/_services/follow.service";
-import {CommonModule} from "@angular/common";
-import {getDaysOfWeekWords} from "../../shared/_constVars/_days";
-import {AuthenticatePipe} from "../../core/_services/authenticate.pipe";
-import {HandleImageErrorDirective} from "../../core/_services/handle-image-error.directive";
-import {DomSanitizer} from "@angular/platform-browser";
-import {ImageCroppedEvent, ImageCropperModule} from "ngx-image-cropper";
-import {SnackbarService} from "../../core/_services/snackbar.service";
+import {
+  Component,
+  effect,
+  inject,
+  Injector,
+  Input,
+  OnInit,
+  runInInjectionContext,
+  Signal,
+  signal,
+  WritableSignal,
+} from '@angular/core';
+import { IProfile, IProfileEdit, ProfileInfo } from '../../shared/_models/IProfile';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { ProfileHeaderComponent } from './profile-header/profile-header.component';
+import { ProfileListComponent } from './profile-list/profile-list.component';
+import { ProfileDetailComponent } from './profile-detail/profile-detail.component';
+import { EMPTY, Subject, switchMap, takeUntil } from 'rxjs';
+import { AccountService } from '../../core/_services/account.service';
+import { ActivatedRoute } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { SnackbarService } from '../../core/_services/snackbar.service';
+import { IUser } from '../../shared/_models/IUser';
 
 @Component({
-    selector: 'app-profile',
-    standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, AuthenticatePipe, HandleImageErrorDirective, ImageCropperModule],
-    templateUrl: './profile.component.html',
-    styleUrl: './profile.component.scss'
+  selector: 'app-profile',
+  standalone: true,
+  imports: [ProfileHeaderComponent, ProfileListComponent, ProfileDetailComponent, CommonModule],
+  templateUrl: './profile.component.html',
+  styleUrl: './profile.component.scss',
 })
 export class ProfileComponent implements OnInit {
-    #profileService = inject(ProfileService);
-    #followService = inject(FollowService);
-    #accountService = inject(AccountService);
-    #activatedRoute = inject(ActivatedRoute);
-    #snackBar = inject(SnackbarService);
-    #domSanitizer = inject(DomSanitizer);
-    #router = inject(Router);
-    imageChangedEvent: any = '';
-    croppedImage: any = '';
-    crop: any = '';
-    profile: IProfile | null = null;
-    currentUser$: Observable<IUser>;
-    editProfileForm: FormGroup;
-    isEditMode: boolean = false;
-    username: string | null = null;
-    info: ProfileInfo = ProfileInfo.ABOUT;
-    subscription: Subscription;
+  #destroySubject$: Subject<void> = new Subject<void>();
+  #injector = inject(Injector);
+  #accountService = inject(AccountService);
+  #activatedRoute = inject(ActivatedRoute);
+  #snackBar = inject(SnackbarService);
+  #domSanitizer = inject(DomSanitizer);
 
-    protected readonly ProfileInfo = ProfileInfo;
-    protected readonly getDaysOfWeekWords = getDaysOfWeekWords;
+  profile: Signal<IProfile> = this.#accountService.profile;
+  photo: Signal<SafeUrl> = this.#accountService.photo;
+  currentUser: Signal<IUser> = this.#accountService.currentUser;
+  safeCroppedImage: WritableSignal<SafeUrl> = signal<SafeUrl>('');
+  listInfo: WritableSignal<ProfileInfo> = signal<ProfileInfo>(ProfileInfo.ABOUT);
 
-    ngOnInit(): void {
-        this.currentUser$ = this.#accountService.currentUser$;
-        this.username = this.#activatedRoute.snapshot.params['userName'];
-        this.#activatedRoute.url.subscribe(() => this.#loadProfile());
-        this.editProfileForm = new FormGroup({
-            fullName: new FormControl('', [Validators.required]),
-            bio: new FormControl('', [Validators.required])
-        })
-    }
+  @Input() userName = '';
 
-    #loadProfile() {
-        if (this.username) {
-            this.#profileService.profile$(this.username).subscribe({
-                next: (profile) => {
-                    this.profile = profile;
-                    this.editProfileForm.patchValue({
-                        fullName: this.profile.fullName,
-                        bio: this.profile.bio
-                    });
-                },
-                error: err => console.error(err)
-            });
-        }
-    }
+  ngOnInit(): void {
+    runInInjectionContext(this.#injector, () => {
+      effect(() => {
+        this.#activatedRoute.paramMap
+          .pipe(
+            switchMap((params) => {
+              const userName = params.get('userName');
+              if (userName) {
+                return this.#accountService.profile$(userName).pipe(
+                  switchMap((response) => {
+                    const photo = response.data?.photoUrl;
+                    if (photo || photo?.length === 0) {
+                      return this.#accountService.loadPhoto(photo);
+                    } else { 
+                      return this.#accountService.loadPhoto('');
+                    }
+                  })
+                );
+              } else {
+                return EMPTY;
+              }
+            }),
+            takeUntil(this.#destroySubject$)
+          )
+          .subscribe({
+            error: (err) => console.error(err),
+          });
+      });
+    });
+  }
 
-    follow(username: string) {
-        if (this.username) {
+  public follow(username: string): void {
+    this.#accountService
+      .followUser(username)
+      .pipe(takeUntil(this.#destroySubject$))
+      .subscribe({
+        next: () => {
+          this.#snackBar.success(`User '${this.profile().fullName}' has been followed`);
+        },
+        error: (err) => console.error(err),
+      });
+  }
 
-            this.#followService.followUser(username).subscribe({
-                next: () => {
-                    this.#loadProfile()
-                    this.#snackBar.success(`User '${username}' has been followed`)
-                },
-                error: err => console.error(err)
-            });
-        }
-    }
+  public unfollow(username: string): void {
+    this.#accountService
+      .unFollowUser(username)
+      .pipe(takeUntil(this.#destroySubject$))
+      .subscribe({
+        next: () => {
+          this.#snackBar.success(`User '${this.profile().fullName}' has been unfollowed`);
+        },
+        error: (err) => console.error(err),
+      });
+  }
 
-    unfollow(username: string) {
-        if (this.username) {
-            this.#followService.unFollowUser(username).subscribe({
-                next: () => {
-                    this.#loadProfile()
-                    this.#snackBar.success(`User '${username}' has been unfollowed`)
-                },
-                error: err => console.error(err)
-            });
-        }
-    }
+  public updateProfile(data: IProfileEdit): void {
+    this.#accountService
+      .updateProfile(this.profile()?.username, data)
+      .pipe(takeUntil(this.#destroySubject$))
+      .subscribe({
+        next: () => {
+          this.#snackBar.success(`User info updated`);
+        },
+        error: (err) => console.error(err),
+      });
+  }
 
-    setInfo(value: ProfileInfo) {
-        this.info = value;
-    }
+  public uploadPhoto(data: FormData): void {
+    this.#accountService
+      .uploadPhoto(data)
+      .pipe(takeUntil(this.#destroySubject$))
+      .subscribe({
+        next: () => {
+          this.#snackBar.success(`User image updated`);
+        },
+        error: (err) => console.error(err),
+      });
+  }
 
-    changeMode() {
-        this.isEditMode = !this.isEditMode;
-    }
+  public getListInfo(profileInfo: ProfileInfo): void {
+    this.listInfo.set(profileInfo);
+  }
 
-    submitFunc() {
-        if (this.username) {
-            this.#profileService.updateProfile((this.username), this.editProfileForm.value)
-                .subscribe({
-                    next: () => {
-                        this.#router.navigateByUrl(`profiles/${this.profile.username}`, {replaceUrl: true})
-                            .then(() => this.#router.navigate([this.#router.url]));
-                        this.#snackBar.success(`User info updated`);
-                        this.#accountService.triggerRefresh();
-                    },
-                    error: err => console.error(err)
-                });
-        }
-    }
-
-    shouldShowFollowButton(profile: IProfile, currentUser: IUser): boolean {
-        return !profile.followers.some((follower) => follower.username === currentUser.userName)
-            && (profile.username !== currentUser.userName);
-    }
-
-    shouldShowUnFollowButton(profile: IProfile, currentUser: IUser): boolean {
-        return profile.followers.some((follower) => follower.username === currentUser.userName)
-            && (profile.username !== currentUser.userName);
-    }
-
-    fileChangeEvent(event: any): void {
-        this.imageChangedEvent = event;
-    }
-
-    cancelPhotoSelection() {
-        this.imageChangedEvent = null;
-    }
-
-    imageCropped(event: ImageCroppedEvent) {
-        this.croppedImage = this.#domSanitizer.bypassSecurityTrustUrl(event.objectUrl);
-        this.crop = event.blob;
-    }
-
-    uploadFile() {
-        if (this.crop && this.profile?.id) {
-            const formData = new FormData();
-            formData.append('file', this.crop);
-            formData.append('id', this.profile.id);
-            this.#profileService.uploadPhoto(formData).subscribe({
-                    next: () => {
-                        this.#router.navigateByUrl(`profiles/${this.profile.username}`, {replaceUrl: true})
-                            .then(() => this.#router.navigate([this.#router.url]));
-                        this.#snackBar.success(`User image updated`);
-                        this.#accountService.triggerRefresh();
-                    },
-                    error: err => console.error(err)
-                }
-            )
-        }
-    }
+  public getUnsafeCroppedImage(unSafeUrl: string): void {
+    this.safeCroppedImage.set(this.#domSanitizer.bypassSecurityTrustUrl(unSafeUrl));
+  }
 }

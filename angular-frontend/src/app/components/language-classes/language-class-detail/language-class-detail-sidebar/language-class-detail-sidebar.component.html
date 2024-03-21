@@ -1,0 +1,30 @@
+<div class="card shadow-lg">
+  <ul class="list-group">
+    <li class="list-group-item title">
+      {{ languageClass()?.userLanguageClasses.length }} people are going
+    </li>
+    @for (attendee of languageClass()?.userLanguageClasses; track attendee) {
+    <li class="list-group-item">
+      <div class="row">
+        @if (attendee.host) {
+        <div class="ribbon"><span>HOST</span></div>
+        }
+        <div class="col-md-4 pl-2 pr-1">
+          <img
+            class="py-1"
+            [src]="attendee.image | authenticate"
+            handleImageError
+            alt="attendee img"
+            style="width: 100%"
+          />
+        </div>
+        <div class="col-md-8 pl-1">
+          <p class="name" (click)="navigateToProfile(attendee.userName)">
+            {{ attendee.fullName }}
+          </p>
+        </div>
+      </div>
+    </li>
+    }
+  </ul>
+</div>

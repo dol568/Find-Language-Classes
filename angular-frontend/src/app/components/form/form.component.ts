@@ -1,107 +1,151 @@
-import {Component, inject, OnInit, ViewChild} from '@angular/core';
-import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {ITrainingClass} from "../../shared/_models/ITrainingClass";
-import {TrainingClassesService} from "../../core/_services/training-classes.service";
-import {ActivatedRoute, Router} from "@angular/router";
-import {getDaysOfWeekNumbers, getDaysOfWeekWords} from "../../shared/_constVars/_days";
-import {CommonModule, Location} from "@angular/common";
-import {NgxMaterialTimepickerModule} from "ngx-material-timepicker";
-import {SnackbarService} from "../../core/_services/snackbar.service";
+import {
+  Component,
+  effect,
+  inject,
+  Injector,
+  OnDestroy,
+  OnInit,
+  runInInjectionContext,
+  signal,
+  Signal,
+  ViewChild,
+  WritableSignal,
+} from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { LanguageClassesService } from '../../core/_services/language-classes.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { getDaysOfWeekNumbers, getDaysOfWeekWords } from '../../shared/_constVars/_days';
+import { CommonModule, Location } from '@angular/common';
+import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
+import { SnackbarService } from '../../core/_services/snackbar.service';
+import { EMPTY, Subject, switchMap, takeUntil } from 'rxjs';
+import { ILanguageClass } from '../../shared/_models/ILanguageClass';
 
 @Component({
-    selector: 'app-form',
-    standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, NgxMaterialTimepickerModule],
-    templateUrl: './form.component.html',
-    styleUrl: './form.component.scss'
+  selector: 'app-form',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, NgxMaterialTimepickerModule],
+  templateUrl: './form.component.html',
+  styleUrl: './form.component.scss',
 })
-export class FormComponent implements OnInit {
-    #trainingClassesService = inject(TrainingClassesService);
-    #activatedRoute = inject(ActivatedRoute);
-    #router = inject(Router);
-    #location = inject(Location);
-    #snackBarService = inject(SnackbarService);
-    @ViewChild('myPickerRef') myTimePicker;
-    addClassForm: FormGroup;
-    isEditMode: boolean = false;
-    trainingClass: ITrainingClass;
+export class FormComponent implements OnInit, OnDestroy {
+  #destroySubject$: Subject<void> = new Subject<void>();
+  #injector = inject(Injector);
+  #languageClassesService = inject(LanguageClassesService);
+  #activatedRoute = inject(ActivatedRoute);
+  #router = inject(Router);
+  #snackBar = inject(SnackbarService);
+  #location = inject(Location);
+  @ViewChild('myPickerRef') myTimePicker;
+  addClassForm: FormGroup;
 
-    ngOnInit(): void {
-        this.addClassForm = new FormGroup({
-            title: new FormControl('', [Validators.required]),
-            category: new FormControl('', [Validators.required]),
-            city: new FormControl('', [Validators.required]),
-            country: new FormControl('', [Validators.required]),
-            province: new FormControl('', [Validators.required]),
-            address: new FormControl('', [Validators.required]),
-            postalCode: new FormControl('', [Validators.required]),
-            dayOfWeek: new FormControl('', [Validators.required]),
-            description: new FormControl('', [Validators.required]),
-            time: new FormControl('', [Validators.required]),
-            totalSpots: new FormControl('', [Validators.required]),
+  id: WritableSignal<number> = signal<number>(undefined);
+  isEditMode: WritableSignal<boolean> = signal<boolean>(false);
+  languageClass: Signal<ILanguageClass> = this.#languageClassesService.languageClass;
+
+  ngOnInit(): void {
+    this.addClassForm = new FormGroup({
+      title: new FormControl('', [Validators.required]),
+      category: new FormControl('', [Validators.required]),
+      city: new FormControl('', [Validators.required]),
+      country: new FormControl('', [Validators.required]),
+      province: new FormControl('', [Validators.required]),
+      address: new FormControl('', [Validators.required]),
+      postalCode: new FormControl('', [Validators.required]),
+      dayOfWeek: new FormControl('', [Validators.required]),
+      description: new FormControl('', [Validators.required]),
+      time: new FormControl('', [Validators.required]),
+      totalSpots: new FormControl('', [Validators.required]),
+    });
+
+    this.#activatedRoute.url
+      .pipe(
+        switchMap((urlSegments) => {
+          if (urlSegments.find((urlSegment) => urlSegment.path.includes('edit'))) {
+            this.isEditMode.set(true);
+            return this.#activatedRoute.paramMap.pipe(
+              switchMap((params) => {
+                const id = Number(params.get('id'));
+                if (this.id !== null) {
+                  this.id.set(id);
+                  return this.#languageClassesService.languageClass$(this.id());
+                } else {
+                  return EMPTY;
+                }
+              })
+            );
+          } else {
+            return EMPTY;
+          }
+        }),
+        takeUntil(this.#destroySubject$)
+      )
+      .subscribe({
+        error: (err) => console.error(err),
+      });
+
+    if (this.isEditMode()) {
+      runInInjectionContext(this.#injector, () => {
+        effect(() => {
+          if (!!this.languageClass()) {
+            this.#populateForm();
+          }
         });
+      });
+    }
+  }
 
-        this.#activatedRoute.url.subscribe({
-            next: (urlSegments) => {
-                this.isEditMode = urlSegments.some(segment => segment.path === 'edit');
-            },
-            error: err => console.error(err)
+  ngOnDestroy(): void {
+    this.#destroySubject$.next();
+    this.#destroySubject$.complete();
+  }
+
+  public submitFunc(): void {
+    this.addClassForm.value.dayOfWeek = getDaysOfWeekNumbers(this.addClassForm.value.dayOfWeek);
+
+    if (!this.isEditMode()) {
+      this.#languageClassesService
+        .addLanguageClass(this.addClassForm.value)
+        .pipe(takeUntil(this.#destroySubject$))
+        .subscribe({
+          next: () => {
+            this.#router
+              .navigate(['/language-classes'])
+              .then(() => this.#snackBar.success('New language class has been added'));
+          },
+          error: (err) => console.error(err),
         });
-        if (this.isEditMode) this.populateForm();
+    } else {
+      this.#languageClassesService
+        .editLanguageClass(this.id(), this.addClassForm.value)
+        .pipe(takeUntil(this.#destroySubject$))
+        .subscribe({
+          next: () => {
+            this.#location.back();
+            this.#snackBar.success('Language class has been updated');
+          },
+          error: (err) => console.error(err),
+        });
     }
+  }
 
-    submitFunc() {
-        this.addClassForm.value.dayOfWeek = getDaysOfWeekNumbers(this.addClassForm.value.dayOfWeek);
+  #populateForm(): void {
+    this.addClassForm.patchValue({
+      title: this.languageClass()?.title,
+      category: this.languageClass()?.category,
+      city: this.languageClass()?.city,
+      country: this.languageClass()?.country,
+      province: this.languageClass()?.province,
+      address: this.languageClass()?.address,
+      postalCode: this.languageClass()?.postalCode,
+      dayOfWeek: getDaysOfWeekWords(this.languageClass()?.dayOfWeek),
+      description: this.languageClass()?.description,
+      time: this.languageClass()?.time,
+      totalSpots: this.languageClass()?.totalSpots,
+    });
+  }
 
-        if (!this.isEditMode) {
-            this.#trainingClassesService.addTrainingClass(this.addClassForm.value)
-                .subscribe({
-                    next: () => {
-                        this.#router.navigate(['/training-classes'])
-                            .then(() => this.#snackBarService.success('New language class has been added')
-                            );
-                    },
-                    error: err => console.error(err)
-                });
-        } else {
-            this.#trainingClassesService.editTrainingClass(this.#activatedRoute.snapshot.params['id'], this.addClassForm.value)
-                .subscribe({
-                    next: () => {
-                        this.#router.navigate(['/training-classes']).then(
-                            () => this.#snackBarService.success('Language class has been updated')
-                        );
-                    },
-                    error: err => console.error(err)
-                });
-        }
-    }
-
-    populateForm() {
-        const trainingClassId = this.#activatedRoute.snapshot.params['id'];
-
-        this.#trainingClassesService.trainingClass$(trainingClassId)
-            .subscribe({
-                next: (trainingClass) => {
-                    this.trainingClass = trainingClass;
-                    this.addClassForm.patchValue({
-                        title: this.trainingClass.title,
-                        category: this.trainingClass.category,
-                        city: this.trainingClass.city,
-                        country: this.trainingClass.country,
-                        province: this.trainingClass.province,
-                        address: this.trainingClass.address,
-                        postalCode: this.trainingClass.postalCode,
-                        dayOfWeek: getDaysOfWeekWords(this.trainingClass.dayOfWeek),
-                        description: this.trainingClass.description,
-                        time: this.trainingClass.time,
-                        totalSpots: this.trainingClass.totalSpots,
-                    });
-                },
-                error: err => console.error(err)
-            });
-    }
-
-    cancel() {
-        this.#location.back();
-    }
+  public cancel(): void {
+    this.#location.back();
+  }
 }

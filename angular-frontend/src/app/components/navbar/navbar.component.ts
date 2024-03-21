@@ -1,76 +1,73 @@
-import {Component, inject, OnDestroy, OnInit} from '@angular/core';
-import {Router, RouterModule} from "@angular/router";
-import {AccountService} from "../../core/_services/account.service";
-import {_client_add_class} from "../../shared/_constVars/_client_consts";
-import {IUser} from "../../shared/_models/IUser";
-import {CommonModule} from "@angular/common";
-import {AuthenticatePipe} from "../../core/_services/authenticate.pipe";
-import {HandleImageErrorDirective} from "../../core/_services/handle-image-error.directive";
-import {HttpClient} from "@angular/common/http";
-import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
-import {map, Subscription} from "rxjs";
+import { Component, effect, inject, OnDestroy, Signal } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
+import { AccountService } from '../../core/_services/account.service';
+import {
+  _client_add_class,
+  _client_language_classes,
+  _client_profiles,
+} from '../../shared/_constVars/_client_consts';
+import { CommonModule } from '@angular/common';
+import { AuthenticatePipe } from '../../core/_services/authenticate.pipe';
+import { HandleImageErrorDirective } from '../../core/_services/handle-image-error.directive';
+import { SafeUrl } from '@angular/platform-browser';
+import { EMPTY, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { IUser } from '../../shared/_models/IUser';
 
 @Component({
-    selector: 'app-navbar',
-    standalone: true,
-    imports: [RouterModule, CommonModule, AuthenticatePipe, HandleImageErrorDirective],
-    templateUrl: './navbar.component.html',
-    styleUrl: './navbar.component.scss'
+  selector: 'app-navbar',
+  standalone: true,
+  imports: [RouterModule, CommonModule, AuthenticatePipe, HandleImageErrorDirective],
+  templateUrl: './navbar.component.html',
+  styleUrl: './navbar.component.scss',
 })
-export class NavbarComponent implements OnInit, OnDestroy {
-    #router = inject(Router);
-    #accountService = inject(AccountService);
-    #httpClient = inject(HttpClient);
-    #domSanitizer = inject(DomSanitizer);
-    add_class: string = _client_add_class;
-    currentUser: IUser = null;
-    photoUrl: SafeUrl = null;
-    subscription1$: Subscription;
-    subscription2$: Subscription;
+export class NavbarComponent implements OnDestroy {
+  #destroySubject$: Subject<void> = new Subject<void>();
+  #router = inject(Router);
+  #accountService = inject(AccountService);
+  currentUser: Signal<IUser> = this.#accountService.currentUser;
+  profile = this.#accountService.profile;
+  add_class: string = _client_add_class;
+  photo: SafeUrl | string = '';
 
-    ngOnInit(): void {
-        const token = sessionStorage.getItem('token');
-        if (token) {
-            this.subscription1$ = this.#accountService.loadCurrentUser(token)
-                .subscribe({
-                        next: (user) => {
-                            this.currentUser = user;
-                            this.#loadUserPhoto(this.currentUser.photoUrl);
-                        },
-                        error: err => console.error(err)
-                    }
-                );
+  constructor() {
+    effect(() => {
+      if (!!this.currentUser()) {
+        this.#accountService
+          .profile$(this.currentUser()?.userName)
+          .pipe(
+            switchMap((response) => {
+              const photo = response.data?.photoUrl;
+              if (photo) {
+                return this.#accountService
+                  .loadPhoto(photo)
+                  .pipe(tap((safeUrl) => (this.photo = safeUrl)));
+              } else {
+                return EMPTY;
+              }
+            }),
+            takeUntil(this.#destroySubject$)
+          )
+          .subscribe({
+            error: (err) => console.error(err),
+          });
+      }
+    });
+  }
 
-            this.subscription2$ = this.#accountService.refresh$.subscribe(() => {
-                this.subscription1$.unsubscribe();
-                this.subscription1$ = this.#accountService.loadCurrentUser(token).subscribe({
-                        next: (user) => {
-                            this.currentUser = user;
-                            this.#loadUserPhoto(this.currentUser.photoUrl);
-                        },
-                        error: err => console.error(err)
-                    }
-                );
-            });
-        }
-    }
+  ngOnDestroy(): void {
+    this.#destroySubject$.next();
+    this.#destroySubject$.complete();
+  }
 
-    ngOnDestroy(): void {
-        // this.subscription1$.unsubscribe();
-        // this.subscription2$.unsubscribe();
-    }
+  public logout(): void {
+    this.#accountService.logout();
+  }
 
-    #loadUserPhoto(photoUrl: string): void {
-        this.#httpClient.get(photoUrl, {responseType: 'blob'}).pipe(
-            map(blob => this.#domSanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob))))
-            .subscribe(safeUrl => this.photoUrl = safeUrl);
-    }
+  public goToClasses(): void {
+    this.#router.navigate([_client_language_classes]);
+  }
 
-    logout() {
-        this.#accountService.logout();
-    }
-
-    goToClasses() {
-        this.#router.navigate([`/training-classes`]);
-    }
+  public goToProfile(): void {
+    this.#router.navigate([_client_profiles + '/' + this.currentUser()?.userName]);
+  }
 }

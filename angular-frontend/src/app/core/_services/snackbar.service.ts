@@ -1,28 +1,24 @@
-import {Injectable, NgZone} from '@angular/core';
-import {MatSnackBar, MatSnackBarConfig} from "@angular/material/snack-bar";
+import { inject, Injectable } from '@angular/core';
+import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SnackbarService {
+  #snackbar = inject(MatSnackBar);
 
-  constructor(public snackbar: MatSnackBar, private zone: NgZone) { }
-
-  success(message: string) {
-    const config = new MatSnackBarConfig();
-    config.panelClass = ['success-snackbar'];
-    config.duration = 3000;
-    this.zone.run(() => {
-      this.snackbar.open(message,'', config);
-    });
+  public success(message: string): void {
+    this.#getSnack(message, 'success-snackbar');
   }
 
-  error(message: string) {
+  public error(message: string): void {
+    this.#getSnack(message, 'error-snackbar');
+  }
+
+  #getSnack(message: string, panelClass: string) {
     const config = new MatSnackBarConfig();
-    config.panelClass = ['error-snackbar'];
+    config.panelClass = [`${panelClass}`];
     config.duration = 3000;
-    this.zone.run(() => {
-      this.snackbar.open(message,'', config);
-    });
+    this.#snackbar.open(message, '', config);
   }
 }

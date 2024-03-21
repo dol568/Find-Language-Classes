@@ -5,7 +5,7 @@ export interface IProfile {
   bio: string;
   photoUrl: string | null;
   isFollowed: boolean;
-  profileTrainingClasses: IProfileTrainingClass[];
+  profileLanguageClasses: IProfileLanguageClass[];
   followings: IProfileFollowing[];
   followers: IProfileFollowing[];
 }
@@ -19,7 +19,7 @@ export interface IProfileEdit {
   fullName: string;
   bio: string;
 }
-export interface IProfileTrainingClass {
+export interface IProfileLanguageClass {
   id: string;
   title: string;
   category: string;
@@ -28,5 +28,9 @@ export interface IProfileTrainingClass {
   hostUserName: string;
 }
 export enum ProfileInfo {
-  ABOUT, PHOTO, CLASSES, FOLLOWERS, FOLLOWINGS
+  ABOUT,
+  PHOTO,
+  CLASSES,
+  FOLLOWERS,
+  FOLLOWINGS,
 }

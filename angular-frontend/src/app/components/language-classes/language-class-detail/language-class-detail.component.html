@@ -1,0 +1,33 @@
+<div class="mt-5">
+  <div class="pt-5 container">
+    <div class="row">
+      <section class="col-8">
+        <div class="d-flex justify-content-between align-items-center pb-2 flex-column">
+          <div class="card text-white shadow-lg">
+            <app-language-class-detail-top
+              [languageClass]="languageClass()"
+              (goToProfile)="goToProfile($event)"
+            ></app-language-class-detail-top>
+          </div>
+          <div class="card shadow-lg mt-3 w-100">
+            <app-language-class-detail-info [languageClass]="languageClass()"></app-language-class-detail-info>
+          </div>
+          <div class="card shadow-lg mt-3 mb-5 w-100">
+            <app-language-class-detail-chat
+              [connectedUsers]="connectedUsers()"
+              [user]="user()"
+              [comments]="comments()"
+              (sendMessage)="postComment($event)"
+            ></app-language-class-detail-chat>
+          </div>
+        </div>
+      </section>
+      <section class="col-4">
+        <app-language-class-detail-sidebar
+          [languageClass]="languageClass()"
+          (goToProfile)="goToProfile($event)"
+        ></app-language-class-detail-sidebar>
+      </section>
+    </div>
+  </div>
+</div>

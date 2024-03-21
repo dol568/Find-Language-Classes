@@ -1,0 +1,42 @@
+<img
+  class="card-img"
+  [src]="bgImg()"
+  alt="Card image"
+/>
+<div class="card-img-overlay pb-5 mb-5 justify-content-end d-flex flex-column">
+  <div class="card" style="background-color: #000; opacity: 0.85">
+    <div class="card-body" style="color: aliceblue">
+      <h3 class="card-title">
+        {{ languageClass()?.title }} {{ totalSpotsLeft() }}
+      </h3>
+      <p class="card-text">
+        Every {{ dateInfo() }} at
+        {{ languageClass()?.time }}
+      </p>
+      <p class="card-text">
+        Hosted By
+        <a
+          style="cursor: pointer; color: #48b0f7"
+          (click)="navigateToProfile(languageClass()?.hostUserName)"
+          >{{ languageClass()?.hostName }}</a
+        >
+      </p>
+    </div>
+  </div>
+</div>
+<div class="d-flex justify-content-end align-items-end">
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">
+      <button
+        type="button"
+        class="btn btn-primary"
+        style="background-color: #0cabba"
+        [routerLink]="
+          '/' + client_language_classes + '/' + languageClass()?.id + '/edit'
+        "
+      >
+        Manage Class
+      </button>
+    </li>
+  </ul>
+</div>
