@@ -1,40 +1,48 @@
-import {Component, inject, OnInit} from '@angular/core';
-import {Router, RouterModule} from "@angular/router";
-import {CommonModule} from "@angular/common";
-import {FormsModule} from "@angular/forms";
-import {Observable} from "rxjs";
-import {AccountService} from "../../core/_services/account.service";
-import {_client_home, _client_signup, _client_training_classes} from "../../shared/_constVars/_client_consts";
-import {IUser} from "../../shared/_models/IUser";
+import { Component, OnDestroy, Signal, inject } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { AccountService } from '../../core/_services/account.service';
+import {
+  _client_home,
+  _client_signup,
+  _client_language_classes,
+} from '../../shared/_constVars/_client_consts';
+import { IUser } from '../../shared/_models/IUser';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
-    selector: 'app-login',
-    standalone: true,
-    imports: [RouterModule, CommonModule, FormsModule],
-    templateUrl: './login.component.html',
-    styleUrl: './login.component.scss'
+  selector: 'app-login',
+  standalone: true,
+  imports: [RouterModule, CommonModule, FormsModule],
+  templateUrl: './login.component.html',
+  styleUrl: './login.component.scss',
 })
-export class LoginComponent implements OnInit {
-    #router = inject(Router);
-    #accountService = inject(AccountService);
-    currentUser$: Observable<IUser>;
-    training_classes: string = _client_training_classes;
-    client_signup: string = _client_signup;
+export class LoginComponent implements OnDestroy {
+  #destroySubject$: Subject<void> = new Subject<void>();
+  #router = inject(Router);
+  #accountService = inject(AccountService);
+  currentUser: Signal<IUser> = this.#accountService.currentUser;
+  language_classes: string = _client_language_classes;
+  client_signup: string = _client_signup;
 
-    ngOnInit(): void {
-        this.currentUser$ = this.#accountService.currentUser$;
-    }
+  ngOnDestroy(): void {
+    this.#destroySubject$.next();
+    this.#destroySubject$.complete();
+  }
 
-    isValidateTextFalse(data: any) {
-        return !!(data.touched && data.invalid);
-    }
+  public isValidateTextFalse(data: any): boolean {
+    return !!(data.touched && data.invalid);
+  }
 
-    submitFunc(data: any, event: Event) {
-        event.preventDefault();
-        this.#accountService.login(data.value)
-            .subscribe({
-                next: () => this.#router.navigate([_client_home]),
-                error: err => console.error(err)
-            });
-    }
+  public submitFunc(data: any, event: Event): void {
+    event.preventDefault();
+    this.#accountService
+      .login(data.value)
+      .pipe(takeUntil(this.#destroySubject$))
+      .subscribe({
+        next: () => this.#router.navigate([_client_home]),
+        error: (err) => console.error(err),
+      });
+  }
 }

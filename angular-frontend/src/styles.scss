@@ -1,6 +1,8 @@
 button:disabled {
   cursor: not-allowed;
   pointer-events: all !important;
+
+
 }
 
 ::-webkit-scrollbar {
@@ -95,24 +97,23 @@ button:disabled {
   bottom: 25px;
   right: 25px;
   position: fixed !important;
-}
 
-.mat-mdc-raised-button:hover {
-  background-color: rgb(20, 108, 26) !important;
 }
 
 .custom-panel-class {
-    .mdc-dialog__container,
-    .mat-dialog-content,
     .mat-mdc-dialog-surface{
       background-color: rgb(153, 50, 50) !important;
-
     }
-  .p {
-    color: beige;
-  }
   }
 
 .content {
   margin: 5% 3%;
 }
+
+.btn-log {
+  background-color: #0cabba;
+  border-color: #0cabba;
+  color: white;
+}
+
+

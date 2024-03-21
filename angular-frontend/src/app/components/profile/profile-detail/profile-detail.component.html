@@ -1,0 +1,211 @@
+<!------------------------------------------ABOUT------------------------------------------>
+
+@if (listInfo() === ProfileInfo.ABOUT && currentUser()) {
+<div class="d-flex justify-content-between flex-row w-100 px-2 pt-3">
+  <div style="font-size: 20px">
+    <i class="fas fa-user-alt mr-3" style="font-size: 26px"></i>
+    <strong>About {{ profile()?.fullName }}</strong>
+  </div>
+  <div>
+    @if (!isEditMode() && profile()?.username === currentUser()?.userName) {
+    <button class="btn btn-outline-secondary" type="button" (click)="changeMode()">
+      Edit Profile
+    </button>
+    } @else if (isEditMode() && profile()?.username === currentUser()?.userName) {
+    <button class="btn btn-outline-secondary" type="button" (click)="changeMode()">Cancel</button>
+    } @else if (isFollowMode && profile()?.username !== currentUser()?.userName) {
+    <button class="btn btn-primary" (click)="follow(profile().username)">Follow</button>
+    } @else if (!isFollowMode && profile()?.username !== currentUser()?.userName) {
+    <button class="btn btn-primary" (click)="unfollow(profile().username)">Unfollow</button>
+    }
+  </div>
+</div>
+<div class="px-2 w-100 d-flex flex-column">
+  @if (!isEditMode()) {
+  <div class="card-body pl-2 mt-4 alert alert-primary">
+    @if (profile()?.bio) {
+    <p class="card-text text-break">{{ profile()?.bio }}</p>
+    } @else {
+    <p class="card-text text-break">{{ "Please provide your bio" }}</p>
+    }
+  </div>
+  }
+  <div class="w-100 mt-3" *ngIf="isEditMode()">
+    <form class="w-100" [formGroup]="editProfileForm" (ngSubmit)="submitFunc()">
+      <div class="form-group">
+        <label for="fullName">Full Name</label>
+        <input
+          type="text"
+          class="form-control"
+          id="fullName"
+          placeholder="Enter full name..."
+          formControlName="fullName"
+          [ngClass]="{ 'is-invalid': fullName.invalid && fullName.touched }"
+        />
+        @if ((fullName.invalid && fullName.touched) || fullName.dirty) {
+        <div class="invalid-feedback">
+          @if (fullName.errors?.['required']) {
+          <span>Full name is required</span>
+          }
+        </div>
+        }
+      </div>
+      <div class="form-group">
+        <label for="bio">Bio</label>
+        <textarea
+          class="form-control"
+          id="bio"
+          rows="3"
+          placeholder="Enter bio..."
+          formControlName="bio"
+          [ngClass]="{ 'is-invalid': bio.invalid && bio.touched }"
+        ></textarea>
+        @if ((bio.invalid && bio.touched) || bio.dirty) {
+        <div class="invalid-feedback">
+          @if (bio.errors?.['required']) {
+          <span>Bio is required</span>
+          } @if (bio.errors?.['maxlength']) {
+          <span>Bio is too long</span>
+          }
+        </div>
+        }
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-success btn-block" [disabled]="!editProfileForm.valid">
+          Submit
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+}
+
+<!------------------------------------------PHOTO------------------------------------------>
+
+@if (listInfo() === ProfileInfo.PHOTO) {
+<div class="d-flex justify-content-between flex-row w-100 px-2 pt-3 mb-3">
+  <div style="font-size: 20px">
+    <strong>Photo</strong>
+  </div>
+  @if (profile()?.username === currentUser()?.userName) { @if (imageChangedEvent()) {
+  <button class="btn btn-outline-secondary" type="button" (click)="cancelPhotoSelection()">
+    Cancel
+  </button>
+  } @else {
+  <input id="files" style="visibility: hidden" type="file" (change)="fileChangeEvent($event)" />
+  <label for="files" class="btn btn-outline-secondary">Select Image</label>
+  } }
+</div>
+@if(imageChangedEvent()) {
+<div class="row mb-3 justify-content-center">
+  <div class="col-4 p-1 mx-3">
+    <image-cropper
+      [imageChangedEvent]="imageChangedEvent()"
+      [maintainAspectRatio]="true"
+      [aspectRatio]="4 / 4"
+      [resizeToWidth]="256"
+      format="png"
+      (imageCropped)="imageCropped($event)"
+    ></image-cropper>
+  </div>
+  <div class="col-4 p-1 d-flex flex-column align-items-center justify-content-center">
+    <img [src]="safecroppedImage()" style="width: 100%" />
+    <button type="button" class="btn btn-success w-100 mt-1" (click)="uploadFile()">
+      <i class="fa fa-check"></i>
+    </button>
+  </div>
+</div>
+} }
+
+<!------------------------------------------CLASSES------------------------------------------>
+
+@if (listInfo() === ProfileInfo.CLASSES) {
+<div class="d-flex justify-content-between flex-row w-100 px-2 pt-3">
+  <div style="font-size: 20px"><strong>Language Classes</strong></div>
+</div>
+@for (tc of profile()?.profileLanguageClasses; track tc) {
+<div class="card w-100 mb-3 mt-2">
+  @if (tc.hostUserName === profile()?.username) {
+  <div class="ribbon"><span>HOST</span></div>
+  } @else {
+  <div class="ribbon-not-host"><span>ATTENDEE</span></div>
+  }
+  <div class="card-header">
+    <h4>{{ tc.title }}</h4>
+  </div>
+  <div class="card-body">
+    <h6 class="card-title">Category: {{ tc.category }}</h6>
+    <p class="card-text">Every {{ getDaysOfWeekWords(tc.dayOfWeek) }} at {{ tc.time }}</p>
+  </div>
+</div>
+} @empty {
+<div class="alert alert-warning mt-2" role="alert">No classes created or attended yet</div>
+} }
+
+<!------------------------------------------FOLLOWERS------------------------------------------>
+
+@if (listInfo() === ProfileInfo.FOLLOWERS) {
+<div class="d-flex justify-content-between flex-row w-100 px-2 pt-3">
+  <div style="font-size: 20px">
+    <strong>Followers</strong>
+  </div>
+</div>
+@for (follower of profile()?.followers; track follower) {
+<div class="card w-100 mb-3 mt-2">
+  <div class="card-header">
+    <h5>{{ follower.fullName }}</h5>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-2 pl-2 pr-1">
+        <img
+          [src]="follower.photoUrl | authenticate"
+          handleImageError
+          alt="image cap"
+          style="width: 100%"
+        />
+      </div>
+      <div class="col-md-10 pl-1">
+        <p style="font-size: 18px">Bio: {{ follower.bio }}</p>
+        <p style="font-size: 18px">Username: {{ follower.username }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+} @empty {
+<div class="alert alert-warning mt-2" role="alert">No followers yet</div>
+} }
+
+<!---------------------------------------------FOLLOWINGS--------------------------------------------->
+
+@if (listInfo() === ProfileInfo.FOLLOWINGS) {
+<div class="d-flex justify-content-between flex-row w-100 px-2 pt-3">
+  <div style="font-size: 20px">
+    <strong>Followings</strong>
+  </div>
+</div>
+@for (following of profile()?.followings; track following) {
+<div class="card w-100 mb-3 mt-2">
+  <div class="card-header">
+    <h5>{{ following.fullName }}</h5>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-2 pl-2 pr-1">
+        <img
+          [src]="following?.photoUrl | authenticate"
+          handleImageError
+          alt="Profile photo"
+          style="width: 100%"
+        />
+      </div>
+      <div class="col-md-10 pl-1">
+        <p style="font-size: 18px">Bio: {{ following.bio }}</p>
+        <p style="font-size: 18px">Username: {{ following.username }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+} @empty {
+<div class="alert alert-warning mt-2" role="alert">No followings yet</div>
+} }

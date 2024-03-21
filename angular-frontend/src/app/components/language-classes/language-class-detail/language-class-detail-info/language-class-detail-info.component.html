@@ -1,0 +1,16 @@
+<ul class="list-group">
+  <li class="list-group-item d-flex align-items-center">
+    <i class="fas fa-info-circle mr-3 icon"></i>
+    {{ languageClass()?.description }}
+  </li>
+  <li class="list-group-item d-flex align-items-center">
+    <i class="fas fa-calendar mr-3 icon"></i>
+    Every {{ dateInfo() }} at
+    {{ languageClass()?.time }}
+  </li>
+  <li class="list-group-item bg-light d-flex align-items-center">
+    <i class="fas fa-map-marker mr-3 icon"></i>
+    {{ languageClass()?.address }} {{ languageClass()?.city }} ,
+    {{ languageClass()?.country }} {{ languageClass()?.postalCode }}
+  </li>
+</ul>

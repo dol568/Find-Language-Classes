@@ -1,9 +1,26 @@
-<mat-dialog-content>
-    <p>
-        {{message}}
-    </p>
+<mat-dialog-content style="color: beige">
+  <p>
+    {{ message }}
+  </p>
 </mat-dialog-content>
-<mat-dialog-actions align="center">
-    <button mat-raised-button color="primary" (click)="close(true)" tabindex="1">{{confirmButtonText}}</button>
-    <button mat-raised-button mat-dialog-close tabindex="-1" (click)="close(false)">{{cancelButtonText}}</button>
+<mat-dialog-actions align="center" style="justify-content: space-evenly" class="mb-1">
+  <button
+    mat-raised-button
+    class="btn btn-light"
+    style="width: 25%"
+    (click)="close(true)"
+    tabindex="1"
+  >
+    {{ confirmButtonText }}
+  </button>
+  <button
+    mat-raised-button
+    mat-dialog-close
+    class="btn btn-light"
+    style="width: 25%"
+    tabindex="-1"
+    (click)="close(false)"
+  >
+    {{ cancelButtonText }}
+  </button>
 </mat-dialog-actions>

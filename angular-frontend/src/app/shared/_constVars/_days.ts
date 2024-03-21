@@ -9,13 +9,13 @@ export const getDays = [
 ];
 
 export const getDaysOfWeekWords = (dayOFWeek: number) => {
-  return getDays.filter(x => x.key === dayOFWeek)[0].text;
-}
+  return getDays.filter((x) => x.key === dayOFWeek)[0].text;
+};
 
 export const getDaysOfWeekNumbers = (dayOFWeek: string) => {
-  return getDays.filter(x => x.text === dayOFWeek)[0].key;
-}
+  return getDays.filter((x) => x.text === dayOFWeek)[0].key;
+};
 
 export const getFlagImg = (category: string) => {
-  return `../../../../assets/${category.toLowerCase()}.jpg`;
-}
+  return `../../../../assets/${category?.toLowerCase()}.jpg`;
+};

@@ -1,0 +1,27 @@
+<ul class="list-group shadow-lg">
+  <li class="list-group-item"
+      (click)="setInfo(ProfileInfo.ABOUT)"
+      [class.active]="ProfileInfo.ABOUT === this.info"
+  >About
+  </li>
+  <li class="list-group-item"
+      (click)="setInfo(ProfileInfo.PHOTO)"
+      [class.active]="ProfileInfo.PHOTO === this.info"
+  >Edit Photo
+  </li>
+  <li class="list-group-item"
+      (click)="setInfo(ProfileInfo.CLASSES)"
+      [class.active]="ProfileInfo.CLASSES === this.info"
+  >Language Classes
+  </li>
+  <li class="list-group-item"
+      (click)="setInfo(ProfileInfo.FOLLOWERS)"
+      [class.active]="ProfileInfo.FOLLOWERS === this.info"
+  >Followers
+  </li>
+  <li class="list-group-item"
+      (click)="setInfo(ProfileInfo.FOLLOWINGS)"
+      [class.active]="ProfileInfo.FOLLOWINGS === this.info"
+  >Followings
+  </li>
+</ul>

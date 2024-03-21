@@ -1,0 +1,107 @@
+<div class="card-header d-flex px-auto py-2 title justify-content-center">Chat messages</div>
+<div>
+  <div
+    #scrollMe
+    [scrollTop]="scrolltop()"
+    class="card-body scroll"
+    data-mdb-perfect-scrollbar="true"
+  >
+  @for (comment of comments(); track comment) {
+    @if (this.user()?.userName === comment.userName) {
+    <div class="d-flex mt-2 flex-row align-items-center">
+      <strong class="mr-3" style="margin-bottom: 0; font-size: 18px; color: #0cabba">{{
+        comment.fullName
+      }}</strong>
+      <small class="text-muted" style="margin-bottom: 0; font-size: 14px">{{
+        comment.createdAt | date : "d.MM.Y" + " HH:mm"
+      }}</small>
+    </div>
+    <div class="d-flex flex-row justify-content-start">
+      @if (comment.body.includes('left the chat') || comment.body.includes('joined the chat')) {
+      <p class="small p-2 mb-3 rounded-3 alert alert-warning w-100" style="border-radius: 7px">
+        {{ comment.body }}
+      </p>
+      } @else {
+      <img
+        class="rounded-circle"
+        [src]="comment.image | authenticate"
+        handleImageError
+        alt="avatar 1"
+        style="width: 45px; height: 100%"
+      />
+      <div>
+        <p
+          class="small p-2 ms-3 mb-3 rounded-3 ml-3"
+          style="background-color: #f5f6f7; border-radius: 7px"
+        >
+          {{ comment.body }}
+        </p>
+      </div>
+      }
+    </div>
+    } @else {
+    <div class="d-flex mt-2 flex-row align-items-center">
+      <strong class="mr-3" style="margin-bottom: 0; font-size: 18px; color: #0cabba">{{
+        comment.fullName
+      }}</strong>
+      <small class="text-muted" style="margin-bottom: 0; font-size: 14px">{{
+        comment.createdAt | date : "d.MM.Y" + " HH:mm"
+      }}</small>
+    </div>
+    <div class="d-flex flex-row justify-content-start">
+      @if (comment.body.includes('left the chat') || comment.body.includes('joined the chat')) {
+      <p class="small py-2 ms-3 rounded-3 alert alert-warning w-100" style="border-radius: 7px">
+        {{ comment.body }}
+      </p>
+      } @else {
+      <img
+        class="rounded-circle"
+        [src]="comment.image | authenticate"
+        handleImageError
+        alt="avatar 1"
+        style="width: 45px; height: 100%"
+      />
+      <div>
+        <p
+          class="small p-2 ms-3 mb-3 text-white rounded-3 ml-3"
+          style="background-color: #48b0f7; border-radius: 7px"
+        >
+          {{ comment.body }}
+        </p>
+      </div>
+      }
+    </div>
+    }
+  }
+    
+    
+  </div>
+  <div class="card-footer text-muted">
+    <form [formGroup]="addComment" (ngSubmit)="submitFunc()" class="d-flex w-100">
+      <div class="flex-grow-1">
+        <div class="form-group">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Type message"
+            formControlName="description"
+          />
+          <div class="invalid-feedback">Please enter a description</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <button
+          class="btn btn-warning btn-md float-right btn-send"
+          type="submit"
+          [disabled]="!addComment.valid"
+        >
+          Send
+        </button>
+      </div>
+    </form>
+    <small class="red-text">{{ connectedUsers()?.length + " users online: " }}</small>
+    @for (user of connectedUsers(); track user.userName) {
+    <small class="red-text">{{ user.fullName + ", " }}</small>
+    }
+  </div>
+</div>
