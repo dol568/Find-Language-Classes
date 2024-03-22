@@ -56,9 +56,7 @@ public class LanguageClassServiceImpl implements LanguageClassService {
         LanguageClass languageClass = this.languageClassDTOToLanguageClassConverter.convert(languageClassDTO);
 
         languageClass.addUserLanguageClass(userLanguageClass);
-        LanguageClass savedLanguageClass = this.languageClassRepository.save(languageClass);
-
-        return this.getLanguageClass(savedLanguageClass.getId());
+        return this.languageClassRepository.save(languageClass);
     }
 
     @Override
@@ -69,8 +67,7 @@ public class LanguageClassServiceImpl implements LanguageClassService {
 
         editLanguageClass.setId(languageClass.getId());
 
-        LanguageClass savedLanguageClass = this.languageClassRepository.save(editLanguageClass);
-        return this.getLanguageClass(savedLanguageClass.getId());
+        return this.languageClassRepository.save(editLanguageClass);
     }
 
     @Override
@@ -110,8 +107,7 @@ public class LanguageClassServiceImpl implements LanguageClassService {
         languageClass.addUserLanguageClass(userLanguageClass);
 
         this.userRepository.save(user);
-        LanguageClass savedLanguageClass = this.languageClassRepository.save(languageClass);
-        return this.getLanguageClass(savedLanguageClass.getId());
+        return this.languageClassRepository.save(languageClass);
     }
 
     @Override
@@ -134,8 +130,7 @@ public class LanguageClassServiceImpl implements LanguageClassService {
         languageClass.removeUserLanguageClass(userLanguageClass);
 
         this.userRepository.save(user);
-        LanguageClass savedLanguageClass = this.languageClassRepository.save(languageClass);
-        return this.getLanguageClass(savedLanguageClass.getId());
+        return this.languageClassRepository.save(languageClass);
     }
 
     @Override

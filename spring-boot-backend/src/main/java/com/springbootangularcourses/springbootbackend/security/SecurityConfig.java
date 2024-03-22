@@ -39,7 +39,7 @@ public class SecurityConfig {
     private final JWTAuthorizationFilter jwtAuthorizationFilter;
     private final JWTForbiddenEntryPoint jwtForbiddenEntryPoint;
     private final PasswordEncoder passwordEncoder;
-//    private final SpaWebFilter spaWebFilter;
+    private final SpaWebFilter spaWebFilter;
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -69,7 +69,7 @@ public class SecurityConfig {
                         .requestMatchers("/ws/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
-//                .addFilterAfter(spaWebFilter, BasicAuthenticationFilter.class)
+                .addFilterAfter(spaWebFilter, BasicAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtForbiddenEntryPoint))
                 .exceptionHandling(exception -> exception.accessDeniedHandler(jwtAccessDeniedHandler))
                 .authenticationProvider(authenticationProvider())

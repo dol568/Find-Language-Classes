@@ -59,8 +59,6 @@ class UserControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    ModelMapper modelMapper;
-
     String baseUrl = "/api/users";
 
     User user1;
@@ -96,7 +94,6 @@ class UserControllerTest {
         users = new ArrayList<>();
         users.add(user1);
         users.add(user2);
-        modelMapper = new ModelMapper();
     }
 
     @AfterEach
@@ -124,6 +121,7 @@ class UserControllerTest {
     @Test
     void testGetCurrentUserSuccess() throws Exception {
         // Given
+        ModelMapper modelMapper = new ModelMapper();
         ReturnUser returnUser = modelMapper.map(user1, ReturnUser.class);
         returnUser.setToken("Token");
         returnUser.setPhotoUrl("");
