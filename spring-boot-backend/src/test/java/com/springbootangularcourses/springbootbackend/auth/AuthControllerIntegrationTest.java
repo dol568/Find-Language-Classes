@@ -6,12 +6,19 @@ import com.springbootangularcourses.springbootbackend.system.HttpResponse;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
+import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -32,7 +39,7 @@ class AuthControllerIntegrationTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 
         HttpEntity<String> request = new HttpEntity<>(loginCredentials.toString(), headers);
 
@@ -40,7 +47,8 @@ class AuthControllerIntegrationTest {
         ResponseEntity<HttpResponse<ReturnUser>> response = testRestTemplate.exchange("/api/login",
                 HttpMethod.POST,
                 request,
-                new ParameterizedTypeReference<>(){});
+                new ParameterizedTypeReference<>() {
+                });
         ReturnUser returnUser = response.getBody().getData();
 
         // Assert
@@ -63,12 +71,12 @@ class AuthControllerIntegrationTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 
         HttpEntity<String> request = new HttpEntity<>(loginCredentials.toString(), headers);
 
         // Act
-        ResponseEntity response = testRestTemplate.postForEntity("/api/login",
+        ResponseEntity<HttpResponse<ReturnUser>> response = testRestTemplate.postForEntity("/api/login",
                 request,
                 null);
 
@@ -88,24 +96,22 @@ class AuthControllerIntegrationTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 
         HttpEntity<String> request = new HttpEntity<>(loginCredentials.toString(), headers);
 
         // Act
-        ResponseEntity<HttpResponse<User>> response = testRestTemplate.exchange("/api/login",
+        ResponseEntity<HttpResponse> response = testRestTemplate.exchange("/api/login",
                 HttpMethod.POST,
                 request,
-                new ParameterizedTypeReference<>(){});
-        User user = response.getBody().getData();
+                new ParameterizedTypeReference<>() {
+                });
 
         // Assert
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(),
                 "HTTP Status code should be 400");
-        Assertions.assertEquals("Email is required", user.getEmail(),
-                "Returned user's full name seems to be incorrect");
-        Assertions.assertEquals("Password is required", user.getPassword(),
-                "Returned user's bio seems to be incorrect");
+        Assertions.assertEquals("Provided arguments are invalid, see data for details.", response.getBody().getMessage(),
+                "Provided arguments are invalid, see data for details.");
     }
 
     @Test
@@ -121,26 +127,27 @@ class AuthControllerIntegrationTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 
         HttpEntity<String> request = new HttpEntity<>(userDetailsRequestJson.toString(), headers);
 
         // Act
-        ResponseEntity<HttpResponse<User>> response = testRestTemplate.exchange("/api/register",
+        ResponseEntity<HttpResponse<ReturnUser>> response = testRestTemplate.exchange("/api/register",
                 HttpMethod.POST,
                 request,
-                new ParameterizedTypeReference<>(){});
-        User user = response.getBody().getData();
+                new ParameterizedTypeReference<>() {
+                });
+        ReturnUser returnUser = response.getBody().getData();
 
         // Assert
         Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        Assertions.assertEquals(userDetailsRequestJson.getString("userName"), user.getUserName(),
+        Assertions.assertEquals(userDetailsRequestJson.getString("userName"), returnUser.getUserName(),
                 "Returned user's userName seems to be incorrect");
-        Assertions.assertEquals(userDetailsRequestJson.getString("fullName"), user.getFullName(),
+        Assertions.assertEquals(userDetailsRequestJson.getString("fullName"), returnUser.getFullName(),
                 "Returned user's full name seems to be incorrect");
-        Assertions.assertEquals(userDetailsRequestJson.getString("email"), user.getEmail(),
+        Assertions.assertEquals(userDetailsRequestJson.getString("email"), returnUser.getEmail(),
                 "Returned user's email seems to be incorrect");
-        Assertions.assertFalse(user.getId().trim().isEmpty(), "User id should not be empty");
+        Assertions.assertFalse(returnUser.getId().trim().isEmpty(), "User id should not be empty");
     }
 
     @Test
@@ -156,19 +163,21 @@ class AuthControllerIntegrationTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 
         HttpEntity<String> request = new HttpEntity<>(userDetailsRequestJson.toString(), headers);
 
         // Act
-        ResponseEntity<HttpResponse<User>> response = testRestTemplate.exchange("/api/register",
+        ResponseEntity<HttpResponse<ReturnUser>> response = testRestTemplate.exchange("/api/register",
                 HttpMethod.POST,
                 request,
-                new ParameterizedTypeReference<>(){});
-        User user = response.getBody().getData();
+                new ParameterizedTypeReference<>() {
+                });
 
         // Assert
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "HTTP Status code should be 400");
+        Assertions.assertEquals("User with email 'joe123@gmail.com' already exists", response.getBody().getMessage(),
+                "HTTP Status code should be 400");
     }
 
     @Test
@@ -184,25 +193,26 @@ class AuthControllerIntegrationTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 
         HttpEntity<String> request = new HttpEntity<>(userDetailsRequestJson.toString(), headers);
 
         // Act
-        ResponseEntity<HttpResponse<User>> response = testRestTemplate.exchange("/api/register",
+        ResponseEntity<HttpResponse<HashMap<String, String>>> response = testRestTemplate.exchange("/api/register",
                 HttpMethod.POST,
                 request,
-                new ParameterizedTypeReference<>(){});
-        User user = response.getBody().getData();
+                new ParameterizedTypeReference<>() {
+                });
 
         // Assert
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(),
                 "HTTP Status code should be 400");
-        Assertions.assertTrue(Arrays.asList("Email is required", "Email must have between 5-125 characters", "Email needs to be a valid email").contains(user.getEmail()),
+        Assertions.assertNotNull(response.getBody());
+        Assertions.assertTrue(Arrays.asList("Email is required", "Email must have between 5-125 characters", "Email needs to be a valid email").contains(response.getBody().getData().get("email")),
                 "Returned user's full name seems to be incorrect");
-        Assertions.assertTrue(Arrays.asList("Password is required", "Password must be at least 8 characters in length.,Password must contain at least 1 uppercase characters.,Password must contain at least 1 lowercase characters.,Password must contain at least 1 digit characters.,Password must contain at least 1 special characters.").contains(user.getPassword()),
+        Assertions.assertTrue(Arrays.asList("Password is required", "Password must be at least 8 characters in length.,Password must contain at least 1 uppercase characters.,Password must contain at least 1 lowercase characters.,Password must contain at least 1 digit characters.,Password must contain at least 1 special characters.").contains(response.getBody().getData().get("password")),
                 "Returned user's bio seems to be incorrect");
-        Assertions.assertTrue(Arrays.asList("Full name is required", "Full name must have between 2-45 characters").contains(user.getFullName()),
+        Assertions.assertTrue(Arrays.asList("Full name is required", "Full name must have between 2-45 characters").contains(response.getBody().getData().get("fullName")),
                 "Returned user's bio seems to be incorrect");
     }
 
@@ -219,20 +229,21 @@ class AuthControllerIntegrationTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 
         HttpEntity<String> request = new HttpEntity<>(userDetailsRequestJson.toString(), headers);
 
         // Act
-        ResponseEntity<HttpResponse<User>> response = testRestTemplate.exchange("/api/register",
+        ResponseEntity<HttpResponse<HashMap<String, String>>> response = testRestTemplate.exchange("/api/register",
                 HttpMethod.POST,
                 request,
-                new ParameterizedTypeReference<>(){});
-        User user = response.getBody().getData();
+                new ParameterizedTypeReference<>() {
+                });
 
         // Assert
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        Assertions.assertEquals("Password must contain at least 1 special characters.", user.getPassword(),
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(), "HTTP Status code should be 400");
+        Assertions.assertNotNull(response.getBody());
+        Assertions.assertEquals("Password must contain at least 1 special characters.", response.getBody().getData().get("password"),
                 "Returned user's bio seems to be incorrect");
     }
 }

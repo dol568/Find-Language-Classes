@@ -300,7 +300,8 @@ class LanguageClassControllerTest {
         // Given
         given(mockPrincipal.getName()).willReturn("me");
 
-        doNothing().when(this.languageClassService).attendClass(eq(1L), Mockito.any(String.class));
+        given(this.languageClassService.attendClass(eq(1L), Mockito.any(String.class))).willReturn(tc1);
+        given(this.LanguageClassToReturnLanguageClass.convert(tc1)).willReturn(tcr1);
 
         // When and then
         this.mockMvc.perform(post(this.baseUrl + "/1/attend")
@@ -309,7 +310,10 @@ class LanguageClassControllerTest {
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.statusCode").value(200))
                 .andExpect(jsonPath("$.message").value("Language class attended"))
-                .andExpect(jsonPath("$.data").doesNotExist());
+                .andExpect(jsonPath("$.data.id").value(tcr1.getId()))
+                .andExpect(jsonPath("$.data.title").value(tcr1.getTitle()))
+                .andExpect(jsonPath("$.data.description").value(tcr1.getDescription()))
+                .andExpect(jsonPath("$.data.category").value(tcr1.getCategory()));
     }
 
     @Test
@@ -334,8 +338,8 @@ class LanguageClassControllerTest {
         // Given
         given(mockPrincipal.getName()).willReturn("me");
 
-        doNothing().when(this.languageClassService)
-                .abandonClass(eq(1L), Mockito.any(String.class));
+        given(this.languageClassService.abandonClass(eq(1L), Mockito.any(String.class))).willReturn(tc1);
+        given(this.LanguageClassToReturnLanguageClass.convert(tc1)).willReturn(tcr1);
 
         // When and then
         this.mockMvc.perform(delete(this.baseUrl + "/1/abandon")
@@ -344,7 +348,10 @@ class LanguageClassControllerTest {
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.statusCode").value(200))
                 .andExpect(jsonPath("$.message").value("Language class abandoned"))
-                .andExpect(jsonPath("$.data").doesNotExist());
+                .andExpect(jsonPath("$.data.id").value(tcr1.getId()))
+                .andExpect(jsonPath("$.data.title").value(tcr1.getTitle()))
+                .andExpect(jsonPath("$.data.description").value(tcr1.getDescription()))
+                .andExpect(jsonPath("$.data.category").value(tcr1.getCategory()));
     }
 
     @Test

@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ import static org.mockito.Mockito.*;
 class LanguageClassServiceTest {
 
     @Mock
-    LanguageClassRepository LanguageClassRepository;
+    LanguageClassRepository languageClassRepository;
 
     @Mock
     UserServiceImpl userService;
@@ -44,18 +45,22 @@ class LanguageClassServiceTest {
     UserRepository userRepository;
 
     @Mock
-    LanguageClassDTOToLanguageClassConverter LanguageClassDTOToLanguageClassConverter;
+    LanguageClassDTOToLanguageClassConverter languageClassDTOToLanguageClassConverter;
 
     @InjectMocks
-    LanguageClassServiceImpl LanguageClassService;
+    LanguageClassServiceImpl languageClassService;
 
     List<LanguageClass> languageClasses;
     User user;
     LanguageClass tc1;
     LanguageClass tc2;
 
+    ModelMapper modelMapper;
+
     @BeforeEach
     void setUp() {
+        modelMapper = new ModelMapper();
+
         user = new User();
         user.setId("1");
         user.setUserName("joetalbot568");
@@ -104,15 +109,15 @@ class LanguageClassServiceTest {
     @Test
     void getAllLanguageClassesSuccess() {
         // Given
-        given(this.LanguageClassRepository.findByOrderByTimeAsc())
+        given(this.languageClassRepository.findByOrderByTimeAsc())
                 .willReturn(this.languageClasses);
 
         // When
-        List<LanguageClass> actualLanguageClasses = this.LanguageClassService.getAllLanguageClasses();
+        List<LanguageClass> actualLanguageClasses = this.languageClassService.getAllLanguageClasses();
 
         //Then
         assertThat(actualLanguageClasses.size()).isEqualTo(this.languageClasses.size());
-        verify(this.LanguageClassRepository, times(1)).findByOrderByTimeAsc();
+        verify(this.languageClassRepository, times(1)).findByOrderByTimeAsc();
     }
 
     @Test
@@ -132,11 +137,11 @@ class LanguageClassServiceTest {
         tc.setCountry("Poland");
         tc.setTotalSpots(20);
 
-        given(this.LanguageClassRepository.findById(3L))
+        given(this.languageClassRepository.findById(3L))
                 .willReturn(Optional.of(tc));
 
         // When
-        LanguageClass returnedLanguageClass = this.LanguageClassService.getLanguageClass(3L);
+        LanguageClass returnedLanguageClass = this.languageClassService.getLanguageClass(3L);
 
         // Then
         assertThat(returnedLanguageClass.getId()).isEqualTo(tc.getId());
@@ -153,22 +158,22 @@ class LanguageClassServiceTest {
         assertThat(returnedLanguageClass.getCountry()).isEqualTo(tc.getCountry());
         assertThat(returnedLanguageClass.getTotalSpots()).isEqualTo(tc.getTotalSpots());
 
-        verify(this.LanguageClassRepository, times(1)).findById(3L);
+        verify(this.languageClassRepository, times(1)).findById(3L);
     }
 
     @Test
     void getLanguageClassNotFound() {
         // Given
-        given(this.LanguageClassRepository.findById(Mockito.any(Long.class))).willReturn(Optional.empty());
+        given(this.languageClassRepository.findById(Mockito.any(Long.class))).willReturn(Optional.empty());
 
         // When
-        Throwable thrown = catchThrowable(() -> this.LanguageClassService.getLanguageClass(3L));
+        Throwable thrown = catchThrowable(() -> this.languageClassService.getLanguageClass(3L));
 
         // Then
         assertThat(thrown)
                 .isInstanceOf(ObjectNotFoundException.class)
                 .hasMessage("Could not find Language class with Id 3");
-        verify(this.LanguageClassRepository, times(1)).findById(3L);
+        verify(this.languageClassRepository, times(1)).findById(3L);
     }
 
     @Test
@@ -187,21 +192,21 @@ class LanguageClassServiceTest {
         tcDTO.setCountry("Poland");
         tcDTO.setTotalSpots(20);
 
+        LanguageClass lc = modelMapper.map(tcDTO, LanguageClass.class);
+
         given(this.userService.findByEmail("joe@gmail.com")).willReturn(user);
-        given(this.LanguageClassDTOToLanguageClassConverter.convert(tcDTO)).willReturn(tc1);
-        given(this.LanguageClassRepository.save(tc1)).willReturn(tc1);
-        given(this.LanguageClassRepository.findById(tc1.getId())).willReturn(Optional.of(tc1));
+        given(this.languageClassDTOToLanguageClassConverter.convert(tcDTO)).willReturn(lc);
+        given(this.languageClassRepository.save(lc)).willReturn(lc);
 
         // When
-        LanguageClass savedLanguageClass = this.LanguageClassService.saveLanguageClass(tcDTO, user.getEmail());
+        LanguageClass savedLanguageClass = this.languageClassService.saveLanguageClass(tcDTO, user.getEmail());
 
         // Then
         assertThat(savedLanguageClass.getUserLanguageClasses().size()).isEqualTo(1);
         assertThat(savedLanguageClass.getTitle()).isEqualTo(tcDTO.getTitle());
         verify(this.userService, times(1)).findByEmail("joe@gmail.com");
-        verify(this.LanguageClassDTOToLanguageClassConverter, times(1)).convert(tcDTO);
-        verify(this.LanguageClassRepository, times(1)).save(tc1);
-        verify(this.LanguageClassRepository, times(1)).findById(tc1.getId());
+        verify(this.languageClassDTOToLanguageClassConverter, times(1)).convert(tcDTO);
+        verify(this.languageClassRepository, times(1)).save(lc);
     }
 
     @Test
@@ -220,18 +225,21 @@ class LanguageClassServiceTest {
         update.setCountry("Poland");
         update.setTotalSpots(17);
 
-        given(this.LanguageClassRepository.findById(1L)).willReturn(Optional.of(tc1));
-        given(this.LanguageClassRepository.save(tc1)).willReturn(tc1);
+        LanguageClass lc = modelMapper.map(update, LanguageClass.class);
+
+        given(this.languageClassRepository.findById(1L)).willReturn(Optional.of(tc1));
+        given(this.languageClassDTOToLanguageClassConverter.convert(update)).willReturn(lc);
+        given(this.languageClassRepository.save(lc)).willReturn(lc);
 
         // When
-        LanguageClass updatedLanguageClass = this.LanguageClassService.editLanguageClass(update, 1L);
+        LanguageClass updatedLanguageClass = this.languageClassService.editLanguageClass(update, 1L);
 
         // Then
         assertThat(updatedLanguageClass.getId()).isEqualTo(1L);
         assertThat(updatedLanguageClass.getTitle()).isEqualTo("Updated title");
         assertThat(updatedLanguageClass.getDescription()).isEqualTo("Updated description");
-        verify(this.LanguageClassRepository, times(1)).save(tc1);
-        verify(this.LanguageClassRepository, times(2)).findById(1L);
+        verify(this.languageClassRepository, times(1)).save(lc);
+        verify(this.languageClassRepository, times(1)).findById(1L);
     }
 
     @Test
@@ -250,59 +258,59 @@ class LanguageClassServiceTest {
         update.setCountry("Poland");
         update.setTotalSpots(17);
 
-        given(this.LanguageClassRepository.findById(1L)).willReturn(Optional.empty());
+        given(this.languageClassRepository.findById(1L)).willReturn(Optional.empty());
 
         // When
         assertThrows(ObjectNotFoundException.class, () -> {
-            this.LanguageClassService.editLanguageClass(update, 1L);
+            this.languageClassService.editLanguageClass(update, 1L);
         });
 
         // Then
-        verify(this.LanguageClassRepository, times(1)).findById(1L);
+        verify(this.languageClassRepository, times(1)).findById(1L);
     }
 
     @Test
     void deleteLanguageClassSuccess() {
         // Given
-        given(this.LanguageClassRepository.findById(2L)).willReturn(Optional.of(tc2));
-        doNothing().when(this.LanguageClassRepository).delete(tc2);
+        given(this.languageClassRepository.findById(2L)).willReturn(Optional.of(tc2));
+        doNothing().when(this.languageClassRepository).delete(tc2);
 
         // When
-        this.LanguageClassService.deleteLanguageClass(2L);
+        this.languageClassService.deleteLanguageClass(2L);
 
         // Then
-        verify(this.LanguageClassRepository, times(1)).delete(tc2);
+        verify(this.languageClassRepository, times(1)).delete(tc2);
     }
 
     @Test
     void deleteLanguageClassNotFound() {
         // Given
-        given(this.LanguageClassRepository.findById(2L)).willReturn(Optional.empty());
+        given(this.languageClassRepository.findById(2L)).willReturn(Optional.empty());
 
         // When
         assertThrows(ObjectNotFoundException.class, () -> {
-            this.LanguageClassService.deleteLanguageClass(2L);
+            this.languageClassService.deleteLanguageClass(2L);
         });
 
         // Then
-        verify(this.LanguageClassRepository, times(1)).findById(2L);
+        verify(this.languageClassRepository, times(1)).findById(2L);
     }
 
     @Test
     void attendClassSuccess() {
         // Given
         given(this.userService.findByEmail("joe@gmail.com")).willReturn(user);
-        given(this.LanguageClassRepository.findById(2L))
+        given(this.languageClassRepository.findById(2L))
                 .willReturn(Optional.of(tc2));
 
         // When
-        this.LanguageClassService.attendClass(2L, "joe@gmail.com");
+        this.languageClassService.attendClass(2L, "joe@gmail.com");
 
         // Then
         assertThat(tc2.getUserLanguageClasses().size()).isEqualTo(1);
         verify(this.userService, times(1)).findByEmail("joe@gmail.com");
-        verify(this.LanguageClassRepository, times(1)).findById(tc2.getId());
-        verify(this.LanguageClassRepository, times(1)).save(tc2);
+        verify(this.languageClassRepository, times(1)).findById(tc2.getId());
+        verify(this.languageClassRepository, times(1)).save(tc2);
         verify(this.userRepository, times(1)).save(user);
     }
 
@@ -310,17 +318,17 @@ class LanguageClassServiceTest {
     void attendClassNotFound() {
         // Given
         given(this.userService.findByEmail("joe@gmail.com")).willReturn(user);
-        given(this.LanguageClassRepository.findById(2L))
+        given(this.languageClassRepository.findById(2L))
                 .willReturn(Optional.empty());
 
         // When
         assertThrows(ObjectNotFoundException.class, () -> {
-            this.LanguageClassService.attendClass(2L, "joe@gmail.com");
+            this.languageClassService.attendClass(2L, "joe@gmail.com");
         });
 
         // Then
         verify(this.userService, times(1)).findByEmail("joe@gmail.com");
-        verify(this.LanguageClassRepository, times(1)).findById(tc2.getId());
+        verify(this.languageClassRepository, times(1)).findById(tc2.getId());
     }
 
     @Test
@@ -333,18 +341,18 @@ class LanguageClassServiceTest {
         tc2.addUserLanguageClass(userLanguageClass);
 
         given(this.userService.findByEmail("joe@gmail.com")).willReturn(user);
-        given(this.LanguageClassRepository.findById(2L))
+        given(this.languageClassRepository.findById(2L))
                 .willReturn(Optional.of(tc2));
 
         // When
         assertThrows(UserNotFoundException.class, () -> {
-            this.LanguageClassService.attendClass(2L, "joe@gmail.com");
+            this.languageClassService.attendClass(2L, "joe@gmail.com");
         });
 
         // Then
         assertThat(tc2.getUserLanguageClasses().size()).isEqualTo(1);
         verify(this.userService, times(1)).findByEmail("joe@gmail.com");
-        verify(this.LanguageClassRepository, times(1)).findById(tc2.getId());
+        verify(this.languageClassRepository, times(1)).findById(tc2.getId());
     }
 
     @Test
@@ -352,7 +360,7 @@ class LanguageClassServiceTest {
         // Given
 
         given(this.userService.findByEmail("joe@gmail.com")).willReturn(user);
-        given(this.LanguageClassRepository.findById(2L))
+        given(this.languageClassRepository.findById(2L))
                 .willReturn(Optional.of(tc2));
 
         UserLanguageClass userLanguageClass = new UserLanguageClass();
@@ -361,13 +369,13 @@ class LanguageClassServiceTest {
 
         tc2.addUserLanguageClass(userLanguageClass);
         // When
-        this.LanguageClassService.abandonClass(2L, "joe@gmail.com");
+        this.languageClassService.abandonClass(2L, "joe@gmail.com");
 
         // Then
         assertThat(tc2.getUserLanguageClasses().size()).isEqualTo(0);
         verify(this.userService, times(1)).findByEmail("joe@gmail.com");
-        verify(this.LanguageClassRepository, times(1)).findById(tc2.getId());
-        verify(this.LanguageClassRepository, times(1)).save(tc2);
+        verify(this.languageClassRepository, times(1)).findById(tc2.getId());
+        verify(this.languageClassRepository, times(1)).save(tc2);
         verify(this.userRepository, times(1)).save(user);
     }
 
@@ -375,35 +383,35 @@ class LanguageClassServiceTest {
     void abandonClassNotFound() {
         // Given
         given(this.userService.findByEmail("joe@gmail.com")).willReturn(user);
-        given(this.LanguageClassRepository.findById(2L))
+        given(this.languageClassRepository.findById(2L))
                 .willReturn(Optional.empty());
 
         // When
         assertThrows(ObjectNotFoundException.class, () -> {
-            this.LanguageClassService.abandonClass(2L, "joe@gmail.com");
+            this.languageClassService.abandonClass(2L, "joe@gmail.com");
         });
 
         // Then
         verify(this.userService, times(1)).findByEmail("joe@gmail.com");
-        verify(this.LanguageClassRepository, times(1)).findById(tc2.getId());
+        verify(this.languageClassRepository, times(1)).findById(tc2.getId());
     }
 
     @Test
     void abandonClassNotAttended() {
         // Given
         given(this.userService.findByEmail("joe@gmail.com")).willReturn(user);
-        given(this.LanguageClassRepository.findById(2L))
+        given(this.languageClassRepository.findById(2L))
                 .willReturn(Optional.of(tc2));
 
         // When
         assertThrows(UserNotFoundException.class, () -> {
-            this.LanguageClassService.abandonClass(2L, "joe@gmail.com");
+            this.languageClassService.abandonClass(2L, "joe@gmail.com");
         });
 
         // Then
         assertThat(tc2.getUserLanguageClasses().size()).isEqualTo(0);
         verify(this.userService, times(1)).findByEmail("joe@gmail.com");
-        verify(this.LanguageClassRepository, times(1)).findById(tc2.getId());
+        verify(this.languageClassRepository, times(1)).findById(tc2.getId());
     }
 
     @Test
@@ -416,17 +424,17 @@ class LanguageClassServiceTest {
         tc2.addUserLanguageClass(userLanguageClass);
 
         given(this.userService.findByEmail("joe@gmail.com")).willReturn(user);
-        given(this.LanguageClassRepository.findById(2L))
+        given(this.languageClassRepository.findById(2L))
                 .willReturn(Optional.of(tc2));
 
         // When
         assertThrows(UserNotFoundException.class, () -> {
-            this.LanguageClassService.abandonClass(2L, "joe@gmail.com");
+            this.languageClassService.abandonClass(2L, "joe@gmail.com");
         });
 
         // Then
         assertThat(tc2.getUserLanguageClasses().size()).isEqualTo(1);
         verify(this.userService, times(1)).findByEmail("joe@gmail.com");
-        verify(this.LanguageClassRepository, times(1)).findById(tc2.getId());
+        verify(this.languageClassRepository, times(1)).findById(tc2.getId());
     }
 }

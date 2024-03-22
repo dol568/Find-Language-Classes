@@ -1,5 +1,6 @@
 package com.springbootangularcourses.springbootbackend.follow;
 
+import com.springbootangularcourses.springbootbackend.domain.dto.ReturnProfile;
 import com.springbootangularcourses.springbootbackend.domain.dto.ReturnUser;
 import com.springbootangularcourses.springbootbackend.system.HttpResponse;
 import org.json.JSONObject;
@@ -11,6 +12,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 
 import java.util.Arrays;
+import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -37,7 +39,7 @@ public class FollowControllerIntegrationTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 
         HttpEntity<String> request = new HttpEntity<>(userDetailsRequestJson.toString(), headers);
 
@@ -45,7 +47,8 @@ public class FollowControllerIntegrationTest {
         ResponseEntity<HttpResponse<ReturnUser>> response = testRestTemplate.exchange("/api/register",
                 HttpMethod.POST,
                 request,
-                new ParameterizedTypeReference<>(){});
+                new ParameterizedTypeReference<>() {
+                });
         ReturnUser returnUser = response.getBody().getData();
 
         // Assert
@@ -64,7 +67,7 @@ public class FollowControllerIntegrationTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 
         HttpEntity<String> request = new HttpEntity<>(loginCredentials.toString(), headers);
 
@@ -72,7 +75,8 @@ public class FollowControllerIntegrationTest {
         ResponseEntity<HttpResponse<ReturnUser>> response = testRestTemplate.exchange("/api/login",
                 HttpMethod.POST,
                 request,
-                new ParameterizedTypeReference<>(){});
+                new ParameterizedTypeReference<>() {
+                });
         ReturnUser returnUser = response.getBody().getData();
 
         authorizationToken = returnUser.getToken();
@@ -92,19 +96,23 @@ public class FollowControllerIntegrationTest {
     void testFollowSuccess() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(authorizationToken);
 
-        HttpEntity requestEntity = new HttpEntity(headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
         // Act
-        ResponseEntity<HttpResponse<ReturnUser>> response = testRestTemplate.exchange(this.baseUrl + "/thomy568",
+        ResponseEntity<HttpResponse<ReturnProfile>> response = testRestTemplate.exchange(this.baseUrl + "/thomy568",
                 HttpMethod.POST,
                 requestEntity,
-                new ParameterizedTypeReference<>(){});
+                new ParameterizedTypeReference<>() {
+                });
+        ReturnProfile returnProfile = response.getBody().getData();
 
         // Assert
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(), "HTTP Status code should be 200");
+        Assertions.assertEquals(1, returnProfile.getFollowers().size(),
+                "Returned profile's number of followers to be incorrect");
     }
 
     @Test
@@ -113,22 +121,22 @@ public class FollowControllerIntegrationTest {
     void testFollowErrorUserNotFound() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(authorizationToken);
 
-        HttpEntity requestEntity = new HttpEntity(headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
         // Act
-        ResponseEntity<HttpResponse<ReturnUser>> response = testRestTemplate.exchange(this.baseUrl + "/jonas568",
+        ResponseEntity<HttpResponse<ReturnProfile>> response = testRestTemplate.exchange(this.baseUrl + "/jonas568",
                 HttpMethod.POST,
                 requestEntity,
-                new ParameterizedTypeReference<>(){});
+                new ParameterizedTypeReference<>() {
+                });
 
         // Assert
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(),
                 "HTTP Status code should be 404");
     }
-
 
     @Test
     @DisplayName("Check follow yourself (POST)")
@@ -136,16 +144,17 @@ public class FollowControllerIntegrationTest {
     void testFollowErrorYourself() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(authorizationToken);
 
-        HttpEntity requestEntity = new HttpEntity(headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
         // Act
-        ResponseEntity<HttpResponse<ReturnUser>> response = testRestTemplate.exchange(this.baseUrl + "/joetalbot12345",
+        ResponseEntity<HttpResponse<ReturnProfile>> response = testRestTemplate.exchange(this.baseUrl + "/joetalbot12345",
                 HttpMethod.POST,
                 requestEntity,
-                new ParameterizedTypeReference<>(){});
+                new ParameterizedTypeReference<>() {
+                });
 
         // Assert
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(),
@@ -158,19 +167,23 @@ public class FollowControllerIntegrationTest {
     void testUnfollowSuccess() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(authorizationToken);
 
-        HttpEntity requestEntity = new HttpEntity(headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
         // Act
-        ResponseEntity response = testRestTemplate.exchange(this.baseUrl + "/thomy568",
+        ResponseEntity<HttpResponse<ReturnProfile>> response = testRestTemplate.exchange(this.baseUrl + "/thomy568",
                 HttpMethod.DELETE,
                 requestEntity,
-                new ParameterizedTypeReference<>(){});
+                new ParameterizedTypeReference<>() {
+                });
+        ReturnProfile returnProfile = response.getBody().getData();
 
         // Assert
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(), "HTTP Status code should be 200");
+        Assertions.assertEquals(0, returnProfile.getFollowers().size(),
+                "Returned profile's number of followers to be incorrect");
     }
 
     @Test
@@ -179,16 +192,17 @@ public class FollowControllerIntegrationTest {
     void testUnfollowErrorUserNotFound() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(authorizationToken);
 
-        HttpEntity requestEntity = new HttpEntity(headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
         // Act
-        ResponseEntity<HttpResponse<ReturnUser>> response = testRestTemplate.exchange(this.baseUrl + "/jonas568",
+        ResponseEntity<HttpResponse<ReturnProfile>> response = testRestTemplate.exchange(this.baseUrl + "/jonas568",
                 HttpMethod.DELETE,
                 requestEntity,
-                new ParameterizedTypeReference<>(){});
+                new ParameterizedTypeReference<>() {
+                });
 
         // Assert
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(), "HTTP Status code should be 404");
@@ -200,16 +214,17 @@ public class FollowControllerIntegrationTest {
     void testUnfollowErrorNotFollowed() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(authorizationToken);
 
-        HttpEntity requestEntity = new HttpEntity(headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
         // Act
-        ResponseEntity<HttpResponse<ReturnUser>> response = testRestTemplate.exchange(this.baseUrl + "/thomy568",
+        ResponseEntity<HttpResponse<ReturnProfile>> response = testRestTemplate.exchange(this.baseUrl + "/thomy568",
                 HttpMethod.DELETE,
                 requestEntity,
-                new ParameterizedTypeReference<>(){});
+                new ParameterizedTypeReference<>() {
+                });
 
         // Assert
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(),
@@ -219,19 +234,20 @@ public class FollowControllerIntegrationTest {
     @Test
     @DisplayName("Check unfollow yourself (DELETE)")
     @Order(9)
-    void testUnfollowErrorYourself() throws Exception {
+    void testUnfollowErrorYourself() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(authorizationToken);
 
-        HttpEntity requestEntity = new HttpEntity(headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
         // Act
-        ResponseEntity<HttpResponse<ReturnUser>> response = testRestTemplate.exchange(this.baseUrl + "/joetalbot12345",
+        ResponseEntity<HttpResponse<ReturnProfile>> response = testRestTemplate.exchange(this.baseUrl + "/joetalbot12345",
                 HttpMethod.DELETE,
                 requestEntity,
-                new ParameterizedTypeReference<>(){});
+                new ParameterizedTypeReference<>() {
+                });
 
         // Assert
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(),

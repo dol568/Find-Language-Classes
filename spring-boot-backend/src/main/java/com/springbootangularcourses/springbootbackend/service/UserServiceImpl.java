@@ -1,6 +1,5 @@
 package com.springbootangularcourses.springbootbackend.service;
 
-import com.springbootangularcourses.springbootbackend.security.CustomUserDetailsService;
 import com.springbootangularcourses.springbootbackend.system.exceptions.UserNotFoundException;
 import com.springbootangularcourses.springbootbackend.system.exceptions.UsernameAlreadyExistsException;
 import com.springbootangularcourses.springbootbackend.domain.User;
@@ -40,7 +39,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final CustomUserDetailsService customUserDetailsService;
 
     @Override
     @Transactional(readOnly = true)

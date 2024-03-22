@@ -12,6 +12,8 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -36,7 +38,7 @@ class ProfileControllerIntegrationTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 
         HttpEntity<String> request = new HttpEntity<>(loginCredentials.toString(), headers);
 
@@ -45,9 +47,8 @@ class ProfileControllerIntegrationTest {
                 HttpMethod.POST,
                 request,
                 new ParameterizedTypeReference<>(){});
-        ReturnUser returnUser = response.getBody().getData();
 
-        authorizationToken = returnUser.getToken();
+        authorizationToken = response.getBody().getData().getToken();
 
         // Assert
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
@@ -60,10 +61,10 @@ class ProfileControllerIntegrationTest {
     void testGetProfileSuccess() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(authorizationToken);
 
-        HttpEntity requestEntity = new HttpEntity(headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
         // Act
         ResponseEntity<HttpResponse<ReturnProfile>> response = testRestTemplate.exchange(this.baseUrl + "/joshh568",
@@ -86,19 +87,21 @@ class ProfileControllerIntegrationTest {
     void testGetProfileNotFound() {
         // Arrange
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(authorizationToken);
 
-        HttpEntity requestEntity = new HttpEntity(headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
         // Act
-        ResponseEntity<HttpResponse<ReturnProfile>> response = testRestTemplate.exchange(this.baseUrl + "/jonas568",
+        ResponseEntity<HttpResponse<Void>> response = testRestTemplate.exchange(this.baseUrl + "/jonas568",
                 HttpMethod.GET,
                 requestEntity,
                 new ParameterizedTypeReference<>(){});
 
         // Assert
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode(), "HTTP Status code should be 404");
+        Assertions.assertEquals("User with username 'jonas568' not found", response.getBody().getMessage(),
+                "Error message seems to be incorrect");
     }
 
     @Test
@@ -112,7 +115,7 @@ class ProfileControllerIntegrationTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(authorizationToken);
 
         HttpEntity<String> request = new HttpEntity<>(profileDTO.toString(), headers);
@@ -143,13 +146,13 @@ class ProfileControllerIntegrationTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(authorizationToken);
 
         HttpEntity<String> request = new HttpEntity<>(profileDTO.toString(), headers);
 
         // Act
-        ResponseEntity<HttpResponse<ReturnProfile>> response = testRestTemplate.exchange(this.baseUrl + "/joshh568",
+        ResponseEntity<HttpResponse<Void>> response = testRestTemplate.exchange(this.baseUrl + "/joshh568",
                 HttpMethod.PUT,
                 request,
                 new ParameterizedTypeReference<>(){});
@@ -157,6 +160,8 @@ class ProfileControllerIntegrationTest {
         // Assert
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(),
                 "HTTP Status code should be 400");
+        Assertions.assertEquals("Profile with username 'joshh568' does not belong to user with email 'thomyorke@gmail.com'",
+                response.getBody().getMessage(), "Error message seems to be incorrect");
     }
 
     @Test
@@ -170,24 +175,24 @@ class ProfileControllerIntegrationTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(authorizationToken);
 
         HttpEntity<String> request = new HttpEntity<>(profileDTO.toString(), headers);
 
         // Act
-        ResponseEntity<HttpResponse<ReturnProfile>> response = testRestTemplate.exchange(this.baseUrl + "/thomy568",
+        ResponseEntity<HttpResponse<HashMap<String, String>>> response = testRestTemplate.exchange(this.baseUrl + "/thomy568",
                 HttpMethod.PUT,
                 request,
                 new ParameterizedTypeReference<>(){});
-        ReturnProfile returnProfile = response.getBody().getData();
 
         // Assert
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode(),
                 "HTTP Status code should be 400");
-        Assertions.assertEquals("Full Name is required", returnProfile.getFullName(),
-                "Returned user's full name seems to be incorrect");
-        Assertions.assertEquals("Bio is required", returnProfile.getBio(),
-                "Returned user's bio seems to be incorrect");
+        Assertions.assertNotNull(response.getBody());
+        Assertions.assertEquals("Full Name is required", response.getBody().getData().get("fullName"),
+                "Error message seems to be incorrect");
+        Assertions.assertEquals("Bio is required", response.getBody().getData().get("bio"),
+                "Error message seems to be incorrect");
     }
 }

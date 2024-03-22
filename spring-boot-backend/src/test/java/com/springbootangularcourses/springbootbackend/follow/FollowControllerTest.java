@@ -1,13 +1,16 @@
 package com.springbootangularcourses.springbootbackend.follow;
 
 import com.springbootangularcourses.springbootbackend.domain.User;
+import com.springbootangularcourses.springbootbackend.domain.dto.ReturnProfile;
 import com.springbootangularcourses.springbootbackend.resource.FollowController;
 import com.springbootangularcourses.springbootbackend.service.UserService;
 import com.springbootangularcourses.springbootbackend.system.exceptions.CustomResponseEntityExceptionHandler;
+import com.springbootangularcourses.springbootbackend.utils.converter.UserToReturnProfileConverter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -23,8 +26,7 @@ import java.security.Principal;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @WebMvcTest(excludeAutoConfiguration = SecurityAutoConfiguration.class)
@@ -41,12 +43,20 @@ class FollowControllerTest {
     @MockBean
     Principal mockPrincipal;
 
+    @MockBean
+    UserToReturnProfileConverter userToReturnProfileConverter;
+
     String baseUrl = "/api/follow";
 
+    ModelMapper modelMapper;
+
     User user;
+    ReturnProfile returnProfile;
 
     @BeforeEach
     void setUp() {
+        modelMapper = new ModelMapper();
+
         user = new User();
         user.setId("1");
         user.setUserName("joetalbot568");
@@ -54,6 +64,8 @@ class FollowControllerTest {
         user.setFullName("Joe Talbot");
         user.setPassword("!Jjoetalbot8");
         user.setBio("im joe");
+
+        returnProfile = modelMapper.map(user, ReturnProfile .class);
     }
 
     @AfterEach
@@ -65,7 +77,9 @@ class FollowControllerTest {
         // Given
         given(mockPrincipal.getName()).willReturn("tom@gmail.com");
 
-        doNothing().when(this.userService).followUser(Mockito.any(String.class), Mockito.any(String.class));
+        given(this.userService.followUser(Mockito.any(String.class), Mockito.any(String.class)))
+                .willReturn(user);
+        given(this.userToReturnProfileConverter.convert(user)).willReturn(returnProfile);
 
         // When and then
         this.mockMvc.perform(post(this.baseUrl + "/joetalbot568")
@@ -74,7 +88,8 @@ class FollowControllerTest {
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.statusCode").value(200))
                 .andExpect(jsonPath("$.message").value("User has been followed"))
-                .andExpect(jsonPath("$.data").doesNotExist());
+                .andExpect(jsonPath("$.data.username").value(user.getUserName()))
+                .andExpect(jsonPath("$.data.fullName").value(user.getFullName()));
     }
 
     @Test
@@ -99,7 +114,9 @@ class FollowControllerTest {
         // Given
         given(mockPrincipal.getName()).willReturn("tom@gmail.com");
 
-        doNothing().when(this.userService).unfollowUser(Mockito.any(String.class), Mockito.any(String.class));
+        given(this.userService.unfollowUser(Mockito.any(String.class), Mockito.any(String.class)))
+                .willReturn(user);
+        given(this.userToReturnProfileConverter.convert(user)).willReturn(returnProfile);
 
         // When and then
         this.mockMvc.perform(delete(this.baseUrl + "/joetalbot568")
@@ -108,7 +125,8 @@ class FollowControllerTest {
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.statusCode").value(200))
                 .andExpect(jsonPath("$.message").value("User has been unfollowed"))
-                .andExpect(jsonPath("$.data").doesNotExist());
+                .andExpect(jsonPath("$.data.username").value(user.getUserName()))
+                .andExpect(jsonPath("$.data.fullName").value(user.getFullName()));
     }
 
     @Test
