@@ -1,0 +1,1 @@
+var e="",t="signup",s="language-classes",o="add-class",n="server-error",r="not-found",c="profiles",_="token",l=/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;export{e as a,t as b,s as c,o as d,n as e,r as f,c as g,_ as h,l as i};
