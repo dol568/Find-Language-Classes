@@ -5,6 +5,9 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "postbuild": "npm run deploy",
+    "predeploy": "rimraf ../spring-boot-backend/src/main/resources/static/ && mkdirp ../spring-boot-backend/src/main/resources/static",
+    "deploy": "copyfiles -f dist/** ../spring-boot-backend/src/main/resources/static",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
