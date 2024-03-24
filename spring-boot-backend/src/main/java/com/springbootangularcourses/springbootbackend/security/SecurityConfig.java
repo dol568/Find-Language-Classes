@@ -66,7 +66,7 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**", "/favicon.ico", "*.png", "*.gif", "*.svg",
                                 "*.jpg", "*.html", "*.css", "*.js", "/static/**", "/api/login",
                                 "/api/register", "/", "/assets/**").permitAll()
-                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/language-classes/ws/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(spaWebFilter, BasicAuthenticationFilter.class)
