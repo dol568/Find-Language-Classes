@@ -27,7 +27,7 @@ import { forkJoin } from 'rxjs';
   templateUrl: './language-class-item.component.html',
   styleUrl: './language-class-item.component.scss',
 })
-export class LanguageClassItemComponent implements OnInit {
+export class LanguageClassItemComponent {
   protected readonly getDaysOfWeekWords = getDaysOfWeekWords;
 
   @Output() goToProfile: EventEmitter<string> = new EventEmitter<string>();
@@ -36,8 +36,6 @@ export class LanguageClassItemComponent implements OnInit {
   @Output() quitClass: EventEmitter<number> = new EventEmitter<number>();
 
   languageClass: InputSignal<ILanguageClass> = input.required<ILanguageClass>();
-
-  ngOnInit(): void {}
 
   client_language_classes: string = _client_language_classes;
 

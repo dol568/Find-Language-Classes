@@ -9,3 +9,9 @@ export const _authSecretKey = 'token';
 
 export const _emailOnly =
   /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+
+
+// export const _img_default = './assets';
+// export const _img_flag = '../../../../assets';
+export const _img_default = '';
+export const _img_flag = '';

@@ -14,5 +14,5 @@ import { CommonModule } from '@angular/common';
 })
 export class ProfileHeaderComponent {
   profile: InputSignal<IProfile> = input.required<IProfile>();
-  photo: InputSignal<SafeUrl> = input.required<SafeUrl>();
+  photo: InputSignal<string> = input.required<string>();
 }
