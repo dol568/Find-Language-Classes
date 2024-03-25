@@ -27,12 +27,12 @@ export class AccountService {
 
   #currentUser: WritableSignal<IUser> = signal<IUser | null>(null);
   #profile: WritableSignal<IProfile> = signal<IProfile | undefined>(undefined);
-  #photo: WritableSignal<SafeUrl> = signal<SafeUrl>(undefined);
+  #photo: WritableSignal<string> = signal<string>(undefined);
   #isAuthenticated: WritableSignal<boolean> = signal<boolean>(false);
 
   currentUser: Signal<IUser> = computed(this.#currentUser);
   profile: Signal<IProfile> = computed(this.#profile);
-  photo: Signal<SafeUrl> = computed(this.#photo);
+  photo: Signal<string> = computed(this.#photo);
 
   constructor() {
     // this.loadCurrentUser();
@@ -137,18 +137,18 @@ export class AccountService {
     );
   }
 
-  public loadPhoto(photoUrl: string): Observable<SafeUrl> {
+  public loadPhoto(photoUrl: string): Observable<string> {
     return this.#http.get(photoUrl, { responseType: 'blob' }).pipe(
-      map((blob) => this.#domSanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob))),
+      map((blob) => this.#domSanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob)) as string),
       tap((response) => {
         this.#photo.set(response);
       })
     );
   }
 
-  public loadPhoto2(photoUrl: string): Observable<Blob> {
-    return this.#http.get(photoUrl, { responseType: 'blob' });
-  }
+  // public loadPhoto2(photoUrl: string): Observable<Blob> {
+  //   return this.#http.get(photoUrl, { responseType: 'blob' });
+  // }
 
   public followUser(userName: string): Observable<IProfile> {
     return this.#http.post<IApiResponse<IProfile>>(this.#followUrl + '/' + userName, null).pipe(

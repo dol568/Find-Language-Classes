@@ -1,3 +1,5 @@
+import { _img_flag} from "./_client_consts";
+
 export const getDays = [
   { key: 0, text: 'Sunday' },
   { key: 1, text: 'Monday' },
@@ -17,6 +19,5 @@ export const getDaysOfWeekNumbers = (dayOFWeek: string) => {
 };
 
 export const getFlagImg = (category: string) => {
-  // return `/${category?.toLowerCase()}.jpg`;
-  return `../../../../assets/${category?.toLowerCase()}.jpg`;
+  return `${_img_flag}/${category?.toLowerCase()}.jpg`;
 };

@@ -38,18 +38,12 @@ export class ProfileComponent implements OnInit {
   #domSanitizer = inject(DomSanitizer);
 
   profile: Signal<IProfile> = this.#accountService.profile;
-  photo: Signal<SafeUrl> = this.#accountService.photo;
+  photo: Signal<string> = this.#accountService.photo;
   currentUser: Signal<IUser> = this.#accountService.currentUser;
   safeCroppedImage: WritableSignal<SafeUrl> = signal<SafeUrl>('');
   listInfo: WritableSignal<ProfileInfo> = signal<ProfileInfo>(ProfileInfo.ABOUT);
 
   @Input() userName = '';
-
-  constructor() {
-    effect(() => {
-      console.log(this.currentUser())
-    })
-  }
 
   ngOnInit(): void {
     runInInjectionContext(this.#injector, () => {
@@ -60,16 +54,6 @@ export class ProfileComponent implements OnInit {
               const userName = params.get('userName');
               if (userName) {
                 return this.#accountService.profile$(userName)
-                // .pipe(
-                //   switchMap((response) => {
-                //     const photo = response.data?.photoUrl;
-                //     if (photo || photo?.length === 0) {
-                //       return this.#accountService.loadPhoto(photo);
-                //     } else { 
-                //       return this.#accountService.loadPhoto('');
-                //     }
-                //   })
-                // );
               } else {
                 return EMPTY;
               }
