@@ -1,3 +1,5 @@
+
+import { SafeUrl } from '@angular/platform-browser';
 import { IUserLanguageClass } from './IUserLanguageClass';
 
 export interface ILanguageClass {

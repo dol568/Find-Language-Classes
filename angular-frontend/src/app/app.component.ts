@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit, signal, Signal, WritableSignal } from '@angular/core';
+import { Component, effect, inject, Input, OnInit, signal, Signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar.component';
@@ -23,6 +23,7 @@ export class AppComponent implements OnInit {
   @Input() userName = '';
 
   constructor() {
+    
     this.#router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {

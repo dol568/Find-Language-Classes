@@ -35,7 +35,7 @@ export class AccountService {
   photo: Signal<SafeUrl> = computed(this.#photo);
 
   constructor() {
-    this.loadCurrentUser();
+    // this.loadCurrentUser();
   }
 
   public loadCurrentUser(): Observable<void> {
@@ -53,6 +53,7 @@ export class AccountService {
         if (user) {
           sessionStorage.setItem(_authSecretKey, user.token);
           this.#currentUser.set(user);
+          this.loadPhoto(user?.photoUrl).subscribe();
           this.#isAuthenticated.set(true);
         } else {
           this.#isAuthenticated.set(false);
@@ -102,6 +103,7 @@ export class AccountService {
   public profile$(userName: string): Observable<IApiResponse<IProfile>> {
     return this.#http.get<IApiResponse<IProfile>>(this.#profileUrl + '/' + userName).pipe(
       tap((response) => {
+        this.loadPhoto(response.data.photoUrl).subscribe();
         this.#profile.set(response.data);
       })
     );
@@ -124,9 +126,12 @@ export class AccountService {
     return this.#http.put<IApiResponse<string>>(this.#profileUrl + '/photo', data).pipe(
       map((response) => response.data),
       tap((response) => {
+        console.log(this.currentUser());
         const copy = { ...this.currentUser() };
         copy.photoUrl = response;
+        this.loadPhoto(response).subscribe();
         this.#currentUser.set(copy);
+        console.log(this.currentUser());
         this.#profile.update((value) => ({ ...value, photoUrl: response }));
       })
     );
@@ -139,6 +144,10 @@ export class AccountService {
         this.#photo.set(response);
       })
     );
+  }
+
+  public loadPhoto2(photoUrl: string): Observable<Blob> {
+    return this.#http.get(photoUrl, { responseType: 'blob' });
   }
 
   public followUser(userName: string): Observable<IProfile> {

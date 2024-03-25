@@ -17,6 +17,6 @@ export const getDaysOfWeekNumbers = (dayOFWeek: string) => {
 };
 
 export const getFlagImg = (category: string) => {
-  return `/${category?.toLowerCase()}.jpg`;
-  // return `../../../../assets/${category?.toLowerCase()}.jpg`;
+  // return `/${category?.toLowerCase()}.jpg`;
+  return `../../../../assets/${category?.toLowerCase()}.jpg`;
 };

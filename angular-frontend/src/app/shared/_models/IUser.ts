@@ -1,3 +1,5 @@
+import { SafeUrl } from "@angular/platform-browser";
+
 export interface IUser {
   userName: string;
   fullName: string;
