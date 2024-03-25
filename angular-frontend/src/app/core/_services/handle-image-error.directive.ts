@@ -12,7 +12,7 @@ export class HandleImageErrorDirective {
   @HostListener('error', ['$event'])
   handleImageError(event: Event): void {
     const image = event.target as HTMLInputElement;
-    image.src = this.handleImgError ?? '/user.jpg';
-    // image.src = this.handleImgError ?? './assets/user.jpg';
+    // image.src = this.handleImgError ?? '/user.jpg';
+    image.src = this.handleImgError ?? './assets/user.jpg';
   }
 }

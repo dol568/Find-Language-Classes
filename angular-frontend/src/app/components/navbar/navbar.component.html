@@ -20,8 +20,9 @@
       aria-haspopup="true"
       aria-expanded="false"
     >
-      <img class="rounded-circle width-30px" 
-      [src]="photo"
+<!--      [src]="photo"-->
+      <img class="rounded-circle width-30px"
+      [src]="currentUser()?.photoUrl | authenticate"
        handleImageError alt="user photo" />
       {{ currentUser()?.fullName }}
     </a>

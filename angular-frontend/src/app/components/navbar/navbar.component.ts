@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnDestroy, Signal } from '@angular/core';
+import { Component, effect, inject, OnDestroy, Signal, computed } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AccountService } from '../../core/_services/account.service';
 import {
@@ -25,33 +25,37 @@ export class NavbarComponent implements OnDestroy {
   #router = inject(Router);
   #accountService = inject(AccountService);
   currentUser: Signal<IUser> = this.#accountService.currentUser;
+  newSignal = computed(() => this.#accountService.currentUser());
   profile = this.#accountService.profile;
   add_class: string = _client_add_class;
-  photo: SafeUrl | string = '';
+  // photo: SafeUrl | string = '';
+  photo = this.#accountService.photo;
+
 
   constructor() {
-    effect(() => {
-      if (!!this.currentUser()) {
-        this.#accountService
-          .profile$(this.currentUser()?.userName)
-          .pipe(
-            switchMap((response) => {
-              const photo = response.data?.photoUrl;
-              if (photo) {
-                return this.#accountService
-                  .loadPhoto(photo)
-                  .pipe(tap((safeUrl) => (this.photo = safeUrl)));
-              } else {
-                return EMPTY;
-              }
-            }),
-            takeUntil(this.#destroySubject$)
-          )
-          .subscribe({
-            error: (err) => console.error(err),
-          });
-      }
-    });
+    effect(() => console.log(this.currentUser()))
+    // effect(() => {
+    //   if (!!this.currentUser()) {
+    //     this.#accountService
+    //       .profile$(this.currentUser()?.userName)
+    //       .pipe(
+    //         switchMap((response) => {
+    //           const photo = response.data?.photoUrl;
+    //           if (photo) {
+    //             return this.#accountService
+    //               .loadPhoto(photo)
+    //               .pipe(tap((safeUrl) => (this.photo = safeUrl)));
+    //           } else {
+    //             return EMPTY;
+    //           }
+    //         }),
+    //         takeUntil(this.#destroySubject$)
+    //       )
+    //       .subscribe({
+    //         error: (err) => console.error(err),
+    //       });
+    //   }
+    // });
   }
 
   ngOnDestroy(): void {

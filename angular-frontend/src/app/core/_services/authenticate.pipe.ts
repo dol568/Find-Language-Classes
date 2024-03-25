@@ -60,7 +60,7 @@ export class AuthenticatePipe implements PipeTransform, OnDestroy {
               map((unsafeBlobUrl: string) =>
                 this.#sanitizer.bypassSecurityTrustUrl(unsafeBlobUrl)
               ),
-              filter((blobUrl) => blobUrl !== this.latestValue)
+              // filter((blobUrl) => blobUrl !== this.latestValue)
             )
         ),
         tap((imagePath: string | SafeUrl) => {
