@@ -56,6 +56,7 @@ export class LanguageClassesComponent implements OnDestroy {
   languageClasses: Signal<ILanguageClass[]> = computed(() =>
     this.#languageClassesService.getLanguageClasses(this.currentUser(), this.classesParams())
   );
+  
 
   ngOnInit(): void {
     this.#languageClassesService.languageClasses$.pipe(takeUntil(this.#destroySubject$)).subscribe({

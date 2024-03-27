@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnDestroy, Signal, computed } from '@angular/core';
+import { Component, inject, OnDestroy, Signal} from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AccountService } from '../../core/_services/account.service';
 import {
@@ -9,8 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { AuthenticatePipe } from '../../core/_services/authenticate.pipe';
 import { HandleImageErrorDirective } from '../../core/_services/handle-image-error.directive';
-import { SafeUrl } from '@angular/platform-browser';
-import { EMPTY, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { Subject } from 'rxjs';
 import { IUser } from '../../shared/_models/IUser';
 
 @Component({
@@ -25,10 +24,9 @@ export class NavbarComponent implements OnDestroy {
   #router = inject(Router);
   #accountService = inject(AccountService);
   currentUser: Signal<IUser> = this.#accountService.currentUser;
-  newSignal = computed(() => this.#accountService.currentUser());
   profile = this.#accountService.profile;
   add_class: string = _client_add_class;
-  photo = this.#accountService.photo;
+  photo = this.#accountService.loggedInUserPhoto;
 
   ngOnDestroy(): void {
     this.#destroySubject$.next();

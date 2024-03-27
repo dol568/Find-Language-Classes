@@ -3,8 +3,10 @@ package com.springbootangularcourses.springbootbackend.service;
 import com.springbootangularcourses.springbootbackend.domain.ChatRoomUser;
 import com.springbootangularcourses.springbootbackend.domain.Comment;
 import com.springbootangularcourses.springbootbackend.domain.LanguageClass;
+import com.springbootangularcourses.springbootbackend.domain.dto.CommentDTO;
 import com.springbootangularcourses.springbootbackend.domain.dto.LanguageClassDTO;
 import com.springbootangularcourses.springbootbackend.domain.dto.ReturnComment;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -24,6 +26,8 @@ public interface LanguageClassService {
 
     LanguageClass abandonClass(Long id, String email);
 
+    Comment postComment(CommentDTO commentDTO, Long id, String email);
+
     void sendPublicMessage(Comment comment);
 
     void sendPublicMessage(ReturnComment comment);
@@ -31,4 +35,6 @@ public interface LanguageClassService {
     void joinChatRoom(ChatRoomUser joiningUser, LanguageClass languageClass);
 
     void leaveChatRoom(ChatRoomUser leavingUser, LanguageClass languageClass);
+
+    Page<Comment> getAllComments(Long id, int page, int size);
 }

@@ -1,0 +1,17 @@
+<nav *ngIf="comments()?.totalPages > 1">
+  <ul class="pagination justify-content-end">
+    <li class="page-item" [ngClass]="{ disabled: page() + 1 === 1 }">
+      <a class="page-link" (click)="onPagerChange(page() - 1)">Previous</a>
+    </li>
+    <li
+      class="page-item"
+      [ngClass]="{ active: item - 1 === page() }"
+      *ngFor="let item of getArrayData()"
+    >
+      <a class="page-link" (click)="onPagerChange(item - 1)">{{ item }}</a>
+    </li>
+    <li class="page-item" [ngClass]="{ disabled: page() === comments()?.totalPages - 1 }">
+      <a class="page-link" (click)="onPagerChange(page() + 1)">Next</a>
+    </li>
+  </ul>
+</nav>
