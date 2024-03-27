@@ -1,1 +1,0 @@
-import{ic as r}from"./chunk-DSNOOFSA.js";var y=[{key:0,text:"Sunday"},{key:1,text:"Monday"},{key:2,text:"Tuesday"},{key:3,text:"Wednesday"},{key:4,text:"Thursday"},{key:5,text:"Friday"},{key:6,text:"Saturday"}],o=e=>y.filter(t=>t.key===e)[0].text,s=e=>y.filter(t=>t.text===e)[0].key,x=e=>`${r}/${e?.toLowerCase()}.jpg`;export{o as a,s as b,x as c};
