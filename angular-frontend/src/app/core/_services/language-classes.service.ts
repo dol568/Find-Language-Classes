@@ -1,28 +1,53 @@
 import { computed, inject, Injectable, Signal, signal, WritableSignal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { _api_default, _api_language_classes } from '../../shared/_constVars/_api_consts';
-import { concatMap, delay, forkJoin, map, Observable, switchMap, tap, toArray } from 'rxjs';
-import { ILanguageClass } from '../../shared/_models/ILanguageClass';
+import { map, Observable, tap } from 'rxjs';
+import { CommentDto, IComment, ILanguageClass } from '../../shared/_models/ILanguageClass';
 import { IApiResponse } from '../../shared/_models/IApiResponse';
 import { IUser } from '../../shared/_models/IUser';
 import { AttendanceType, Params } from '../../shared/_models/Params';
 import { timeToNumber } from '../../shared/_helper/_languageClass';
 import { AccountService } from './account.service';
+import { ShopParams } from '../../shared/_models/ShopParams';
+import { IApiResponsePage } from '../../shared/_models/IApiResponsePage';
+import { IPage } from '../../shared/_models/IPage';
+import { _paramsAppend } from '../../shared/_helper/_paramsAppend';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LanguageClassesService {
-  acc = inject(AccountService)
+  acc = inject(AccountService);
   #http = inject(HttpClient);
   #baseUrl = _api_default + _api_language_classes;
   #displayedHours: WritableSignal<number[]> = signal<number[]>([]);
   #languageClasses: WritableSignal<ILanguageClass[]> = signal<ILanguageClass[]>([]);
   #languageClass: WritableSignal<ILanguageClass> = signal<ILanguageClass>(undefined);
+  #comments: WritableSignal<IPage<IComment>> = signal<IPage<IComment> | undefined>(undefined);
+  comments: Signal<IPage<IComment>> = computed(this.#comments);
 
   displayedHours: Signal<number[]> = computed(this.#displayedHours);
   languageClasses: Signal<ILanguageClass[]> = computed(this.#languageClasses);
   languageClass: Signal<ILanguageClass> = computed(this.#languageClass);
+
+  public comments$ = function (
+    id: number,
+    params: ShopParams
+  ): Observable<IApiResponsePage<IPage<IComment>>> {
+    const options = {
+      params: _paramsAppend(params),
+      observe: 'response' as 'body',
+      responseType: 'json',
+    };
+
+    return this.#http
+      .get(`${this.#baseUrl}/${id}/comment`, options)
+      .pipe(map((response) => response['body']));
+  };
+
+  public postComment(data: CommentDto, id: number): Observable<IApiResponse<IComment>> {
+    return this.#http.post<IApiResponse<IComment>>(`${this.#baseUrl}/${id}/comment`, data);
+  }
 
   public getLanguageClasses(user: IUser, params: Params): ILanguageClass[] {
     this.#filterAndSort(user, params)().forEach((languageClass) =>
@@ -35,44 +60,9 @@ export class LanguageClassesService {
     .get<IApiResponse<ILanguageClass[]>>(this.#baseUrl)
     .pipe(
       map((response) => response.data),
-      tap(res => this.#languageClasses.set(res))
+      tap((res) => this.#languageClasses.set(res))
     );
 
-  // public languageClasses$: Observable<ILanguageClass[]> = this.#http
-  // .get<IApiResponse<ILanguageClass[]>>(this.#baseUrl)
-  // .pipe(
-  //   map((response) => response.data),
-  //   concatMap((classes) =>
-  //     forkJoin(
-  //       classes.map((languageClass) =>
-  //         forkJoin(
-  //           this.acc.loadPhoto2(languageClass.hostImage),
-  //           forkJoin(
-  //             languageClass.userLanguageClasses.map((userLanguageClass) =>
-  //               this.acc.loadPhoto2(userLanguageClass.image)
-  //             )
-  //           )
-  //         ).pipe(
-  //           map(([hostImageBlob, userImagesBlobs]) => ({
-  //             ...languageClass,
-  //             hostImage: this.#domSanitizer.bypassSecurityTrustUrl(
-  //               URL.createObjectURL(hostImageBlob)
-  //             ) as string,
-  //             userLanguageClasses: languageClass.userLanguageClasses.map((userLanguageClass, index) => ({
-  //               ...userLanguageClass,
-  //               image: this.#domSanitizer.bypassSecurityTrustUrl(
-  //                 URL.createObjectURL(userImagesBlobs[index])
-  //               ) as string
-  //             }))
-  //           }))
-  //         )
-  //       )
-  //     )
-  //   ),
-  //   tap(res => this.#languageClasses.set(res))
-  // );
-
-      
   public languageClass$ = (id: number): Observable<ILanguageClass> =>
     this.#http.get<IApiResponse<ILanguageClass>>(this.#baseUrl + '/' + id).pipe(
       map((response) => response.data),
@@ -128,11 +118,11 @@ export class LanguageClassesService {
     );
   }
 
-  public removeLanguageClass(LanguageClassId: number): Observable<IApiResponse<void>> {
-    return this.#http.delete<IApiResponse<any>>(this.#baseUrl + '/' + LanguageClassId).pipe(
+  public removeLanguageClass(languageClassId: number): Observable<IApiResponse<void>> {
+    return this.#http.delete<IApiResponse<any>>(this.#baseUrl + '/' + languageClassId).pipe(
       tap(() => {
         const updatedClasses = this.languageClasses().filter(
-          (value) => value.id !== LanguageClassId
+          (value) => value.id !== languageClassId
         );
         this.#languageClasses.set(updatedClasses);
       })

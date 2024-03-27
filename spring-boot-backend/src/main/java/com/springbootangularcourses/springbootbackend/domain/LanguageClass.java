@@ -49,7 +49,7 @@ public class LanguageClass {
     @NotNull(message = "Total spots is required")
     private int totalSpots;
 
-    @OneToMany(mappedBy = "languageClass", cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.PERSIST}  , orphanRemoval = true)
+    @OneToMany(mappedBy = "languageClass", cascade = {CascadeType.REMOVE, CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
     private List<UserLanguageClass> userLanguageClasses = new ArrayList<>();
 
     @OneToMany(mappedBy = "languageClass", cascade = CascadeType.REMOVE, orphanRemoval = true)

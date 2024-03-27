@@ -21,7 +21,7 @@
       aria-expanded="false"
     >
       <img class="rounded-circle width-30px"
-      [src]="currentUser()?.photoUrl | authenticate"
+      [src]="photo()"
        handleImageError alt="user photo" />
       {{ currentUser()?.fullName }}
     </a>

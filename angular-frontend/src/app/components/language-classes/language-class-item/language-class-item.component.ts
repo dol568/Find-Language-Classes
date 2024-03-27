@@ -2,11 +2,7 @@ import {
   Component,
   EventEmitter,
   InputSignal,
-  OnInit,
   Output,
-  computed,
-  effect,
-  inject,
   input,
 } from '@angular/core';
 import { _client_language_classes } from '../../../shared/_constVars/_client_consts';
@@ -16,9 +12,6 @@ import { AuthenticatePipe } from '../../../core/_services/authenticate.pipe';
 import { CommonModule } from '@angular/common';
 import { HandleImageErrorDirective } from '../../../core/_services/handle-image-error.directive';
 import { ILanguageClass } from '../../../shared/_models/ILanguageClass';
-import { DomSanitizer } from '@angular/platform-browser';
-import { AccountService } from '../../../core/_services/account.service';
-import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-language-class-item',

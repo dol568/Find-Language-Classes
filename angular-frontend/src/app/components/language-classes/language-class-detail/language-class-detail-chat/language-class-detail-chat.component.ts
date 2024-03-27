@@ -27,7 +27,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 })
 export class LanguageClassDetailChatComponent implements OnInit, AfterViewChecked {
   @Output() sendMessage = new EventEmitter<CommentDto>();
-  comments: InputSignal<IComment[]> = input.required<IComment[]>();
+  // comments: InputSignal<IComment[]> = input.required<IComment[]>();
   connectedUsers: InputSignal<IUser[]> = input.required<IUser[]>();
   user: InputSignal<IUser> = input.required<IUser>();
   scrolltop: WritableSignal<number> = signal<number>(undefined);

@@ -1,14 +1,22 @@
 package com.springbootangularcourses.springbootbackend.resource;
 
+import com.springbootangularcourses.springbootbackend.domain.Comment;
 import com.springbootangularcourses.springbootbackend.domain.LanguageClass;
+import com.springbootangularcourses.springbootbackend.domain.dto.CommentDTO;
+import com.springbootangularcourses.springbootbackend.domain.dto.ReturnComment;
 import com.springbootangularcourses.springbootbackend.service.LanguageClassService;
 import com.springbootangularcourses.springbootbackend.system.HttpResponse;
+import com.springbootangularcourses.springbootbackend.utils.converter.CommentToReturnCommentConverter;
 import com.springbootangularcourses.springbootbackend.utils.converter.LanguageClassToReturnLanguageClassConverter;
 import com.springbootangularcourses.springbootbackend.utils.converter.LanguageClassesToReturnLanguageClassesConverter;
 import com.springbootangularcourses.springbootbackend.domain.dto.ReturnLanguageClass;
 import com.springbootangularcourses.springbootbackend.domain.dto.LanguageClassDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -17,7 +25,10 @@ import java.net.URI;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
+import static java.util.Map.of;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -26,9 +37,11 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/api/languageClasses")
 public class LanguageClassController {
 
+
     private final LanguageClassService languageClassService;
     private final LanguageClassToReturnLanguageClassConverter languageClassToReturnLanguageClass;
     private final LanguageClassesToReturnLanguageClassesConverter languageClassesToReturnLanguageClassesConverter;
+    private final CommentToReturnCommentConverter commentToReturnCommentConverter;
 
     @GetMapping("")
     public ResponseEntity<HttpResponse> getLanguageClasses() {
@@ -147,6 +160,47 @@ public class LanguageClassController {
                         .message("Language class abandoned")
                         .status(OK)
                         .statusCode(OK.value())
+                        .build());
+    }
+
+    @GetMapping("/{id}/comment")
+    public ResponseEntity<HttpResponse> getComments(@PathVariable Long id, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
+
+        Page<Comment> comments = this.languageClassService.getAllComments(id, page, size);
+
+        List<ReturnComment> returnCommentList = comments.getContent().stream()
+                .map(commentToReturnCommentConverter::convert)
+                .collect(Collectors.toList());
+
+        Page<ReturnComment> returnCommentPage = new PageImpl<>(returnCommentList, PageRequest.of(page, size), comments.getTotalElements());
+
+        return ResponseEntity.ok().body(
+                HttpResponse.builder()
+                        .timeStamp(LocalDateTime.now().toString())
+                        .data(of("page", returnCommentPage))
+                        .message("Comments for language class with id '" + id + "' retrieved")
+                        .status(OK)
+                        .statusCode(OK.value())
+                        .build());
+    }
+
+    @PostMapping("/{id}/comment")
+    public ResponseEntity<HttpResponse> postComment(@Valid @RequestBody CommentDTO commentDTO, @PathVariable Long id, Principal principal) {
+
+        Comment comment = this.languageClassService.postComment(commentDTO, id, principal.getName());
+
+        ReturnComment returnComment = this.commentToReturnCommentConverter.convert(comment);
+
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}").buildAndExpand(comment.getId()).toUri();
+
+        return ResponseEntity.created(uri).body(
+                HttpResponse.builder()
+                        .timeStamp(LocalDateTime.now().toString())
+                        .data(returnComment)
+                        .message("Comment has been posted")
+                        .status(CREATED)
+                        .statusCode(CREATED.value())
                         .build());
     }
 }

@@ -23,7 +23,6 @@ export class AppComponent implements OnInit {
   @Input() userName = '';
 
   constructor() {
-    
     this.#router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {

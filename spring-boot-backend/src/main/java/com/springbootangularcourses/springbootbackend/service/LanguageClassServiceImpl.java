@@ -1,6 +1,8 @@
 package com.springbootangularcourses.springbootbackend.service;
 
 import com.springbootangularcourses.springbootbackend.domain.*;
+import com.springbootangularcourses.springbootbackend.domain.dto.CommentDTO;
+import com.springbootangularcourses.springbootbackend.repository.CommentRepository;
 import com.springbootangularcourses.springbootbackend.repository.LanguageClassRepository;
 import com.springbootangularcourses.springbootbackend.repository.UserLanguageClassRepository;
 import com.springbootangularcourses.springbootbackend.system.Destinations;
@@ -12,6 +14,9 @@ import com.springbootangularcourses.springbootbackend.domain.dto.ReturnComment;
 import com.springbootangularcourses.springbootbackend.domain.dto.LanguageClassDTO;
 import com.springbootangularcourses.springbootbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +30,7 @@ import java.util.List;
 public class LanguageClassServiceImpl implements LanguageClassService {
 
     private final SimpMessagingTemplate webSocketMessagingTemplate;
+    private final CommentRepository commentRepository;
     private final LanguageClassRepository languageClassRepository;
     private final UserRepository userRepository;
     private final UserService userService;
@@ -131,6 +137,26 @@ public class LanguageClassServiceImpl implements LanguageClassService {
 
         this.userRepository.save(user);
         return this.languageClassRepository.save(languageClass);
+    }
+
+    @Override
+    public Comment postComment(CommentDTO commentDTO, Long id, String email) {
+        User user = this.userService.findByEmail(email);
+        LanguageClass languageClass = this.getLanguageClass(id);
+
+        Comment comment = Comment.builder()
+                .body(commentDTO.getBody())
+                .author(user)
+                .languageClass(languageClass)
+                .build();
+
+        return this.commentRepository.save(comment);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Comment> getAllComments(Long id, int page, int size) {
+        return this.commentRepository.findCommentsByLanguageClass_Id(id, PageRequest.of(page, size));
     }
 
     @Override

@@ -48,8 +48,9 @@ public class WebSocketController {
     @SubscribeMapping("/old.messages")
     public List<ReturnComment> listOldMessagesFromUserOnSubscribe(SimpMessageHeaderAccessor headerAccessor) {
         String chatRoomId = Objects.requireNonNull(headerAccessor.getSessionAttributes()).get(CHAT_ROOM_ID).toString();
-        List<Comment> comments = commentRepository.findCommentsByLanguageClass_Id(Long.valueOf(chatRoomId));
-        return comments.stream().map(commentToReturnCommentConverter::convert).collect(Collectors.toList());
+//        List<Comment> comments = commentRepository.findCommentsByLanguageClass_Id(Long.valueOf(chatRoomId));
+//        return comments.stream().map(commentToReturnCommentConverter::convert).collect(Collectors.toList());
+        return null;
     }
 
     @MessageMapping("/send.message")
