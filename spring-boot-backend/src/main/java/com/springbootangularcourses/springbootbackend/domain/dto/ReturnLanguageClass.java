@@ -1,5 +1,6 @@
 package com.springbootangularcourses.springbootbackend.domain.dto;
 
+import com.springbootangularcourses.springbootbackend.domain.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,5 +30,5 @@ public class ReturnLanguageClass {
     private String hostName;
     private String hostUserName;
     private String hostImage;
-//    comments?: IComment[];
+    private List<ReturnComment> comments;
 }

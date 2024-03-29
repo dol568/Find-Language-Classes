@@ -1,4 +1,14 @@
-import { Component, computed, effect, inject, OnDestroy, signal, Signal, WritableSignal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  Signal,
+  WritableSignal,
+} from '@angular/core';
 import { CommentDto, IComment, ILanguageClass } from '../../../shared/_models/ILanguageClass';
 import { ReactiveFormsModule } from '@angular/forms';
 import { map, Subject, switchMap, takeUntil, tap } from 'rxjs';
@@ -17,6 +27,7 @@ import { LanguageClassDetailCommentsComponent } from './language-class-detail-co
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IPage } from '../../../shared/_models/IPage';
 import { ShopParams } from '../../../shared/_models/ShopParams';
+import { SnackbarService } from '../../../core/_services/snackbar.service';
 
 @Component({
   selector: 'app-Language-class-detail',
@@ -35,22 +46,24 @@ import { ShopParams } from '../../../shared/_models/ShopParams';
   templateUrl: './language-class-detail.component.html',
   styleUrl: './language-class-detail.component.scss',
 })
-export class LanguageClassDetailComponent implements OnDestroy {
+export class LanguageClassDetailComponent implements OnInit, OnDestroy {
   #destroySubject$: Subject<void> = new Subject<void>();
   #languageClassesService = inject(LanguageClassesService);
   #activatedRoute = inject(ActivatedRoute);
   #accountService = inject(AccountService);
   #router = inject(Router);
   client_language_classes: string = _client_language_classes;
-  languageClass: Signal<ILanguageClass> = this.#languageClassesService.languageClass;
+  // languageClass: Signal<ILanguageClass> = this.#languageClassesService.languageClass;
   user: Signal<IUser> = this.#accountService.currentUser;
 
   params: Signal<ParamMap> = toSignal(this.#activatedRoute.paramMap);
-  id: number = Number(this.params().get('id'));
+  id = Number(this.params().get('id'));
+
+  languageClass = this.#languageClassesService.langClassSignal(this.id);
 
   total: WritableSignal<number> = signal<number>(0);
 
-  comments: WritableSignal<IPage<IComment>> = signal<IPage<IComment>>(null);
+  comments: WritableSignal<IComment[]> = signal<IComment[]>([]);
   #page: WritableSignal<number> = signal<number>(0);
   page: Signal<number> = computed(this.#page);
 
@@ -58,27 +71,15 @@ export class LanguageClassDetailComponent implements OnDestroy {
     this.#page.set(num);
   }
 
-  constructor() {
-    effect(() => {
-      const shopParams = new ShopParams(this.page(), this.total());
-      this.#languageClassesService
-        .languageClass$(this.id)
-        .pipe(
-          switchMap(() => {
-            return this.#languageClassesService.comments$(this.id, shopParams).pipe(
-              map((response) => response.data.page),
-              tap((response) => {
-                this.comments.set(response);
-                this.total.set(response.totalElements);
-              })
-            );
-          }),
-          takeUntil(this.#destroySubject$)
-        )
-        .subscribe({
-          error: (err) => console.error(err),
-        });
-    });
+  ngOnInit(): void {
+    if (!this.languageClass()) {
+      this.#languageClassesService.languageClasses$.pipe(takeUntil(this.#destroySubject$)).subscribe({
+        next: () => this.comments.set(this.languageClass()?.comments),
+        error: (err) => console.error(err),
+      });
+    } else {
+      this.comments.set(this.languageClass()?.comments)
+    }
   }
 
   ngOnDestroy(): void {
@@ -91,19 +92,19 @@ export class LanguageClassDetailComponent implements OnDestroy {
   }
 
   public postComment(data: CommentDto): void {
-    this.#languageClassesService
-      .postComment(data, this.id)
-      .pipe(
-        tap(() => {
-          this.total.update((value) => {
-            const newTotal = value + 1;
-            if (newTotal > 5 && newTotal % 5 === 1) {
-              this.#page.update((value) => value + 1);
-            }
-            return newTotal;
-          });
-        })
-      )
-      .subscribe();
+      this.#languageClassesService
+        .postComment(data, this.id)
+        // .pipe(
+        //   tap(() => {
+        //     this.total.update((value) => {
+        //       const newTotal = value + 1;
+        //       if (newTotal > 5 && newTotal % 5 === 1) {
+        //         this.#page.update((value) => value + 1);
+        //       }
+        //       return newTotal;
+        //     });
+        //   })
+        // )
+        .subscribe();
   }
 }

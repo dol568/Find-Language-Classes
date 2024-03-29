@@ -1,7 +1,9 @@
 package com.springbootangularcourses.springbootbackend.utils.converter;
 
+import com.springbootangularcourses.springbootbackend.domain.Comment;
 import com.springbootangularcourses.springbootbackend.domain.LanguageClass;
 import com.springbootangularcourses.springbootbackend.domain.UserLanguageClass;
+import com.springbootangularcourses.springbootbackend.domain.dto.ReturnComment;
 import com.springbootangularcourses.springbootbackend.domain.dto.ReturnLanguageClass;
 import com.springbootangularcourses.springbootbackend.domain.dto.ReturnUserLanguageClass;
 import com.springbootangularcourses.springbootbackend.domain.User;
@@ -19,6 +21,7 @@ public class LanguageClassToReturnLanguageClassConverter implements Converter<La
 
     private final UserRepository userRepository;
     private final UserLanguageClassToReturnUserLanguageClassConverter userLanguageClassToReturnUserLanguageClass;
+    private final CommentToReturnCommentConverter commentToReturnCommentConverter;
 
     @Override
     public ReturnLanguageClass convert(LanguageClass source) {
@@ -54,6 +57,14 @@ public class LanguageClassToReturnLanguageClassConverter implements Converter<La
             returnLanguageClass.setHostUserName(host.getUserName());
             returnLanguageClass.setHostImage(host.getPhotoUrl());
         }
+
+        List<ReturnComment> comments = new ArrayList<>();
+
+        for (Comment comment: source.getComments()) {
+            comments.add(this.commentToReturnCommentConverter.convert(comment));
+        }
+
+        returnLanguageClass.setComments(comments);
 
         return returnLanguageClass;
     }

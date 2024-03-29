@@ -12,7 +12,8 @@ import { _authSecretKey, _client_home } from '../../shared/_constVars/_client_co
 import { IUser, IUserFormValues } from '../../shared/_models/IUser';
 import { IApiResponse } from '../../shared/_models/IApiResponse';
 import { IProfile, IProfileEdit } from '../../shared/_models/IProfile';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { ImageService } from './image.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +21,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 export class AccountService {
   #http = inject(HttpClient);
   #domSanitizer = inject(DomSanitizer);
+  #imageService = inject(ImageService);
   #router = inject(Router);
   #baseUrl: string = _api_default;
   #followUrl: string = this.#baseUrl + 'follow';
@@ -27,14 +29,18 @@ export class AccountService {
 
   #currentUser: WritableSignal<IUser> = signal<IUser | null>(null);
   #profile: WritableSignal<IProfile> = signal<IProfile | undefined>(undefined);
-  #photo: WritableSignal<string> = signal<string>(undefined);
-  #loggedInUserPhoto: WritableSignal<string> = signal<string>(undefined);
+  // #photo: WritableSignal<string> = signal<string>(undefined);
+  #photo: WritableSignal<SafeUrl> = signal<SafeUrl>(undefined);
+  // #loggedInUserPhoto: WritableSignal<string> = signal<string>(undefined);
+  #loggedInUserPhoto: WritableSignal<SafeUrl> = signal<SafeUrl>(undefined);
   #isAuthenticated: WritableSignal<boolean> = signal<boolean>(false);
 
   currentUser: Signal<IUser> = computed(this.#currentUser);
   profile: Signal<IProfile> = computed(this.#profile);
-  photo: Signal<string> = computed(this.#photo);
-  loggedInUserPhoto: Signal<string> = computed(this.#loggedInUserPhoto);
+  // photo: Signal<string> = computed(this.#photo);
+  photo: Signal<SafeUrl> = computed(this.#photo);
+  // loggedInUserPhoto: Signal<string> = computed(this.#loggedInUserPhoto);
+  loggedInUserPhoto: Signal<SafeUrl> = computed(this.#loggedInUserPhoto);
 
   public loadCurrentUser(): Observable<void> {
     const token = sessionStorage.getItem(_authSecretKey);
@@ -51,9 +57,13 @@ export class AccountService {
         if (user) {
           sessionStorage.setItem(_authSecretKey, user.token);
           this.#currentUser.set(user);
-          this.#loadPhoto(user?.photoUrl).subscribe((photo) => {
+          this.#imageService.getImage(user?.photoUrl).subscribe((photo) => {
             this.#loggedInUserPhoto.set(photo);
-          });
+      
+          })
+          // this.#loadPhoto(user?.photoUrl).subscribe((photo) => {
+          //   this.#loggedInUserPhoto.set(photo);
+          // });
           this.#isAuthenticated.set(true);
         } else {
           this.#isAuthenticated.set(false);
@@ -103,9 +113,13 @@ export class AccountService {
   public profile$(userName: string): Observable<IApiResponse<IProfile>> {
     return this.#http.get<IApiResponse<IProfile>>(this.#profileUrl + '/' + userName).pipe(
       tap((response) => {
-        this.#loadPhoto(response.data.photoUrl).subscribe((photo) => {
+        this.#imageService.getImage(response.data.photoUrl).subscribe((photo) => {
           this.#photo.set(photo);
-        });
+    
+        })
+        // this.#loadPhoto(response.data.photoUrl).subscribe((photo) => {
+        //   this.#photo.set(photo);
+        // });
         this.#profile.set(response.data);
       })
     );
@@ -130,6 +144,11 @@ export class AccountService {
       tap((response) => {
         const copy = { ...this.currentUser() };
         copy.photoUrl = response;
+        // this.#imageService.getImage(response).subscribe((photo) => {
+        //   // console.log(photo)
+        //   this.#photo.set(photo);
+        //   this.#loggedInUserPhoto.set(photo);
+        // })
         this.#loadPhoto(response).subscribe((photo) => {
           this.#photo.set(photo);
           this.#loggedInUserPhoto.set(photo);
@@ -158,13 +177,19 @@ export class AccountService {
     );
   }
 
-  #loadPhoto(photoUrl: string): Observable<string> {
+  #loadPhoto(photoUrl: string): Observable<SafeUrl> {
     return this.#http
       .get(photoUrl, { responseType: 'blob' })
       .pipe(
         map(
-          (blob) => this.#domSanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob)) as string
-        )
-      );
+          (blob) => this.#domSanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob))
+        ),
+          
+        tap((blob) => {
+          console.log(blob)
+          this.#imageService._cachedImages[photoUrl] = blob
+          // console.log(this._cachedImages)
+  }))
+      
   }
 }

@@ -58,6 +58,7 @@ export class LanguageClassesComponent implements OnDestroy {
   );
   
 
+
   ngOnInit(): void {
     this.#languageClassesService.languageClasses$.pipe(takeUntil(this.#destroySubject$)).subscribe({
       next: () => this.#snackBar.success('Language classes retrieved'),

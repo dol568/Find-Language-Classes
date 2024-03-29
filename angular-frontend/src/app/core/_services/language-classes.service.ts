@@ -12,6 +12,7 @@ import { ShopParams } from '../../shared/_models/ShopParams';
 import { IApiResponsePage } from '../../shared/_models/IApiResponsePage';
 import { IPage } from '../../shared/_models/IPage';
 import { _paramsAppend } from '../../shared/_helper/_paramsAppend';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root',
@@ -60,15 +61,29 @@ export class LanguageClassesService {
     .get<IApiResponse<ILanguageClass[]>>(this.#baseUrl)
     .pipe(
       map((response) => response.data),
-      tap((res) => this.#languageClasses.set(res))
+      tap((res) => {
+        console.log(res)
+        this.#languageClasses.set(res)})
     );
+
+langClassSignal = (id: number) => {
+
+  const found = this.languageClasses().find(cl => cl.id === id);
+  if (found) {
+
+    return computed(() => found);
+  }
+  else {
+    return toSignal(this.languageClass$(id))
+  }
+}
 
   public languageClass$ = (id: number): Observable<ILanguageClass> =>
     this.#http.get<IApiResponse<ILanguageClass>>(this.#baseUrl + '/' + id).pipe(
       map((response) => response.data),
-      tap((response) => {
-        this.#languageClass.set(response);
-      })
+      // tap((response) => {
+      //   this.#languageClass.set(response);
+      // })
     );
 
   #filterAndSort(user: IUser, params: Params): Signal<ILanguageClass[]> {

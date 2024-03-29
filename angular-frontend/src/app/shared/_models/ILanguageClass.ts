@@ -24,7 +24,7 @@ export interface ILanguageClass {
   comments?: IComment[];
 }
 export interface IComment {
-  id: number;
+  id?: number;
   createdAt: Date;
   body: string;
   userName: string;

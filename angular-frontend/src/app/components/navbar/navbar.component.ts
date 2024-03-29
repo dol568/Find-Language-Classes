@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, Signal} from '@angular/core';
+import { Component, effect, inject, OnDestroy, Signal} from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AccountService } from '../../core/_services/account.service';
 import {
@@ -11,13 +11,15 @@ import { AuthenticatePipe } from '../../core/_services/authenticate.pipe';
 import { HandleImageErrorDirective } from '../../core/_services/handle-image-error.directive';
 import { Subject } from 'rxjs';
 import { IUser } from '../../shared/_models/IUser';
+import { ImageService } from '../../core/_services/image.service';
+import { ImageCachePipe } from "../../core/_services/image-cache.pipe";
 
 @Component({
-  selector: 'app-navbar',
-  standalone: true,
-  imports: [RouterModule, CommonModule, AuthenticatePipe, HandleImageErrorDirective],
-  templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.scss',
+    selector: 'app-navbar',
+    standalone: true,
+    templateUrl: './navbar.component.html',
+    styleUrl: './navbar.component.scss',
+    imports: [RouterModule, CommonModule, AuthenticatePipe, HandleImageErrorDirective, ImageCachePipe]
 })
 export class NavbarComponent implements OnDestroy {
   #destroySubject$: Subject<void> = new Subject<void>();
@@ -27,6 +29,16 @@ export class NavbarComponent implements OnDestroy {
   profile = this.#accountService.profile;
   add_class: string = _client_add_class;
   photo = this.#accountService.loggedInUserPhoto;
+
+  // ph
+
+  // serv = inject(ImageService)
+
+  // constructor() {
+  //   effect(() => {
+  //     this.serv.getImage(this.currentUser()?.photoUrl).subscribe(resp => this.ph = resp)
+  //   })
+  // }
 
   ngOnDestroy(): void {
     this.#destroySubject$.next();

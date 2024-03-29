@@ -159,7 +159,7 @@
     <div class="row">
       <div class="col-md-2 pl-2 pr-1">
         <img
-          [src]="follower.photoUrl | authenticate"
+          [src]="follower.photoUrl | imageCache | async"
           handleImageError
           alt="image cap"
           style="width: 100%"
@@ -193,7 +193,7 @@
     <div class="row">
       <div class="col-md-2 pl-2 pr-1">
         <img
-          [src]="following?.photoUrl | authenticate"
+          [src]="following?.photoUrl | imageCache | async"
           handleImageError
           alt="Profile photo"
           style="width: 100%"

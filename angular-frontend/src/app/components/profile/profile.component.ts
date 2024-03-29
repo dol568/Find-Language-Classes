@@ -38,7 +38,8 @@ export class ProfileComponent implements OnInit {
   #domSanitizer = inject(DomSanitizer);
 
   profile: Signal<IProfile> = this.#accountService.profile;
-  photo: Signal<string> = this.#accountService.photo;
+  // photo: Signal<string> = this.#accountService.photo;
+  photo: Signal<SafeUrl> = this.#accountService.photo;
   currentUser: Signal<IUser> = this.#accountService.currentUser;
   safeCroppedImage: WritableSignal<SafeUrl> = signal<SafeUrl>('');
   listInfo: WritableSignal<ProfileInfo> = signal<ProfileInfo>(ProfileInfo.ABOUT);
@@ -46,7 +47,28 @@ export class ProfileComponent implements OnInit {
   @Input() userName = '';
 
   ngOnInit(): void {
-    runInInjectionContext(this.#injector, () => {
+    // runInInjectionContext(this.#injector, () => {
+    //   effect(() => {
+    //     this.#activatedRoute.paramMap
+    //       .pipe(
+    //         switchMap((params) => {
+    //           const userName = params.get('userName');
+    //           if (userName) {
+    //             return this.#accountService.profile$(userName)
+    //           } else {
+    //             return EMPTY;
+    //           }
+    //         }),
+    //         takeUntil(this.#destroySubject$)
+    //       )
+    //       .subscribe({
+    //         error: (err) => console.error(err),
+    //       });
+    //   });
+    // });
+  }
+
+  constructor() {
       effect(() => {
         this.#activatedRoute.paramMap
           .pipe(
@@ -64,7 +86,6 @@ export class ProfileComponent implements OnInit {
             error: (err) => console.error(err),
           });
       });
-    });
   }
 
   public follow(username: string): void {

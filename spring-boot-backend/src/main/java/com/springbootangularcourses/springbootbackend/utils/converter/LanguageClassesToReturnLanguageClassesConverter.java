@@ -13,13 +13,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LanguageClassesToReturnLanguageClassesConverter implements Converter<List<LanguageClass>, List<ReturnLanguageClass>> {
 
-    private final LanguageClassToReturnLanguageClassConverter LanguageClassToReturnLanguageClassConverter;
+    private final LanguageClassToReturnLanguageClassConverter languageClassToReturnLanguageClassConverter;
 
     @Override
     public List<ReturnLanguageClass> convert(List<LanguageClass> source) {
 
         return source.stream()
-                .map(this.LanguageClassToReturnLanguageClassConverter::convert)
+                .map(this.languageClassToReturnLanguageClassConverter::convert)
                 .collect(Collectors.toList());
     }
 }
