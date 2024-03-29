@@ -22,9 +22,10 @@
     >
       <img class="rounded-circle width-30px"
       [src]="photo()"
-       handleImageError alt="user photo" />
+      alt="user photo" />
       {{ currentUser()?.fullName }}
     </a>
+    <!-- handleImageError  -->
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
       <a class="dropdown-item" (click)="goToProfile()"
         ><i class="fas fa-archive"></i>

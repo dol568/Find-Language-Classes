@@ -4,7 +4,7 @@
       <img
       class="card-img-top rounded-circle mt-3 ml-3"
       handleImageError
-      [src]="languageClass()?.hostImage | authenticate"
+      [src]="ph"
         alt="Card image cap"
         style="width: 100%"
       />
@@ -64,13 +64,13 @@
         class="col-lg-1 col-md-1 col-xs-1 thumb px-1"
         *ngFor="let user of languageClass()?.userLanguageClasses; let i = index"
       >
+      <!-- handleImageError -->
       <img
       class="rounded-circle resize-image"
-      [src]="user.image | authenticate"
+      [src]="photos[i]"
       alt="Card image cap"
       (click)="navigateToProfile(user.userName)"
       data-toggle="tooltip"
-      handleImageError
           data-placement="top"
           [title]="user.fullName"
           style="width: 100%; cursor: pointer"

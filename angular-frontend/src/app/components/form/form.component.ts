@@ -43,21 +43,10 @@ export class FormComponent implements OnInit, OnDestroy {
   isEditMode: WritableSignal<boolean> = signal<boolean>(false);
   languageClass: Signal<ILanguageClass> = this.#languageClassesService.languageClass;
 
-  ngOnInit(): void {
-    this.addClassForm = new FormGroup({
-      title: new FormControl('', [Validators.required]),
-      category: new FormControl('', [Validators.required]),
-      city: new FormControl('', [Validators.required]),
-      country: new FormControl('', [Validators.required]),
-      province: new FormControl('', [Validators.required]),
-      address: new FormControl('', [Validators.required]),
-      postalCode: new FormControl('', [Validators.required]),
-      dayOfWeek: new FormControl('', [Validators.required]),
-      description: new FormControl('', [Validators.required]),
-      time: new FormControl('', [Validators.required]),
-      totalSpots: new FormControl('', [Validators.required]),
-    });
-
+  constructor() {
+    effect(() => {
+      
+    })
     this.#activatedRoute.url
       .pipe(
         switchMap((urlSegments) => {
@@ -84,6 +73,25 @@ export class FormComponent implements OnInit, OnDestroy {
         error: (err) => console.error(err),
       });
 
+  }
+
+  ngOnInit(): void {
+    this.addClassForm = new FormGroup({
+      title: new FormControl('', [Validators.required]),
+      category: new FormControl('', [Validators.required]),
+      city: new FormControl('', [Validators.required]),
+      country: new FormControl('', [Validators.required]),
+      province: new FormControl('', [Validators.required]),
+      address: new FormControl('', [Validators.required]),
+      postalCode: new FormControl('', [Validators.required]),
+      dayOfWeek: new FormControl('', [Validators.required]),
+      description: new FormControl('', [Validators.required]),
+      time: new FormControl('', [Validators.required]),
+      totalSpots: new FormControl('', [Validators.required]),
+    });
+
+    
+      console.log(this.languageClass())
     if (this.isEditMode()) {
       runInInjectionContext(this.#injector, () => {
         effect(() => {

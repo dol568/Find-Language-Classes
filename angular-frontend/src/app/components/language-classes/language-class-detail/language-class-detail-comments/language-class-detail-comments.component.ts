@@ -5,7 +5,9 @@ import {
   OnInit,
   Output,
   WritableSignal,
+  computed,
   effect,
+  inject,
   input,
   signal,
 } from '@angular/core';
@@ -17,6 +19,8 @@ import { CommonModule } from '@angular/common';
 import { HandleImageErrorDirective } from '../../../../core/_services/handle-image-error.directive';
 import { PagerComponent } from './pager/pager.component';
 import { IPage } from '../../../../shared/_models/IPage';
+import { ImageCachePipe } from '../../../../core/_services/image-cache.pipe';
+import { ImageService } from '../../../../core/_services/image.service';
 
 @Component({
   selector: 'app-language-class-detail-comments',
@@ -27,6 +31,7 @@ import { IPage } from '../../../../shared/_models/IPage';
     HandleImageErrorDirective,
     ReactiveFormsModule,
     PagerComponent,
+    ImageCachePipe
   ],
   templateUrl: './language-class-detail-comments.component.html',
   styleUrl: './language-class-detail-comments.component.scss',
@@ -34,28 +39,75 @@ import { IPage } from '../../../../shared/_models/IPage';
 export class LanguageClassDetailCommentsComponent implements OnInit {
   @Output() sendMessage = new EventEmitter<CommentDto>();
   @Output() sendPage = new EventEmitter<number>();
-  comments: InputSignal<IPage<IComment>> = input.required<IPage<IComment>>();
+  comments: InputSignal<IComment[]> = input.required<IComment[]>();
   user: InputSignal<IUser> = input.required<IUser>();
   addComment: FormGroup;
 
-  page = input.required<number>();
+  itemsPerPage = 5;
+
+  commentsList = signal<IComment[]>([]);
+
+  currentPage = signal<number>(1);
+
+  paginatedComments = computed(() => {
+    const startIndex = (this.currentPage() - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.commentsList()?.slice(startIndex, endIndex);
+  });
 
   ngOnInit(): void {
     this.addComment = new FormGroup({
       description: new FormControl('', [Validators.required]),
     });
+    
   }
+  ph
+photos = []
+serv = inject(ImageService)
 
-  constructor() {}
+  constructor() {
+    effect(
+      () => {
+        this.commentsList.set(this.comments());
+        this.currentPage.set(Math.ceil(this.comments()?.length / 5));
+        for (let attendee of this.comments()) {
+          this.serv.getImage(attendee.image).subscribe(reponse => this.photos.push(reponse))
+        }
+        
+      },
+      { allowSignalWrites: true }
+    );
+
+    }
+
+    
 
   public submitFunc(): void {
+    const newComment: IComment = {
+      createdAt: new Date(),
+      body: this.addComment.value.description,
+      userName: this.user()?.userName,
+      fullName: this.user()?.fullName,
+      image: this.user()?.photoUrl,
+    };
     this.sendMessage.emit(new CommentDto(this.addComment.value.description, this.user()?.email));
+
+    if (!this.commentsList()) {
+      this.commentsList.set([]);
+    }
+    this.commentsList.update((vals) => [...vals, newComment]);
+    const lastPage = this.calculateLastPage();
+    this.currentPage.set(lastPage);
     this.addComment.reset();
   }
 
   onPageChanged(page: number) {
-    if (this.page() !== page) {
-      this.sendPage.emit(page);
+    if (this.currentPage() !== page) {
+      this.currentPage.set(page);
     }
+  }
+  private calculateLastPage(): number {
+    const totalComments = this.commentsList()?.length || 0;
+    return Math.max(1, Math.ceil(totalComments / this.itemsPerPage));
   }
 }

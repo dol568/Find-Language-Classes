@@ -29,6 +29,7 @@ import { ImageCroppedEvent, ImageCropperModule } from 'ngx-image-cropper';
 import { AuthenticatePipe } from '../../../core/_services/authenticate.pipe';
 import { HandleImageErrorDirective } from '../../../core/_services/handle-image-error.directive';
 import { IUser } from '../../../shared/_models/IUser';
+import { ImageCachePipe } from '../../../core/_services/image-cache.pipe';
 
 @Component({
   selector: 'app-profile-detail',
@@ -39,6 +40,7 @@ import { IUser } from '../../../shared/_models/IUser';
     ImageCropperModule,
     AuthenticatePipe,
     HandleImageErrorDirective,
+    ImageCachePipe
   ],
   templateUrl: './profile-detail.component.html',
   styleUrl: './profile-detail.component.scss',

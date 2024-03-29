@@ -1,6 +1,6 @@
 <div class="card-header d-flex px-auto py-2 title justify-content-center">Comments</div>
 <div class="card-body pb-2 pt-2">
-  @for (comment of comments()?.content; track comment) { @if (this.user()?.userName ===
+  @for (comment of paginatedComments(); track comment; let i = $index) { @if (this.user()?.userName ===
   comment.userName) {
   <div class="d-flex mt-1 flex-row align-items-center">
     <strong class="mr-3" style="margin-bottom: 0; font-size: 18px; color: #0cabba">{{
@@ -11,10 +11,10 @@
     }}</small>
   </div>
   <div class="d-flex flex-row justify-content-start">
+    <!-- handleImageError -->
     <img
       class="rounded-circle"
-      [src]="comment.image | authenticate"
-      handleImageError
+      [src]="photos[i]"
       alt="avatar 1"
       style="width: 45px; height: 100%"
     />
@@ -37,10 +37,10 @@
     }}</small>
   </div>
   <div class="d-flex flex-row justify-content-start">
+    <!-- handleImageError -->
     <img
       class="rounded-circle"
-      [src]="comment.image | authenticate"
-      handleImageError
+      [src]="photos[i]"
       alt="avatar 1"
       style="width: 45px; height: 100%"
     />
@@ -59,10 +59,11 @@
 </div>
 <div class="card-body py-0">
   <app-pager
-    [comments]="comments()"
-    [page]="page()"
+    [comments]="commentsList()"
+    [page]="currentPage()"
     (pageChanged)="onPageChanged($event)"
-  ></app-pager>
+    ></app-pager>
+    <!-- [commentsLength]="commentsLength()" -->
 </div>
 <div>
   <div class="card-footer text-muted pb-0">
