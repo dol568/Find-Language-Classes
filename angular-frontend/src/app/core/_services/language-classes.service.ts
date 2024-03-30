@@ -13,6 +13,7 @@ import { IApiResponsePage } from '../../shared/_models/IApiResponsePage';
 import { IPage } from '../../shared/_models/IPage';
 import { _paramsAppend } from '../../shared/_helper/_paramsAppend';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { ImageService } from './image.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +21,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 export class LanguageClassesService {
   acc = inject(AccountService);
   #http = inject(HttpClient);
+  img = inject(ImageService);
   #baseUrl = _api_default + _api_language_classes;
   #displayedHours: WritableSignal<number[]> = signal<number[]>([]);
   #languageClasses: WritableSignal<ILanguageClass[]> = signal<ILanguageClass[]>([]);
@@ -61,30 +63,69 @@ export class LanguageClassesService {
     .get<IApiResponse<ILanguageClass[]>>(this.#baseUrl)
     .pipe(
       map((response) => response.data),
-      tap((res) => {
-        console.log(res)
-        this.#languageClasses.set(res)})
+      tap((languageClasses) => {
+        languageClasses.forEach((languageClass) => {
+          if (languageClass.hostImage) {
+            this.img
+              .getImage(languageClass.hostImage)
+              .subscribe((image) => (languageClass.hostImage = image as string));
+          }
+          if (languageClass.comments) {
+            languageClass.comments.forEach((comment) => {
+              // if (comment.image) {
+              this.img
+                .getImage(comment.image)
+                .subscribe((image) => (comment.image = image as string));
+              // }
+            });
+          }
+          if (languageClass.userLanguageClasses) {
+            languageClass.userLanguageClasses.forEach((ulc) => {
+              // if (ulc.image) {
+              this.img.getImage(ulc.image).subscribe((image) => (ulc.image = image as string));
+              // }
+            });
+          }
+        });
+        console.log(languageClasses);
+        this.#languageClasses.set(languageClasses);
+      })
     );
 
-langClassSignal = (id: number) => {
-
-  const found = this.languageClasses().find(cl => cl.id === id);
-  if (found) {
-
-    return computed(() => found);
-  }
-  else {
-    return toSignal(this.languageClass$(id))
-  }
-}
+  langClassSignal = (id: number) => {
+    const found = this.languageClasses().find((cl) => cl.id === id);
+    if (found) {
+      return computed(() => found);
+    } 
+      return toSignal(this.languageClass$(id));
+    
+  };
 
   public languageClass$ = (id: number): Observable<ILanguageClass> =>
-    this.#http.get<IApiResponse<ILanguageClass>>(this.#baseUrl + '/' + id).pipe(
-      map((response) => response.data),
-      // tap((response) => {
-      //   this.#languageClass.set(response);
-      // })
-    );
+    this.#http
+      .get<IApiResponse<ILanguageClass>>(this.#baseUrl + '/' + id)
+      .pipe(
+        map((response) => response.data),
+        tap((languageClass) => {
+            if (languageClass.comments) {
+              languageClass.comments.forEach((comment) => {
+                // if (comment.image) {
+                this.img
+                  .getImage(comment.image)
+                  .subscribe((image) => (comment.image = image as string));
+                // }
+              });
+            }
+            if (languageClass.userLanguageClasses) {
+              languageClass.userLanguageClasses.forEach((ulc) => {
+                // if (ulc.image) {
+                this.img.getImage(ulc.image).subscribe((image) => (ulc.image = image as string));
+                // }
+              });
+            }
+          })
+  
+        );
 
   #filterAndSort(user: IUser, params: Params): Signal<ILanguageClass[]> {
     return computed(() =>
@@ -169,6 +210,20 @@ langClassSignal = (id: number) => {
     if (index !== -1) {
       this.#languageClasses.update((values) => {
         const updatedClasses = [...values];
+        if (response.userLanguageClasses) {
+          response.userLanguageClasses.forEach((ulc) => {
+            this.img.getImage(ulc.image).subscribe((image) => (ulc.image = image as string));
+          });
+        }
+        if (response.comments) {
+        response.comments.forEach((comment) => {
+          // if (comment.image) {
+          this.img
+            .getImage(comment.image)
+            .subscribe((image) => (comment.image = image as string));
+          // }
+        });
+      }
         updatedClasses[index] = response;
         return updatedClasses;
       });

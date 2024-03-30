@@ -21,18 +21,24 @@ export class LanguageClassDetailSidebarComponent {
     this.goToProfile.emit(username);
   }
 
-  ph
-  photos = []
-
-  serv = inject(ImageService)
-
-  constructor() {
-    effect(() => {
-      for (let attendee of this.languageClass()?.userLanguageClasses) {
-        this.serv.getImage(attendee.image).subscribe(reponse => this.photos.push(reponse))
-      }
-    })
-  }
+      // ph
+      // photos = []
+      
+      // img = inject(ImageService)
+      
+      // constructor() {
+      //     effect(() => {
+             
+          // this.languageClass().userLanguageClasses.forEach(comment => {
+          //   if (comment.image && (typeof comment.image === 'string')) {
+          //     this.img.getImage(comment.image).subscribe(
+          //       image => comment.image = image as string
+          //     )
+          //   }
+          // })
+         
+  //   })
+  // }
 
   
 }

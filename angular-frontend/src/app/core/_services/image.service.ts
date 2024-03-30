@@ -23,12 +23,11 @@ export class ImageService {
 
   getImage(url: string) {
     if (!url || url.trim() === '') { 
-      return of(this.#domSanitizer.bypassSecurityTrustUrl(`${_img_default}/user.jpg`));
+      return of(`${_img_default}/user.jpg`);
     } else if (url.toLowerCase() === 'french' 
     || url.toLowerCase() === 'english' || url .toLowerCase()=== 'german' 
     || url.toLowerCase() === 'italian' || url.toLowerCase() === 'polish' || url.toLowerCase() === 'spanish') {
-      console.log(`${_img_flag}/${url?.toLowerCase()}.jpg`)
-      return of(this.#domSanitizer.bypassSecurityTrustUrl(`${_img_flag}/${url?.toLowerCase()}.jpg`));
+      return of(`${_img_flag}/${url?.toLowerCase()}.jpg`);
     }
     console.log(this._cachedImages)
     if (url in this._cachedImages) {
@@ -44,9 +43,9 @@ export class ImageService {
         ),
           
           tap((blob) => {
-            console.log(blob)
+            console.log('http')
+            console.log(url)
             this._cachedImages[url] = blob
-            console.log(this._cachedImages)
     }))
   }
   }

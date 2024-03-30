@@ -63,23 +63,41 @@ export class LanguageClassDetailComponent implements OnInit, OnDestroy {
 
   total: WritableSignal<number> = signal<number>(0);
 
-  comments: WritableSignal<IComment[]> = signal<IComment[]>([]);
-  #page: WritableSignal<number> = signal<number>(0);
-  page: Signal<number> = computed(this.#page);
+  // comments: WritableSignal<IComment[]> = signal<IComment[]>([]);
+  comments = computed(() => this.languageClass()?.comments)
+  // #page: WritableSignal<number> = signal<number>(0);
+  // page: Signal<number> = computed(this.#page);
 
-  public getPage(num: number) {
-    this.#page.set(num);
-  }
+  // public getPage(num: number) {
+  //   this.#page.set(num);
+  // }
+
+  // ngOnInit(): void {
+  //   if (!this.languageClass()) {
+  //     this.#languageClassesService.languageClasses$.pipe(takeUntil(this.#destroySubject$)).subscribe({
+  //       next: () => {
+  //         console.log(this.languageClass()?.comments)
+  //         this.comments.set(this.languageClass()?.comments)
+  //       },
+  //       error: (err) => console.error(err),
+  //     });
+  //   } else {
+  //     this.comments.set(this.languageClass()?.comments)
+  //   }
+  // }
 
   ngOnInit(): void {
-    if (!this.languageClass()) {
-      this.#languageClassesService.languageClasses$.pipe(takeUntil(this.#destroySubject$)).subscribe({
-        next: () => this.comments.set(this.languageClass()?.comments),
-        error: (err) => console.error(err),
-      });
-    } else {
-      this.comments.set(this.languageClass()?.comments)
-    }
+    // if (!this.languageClass()) {
+    //   this.#languageClassesService.languageClass$(this.id).pipe(takeUntil(this.#destroySubject$)).subscribe({
+    //     next: () => {
+    //       console.log(this.languageClass()?.comments)
+    //       this.comments.set(this.languageClass()?.comments)
+    //     },
+    //     error: (err) => console.error(err),
+    //   });
+    // } else {
+    //   this.comments.set(this.languageClass()?.comments)
+    // }
   }
 
   ngOnDestroy(): void {

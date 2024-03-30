@@ -13,13 +13,14 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LanguageClassesService } from '../../core/_services/language-classes.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { getDaysOfWeekNumbers, getDaysOfWeekWords } from '../../shared/_constVars/_days';
 import { CommonModule, Location } from '@angular/common';
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 import { SnackbarService } from '../../core/_services/snackbar.service';
 import { EMPTY, Subject, switchMap, takeUntil } from 'rxjs';
 import { ILanguageClass } from '../../shared/_models/ILanguageClass';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-form',
@@ -30,7 +31,6 @@ import { ILanguageClass } from '../../shared/_models/ILanguageClass';
 })
 export class FormComponent implements OnInit, OnDestroy {
   #destroySubject$: Subject<void> = new Subject<void>();
-  #injector = inject(Injector);
   #languageClassesService = inject(LanguageClassesService);
   #activatedRoute = inject(ActivatedRoute);
   #router = inject(Router);
@@ -39,40 +39,22 @@ export class FormComponent implements OnInit, OnDestroy {
   @ViewChild('myPickerRef') myTimePicker;
   addClassForm: FormGroup;
 
-  id: WritableSignal<number> = signal<number>(undefined);
-  isEditMode: WritableSignal<boolean> = signal<boolean>(false);
-  languageClass: Signal<ILanguageClass> = this.#languageClassesService.languageClass;
+  paramsUrl = toSignal(this.#activatedRoute.url);
+  isEditMode = this.paramsUrl().find((urlSegment) => urlSegment.path.includes('edit'));
+
+  params: Signal<ParamMap> = toSignal(this.#activatedRoute.paramMap);
+  id = Number(this.params().get('id'));
+
+  languageClass = this.#languageClassesService.langClassSignal(this.id);
 
   constructor() {
-    effect(() => {
-      
-    })
-    this.#activatedRoute.url
-      .pipe(
-        switchMap((urlSegments) => {
-          if (urlSegments.find((urlSegment) => urlSegment.path.includes('edit'))) {
-            this.isEditMode.set(true);
-            return this.#activatedRoute.paramMap.pipe(
-              switchMap((params) => {
-                const id = Number(params.get('id'));
-                if (this.id !== null) {
-                  this.id.set(id);
-                  return this.#languageClassesService.languageClass$(this.id());
-                } else {
-                  return EMPTY;
-                }
-              })
-            );
-          } else {
-            return EMPTY;
+    if (this.isEditMode !== null) {
+        effect(() => {
+          if (!!this.languageClass()) {
+            this.#populateForm();
           }
-        }),
-        takeUntil(this.#destroySubject$)
-      )
-      .subscribe({
-        error: (err) => console.error(err),
       });
-
+    }
   }
 
   ngOnInit(): void {
@@ -89,18 +71,6 @@ export class FormComponent implements OnInit, OnDestroy {
       time: new FormControl('', [Validators.required]),
       totalSpots: new FormControl('', [Validators.required]),
     });
-
-    
-      console.log(this.languageClass())
-    if (this.isEditMode()) {
-      runInInjectionContext(this.#injector, () => {
-        effect(() => {
-          if (!!this.languageClass()) {
-            this.#populateForm();
-          }
-        });
-      });
-    }
   }
 
   ngOnDestroy(): void {
@@ -111,7 +81,7 @@ export class FormComponent implements OnInit, OnDestroy {
   public submitFunc(): void {
     this.addClassForm.value.dayOfWeek = getDaysOfWeekNumbers(this.addClassForm.value.dayOfWeek);
 
-    if (!this.isEditMode()) {
+    if (!this.isEditMode) {
       this.#languageClassesService
         .addLanguageClass(this.addClassForm.value)
         .pipe(takeUntil(this.#destroySubject$))
@@ -125,7 +95,7 @@ export class FormComponent implements OnInit, OnDestroy {
         });
     } else {
       this.#languageClassesService
-        .editLanguageClass(this.id(), this.addClassForm.value)
+        .editLanguageClass(this.id, this.addClassForm.value)
         .pipe(takeUntil(this.#destroySubject$))
         .subscribe({
           next: () => {
