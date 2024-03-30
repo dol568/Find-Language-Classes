@@ -4,7 +4,7 @@
       <img
       class="card-img-top rounded-circle mt-3 ml-3"
       handleImageError
-      [src]="ph"
+      [src]="this.languageClass()?.hostImage"
         alt="Card image cap"
         style="width: 100%"
       />
@@ -67,7 +67,7 @@
       <!-- handleImageError -->
       <img
       class="rounded-circle resize-image"
-      [src]="photos[i]"
+      [src]="user.image"
       alt="Card image cap"
       (click)="navigateToProfile(user.userName)"
       data-toggle="tooltip"
