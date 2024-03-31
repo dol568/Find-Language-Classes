@@ -5,6 +5,9 @@ import { finalize, debounceTime } from 'rxjs';
 
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
   const busyService = inject(BusyService);
+  if (req.method === 'POST' && req.url.includes('comment')) {
+    return next(req);
+  }
   busyService.busy();
-  return next(req).pipe(debounceTime(2000), finalize(() => busyService.idle()));
+  return next(req).pipe(finalize(() => busyService.idle()));
 };

@@ -30,18 +30,11 @@ export class ImageService {
   constructor(private http: HttpClient) {}
 
   getImage(url: string) {
-    console.log(url)
+    if (!url) { 
+      return of(this._cachedImages['']);
+    } 
     url = url.toLowerCase()
-    // if (!url || url.trim() === '') { 
-    //   return of(`${_img_default}/user.jpg`);
-    // } 
-    
-    // else if (url.toLowerCase() === 'french' 
-    // if (url.toLowerCase() === 'french' 
-    // || url.toLowerCase() === 'english' || url .toLowerCase()=== 'german' 
-    // || url.toLowerCase() === 'italian' || url.toLowerCase() === 'polish' || url.toLowerCase() === 'spanish') {
-    //   return of(`${_img_flag}/${url?.toLowerCase()}.jpg`);
-    // }
+
     if (url in this._cachedImages) {
       console.log('inside cache images')
       return of(this._cachedImages[url]);

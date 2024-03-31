@@ -3,24 +3,18 @@ import {
   EventEmitter,
   InputSignal,
   Output,
-  effect,
-  inject,
   input,
 } from '@angular/core';
 import { _client_language_classes } from '../../../shared/_constVars/_client_consts';
 import { RouterLink } from '@angular/router';
 import { getDaysOfWeekWords } from '../../../shared/_constVars/_days';
-import { AuthenticatePipe } from '../../../core/_services/authenticate.pipe';
 import { CommonModule } from '@angular/common';
-import { HandleImageErrorDirective } from '../../../core/_services/handle-image-error.directive';
 import { ILanguageClass } from '../../../shared/_models/ILanguageClass';
-import { ImageService } from '../../../core/_services/image.service';
-import { ImageCachePipe } from '../../../core/_services/image-cache.pipe';
 
 @Component({
   selector: 'app-language-class-item',
   standalone: true,
-  imports: [RouterLink, AuthenticatePipe, CommonModule, HandleImageErrorDirective, ImageCachePipe],
+  imports: [RouterLink, CommonModule],
   templateUrl: './language-class-item.component.html',
   styleUrl: './language-class-item.component.scss',
 })
@@ -33,25 +27,6 @@ export class LanguageClassItemComponent {
   @Output() quitClass: EventEmitter<number> = new EventEmitter<number>();
 
   languageClass: InputSignal<ILanguageClass> = input.required<ILanguageClass>();
-
-
-  // photos = []
-  // ph
-
-  serv = inject(ImageService)
-
-  constructor() {
-    effect(() => {
-      console.log(this.languageClass())
-      // if (typeof this.languageClass()?.hostImage === 'string') {
-
-      //   this.serv.getImage(this.languageClass()?.hostImage).subscribe(resp => this.ph = resp);
-      // } else {
-      //   this.ph = this.languageClass()?.hostImage
-      // }
-     
-    })
-  }
 
   client_language_classes: string = _client_language_classes;
 

@@ -54,12 +54,12 @@ export class LanguageClassesService {
   }
 
   // public getLanguageClasses(user: IUser, params: Params): ILanguageClass[] {
-  public getLanguageClasses(user: IUser, params: Params) {
-    this.#filterAndSort(user, params).forEach((languageClass) => {
+  public getLanguageClasses(params: Params) {
+    this.#filterAndSort(params).forEach((languageClass) => {
       console.log(languageClass);
       this.#evalTime(languageClass.time);
     });
-    return this.#filterAndSort(user, params);
+    return this.#filterAndSort(params);
 
     // ...languageClass,
     // hostImage: this.img
@@ -143,16 +143,8 @@ export class LanguageClassesService {
       })
     );
 
-  #filterAndSort(user: IUser, params: Params) {
-    console.log(this.languageClasses());
-
-    //
+  #filterAndSort(params: Params) {
     const langs =  this.languageClasses()
-    // .map((tc) => ({
-    //   ...tc,
-    //   isHost: tc.userLanguageClasses.some((x) => x.userName === user?.userName && x.host),
-    //   isGoing: tc.userLanguageClasses.some((x) => x.userName === user?.userName && !x.host),
-    // }))
     .filter(
       (tc) =>
         (tc.isHost && params.attend === AttendanceType.HOST) ||
@@ -160,7 +152,6 @@ export class LanguageClassesService {
         params.attend === null
     )
     .filter((tc) => params.time === null || timeToNumber(tc.time) >= timeToNumber(params.time))
-    console.log(langs)
     return langs
   }
 

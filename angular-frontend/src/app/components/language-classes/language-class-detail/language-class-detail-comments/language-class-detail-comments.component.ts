@@ -4,7 +4,6 @@ import {
   InputSignal,
   OnInit,
   Output,
-  WritableSignal,
   computed,
   effect,
   inject,
@@ -14,26 +13,14 @@ import {
 import { CommentDto, IComment } from '../../../../shared/_models/ILanguageClass';
 import { IUser } from '../../../../shared/_models/IUser';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthenticatePipe } from '../../../../core/_services/authenticate.pipe';
 import { CommonModule } from '@angular/common';
-import { HandleImageErrorDirective } from '../../../../core/_services/handle-image-error.directive';
 import { PagerComponent } from './pager/pager.component';
-import { IPage } from '../../../../shared/_models/IPage';
-import { ImageCachePipe } from '../../../../core/_services/image-cache.pipe';
 import { ImageService } from '../../../../core/_services/image.service';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-language-class-detail-comments',
   standalone: true,
-  imports: [
-    CommonModule,
-    AuthenticatePipe,
-    HandleImageErrorDirective,
-    ReactiveFormsModule,
-    PagerComponent,
-    ImageCachePipe
-  ],
+  imports: [CommonModule, ReactiveFormsModule, PagerComponent],
   templateUrl: './language-class-detail-comments.component.html',
   styleUrl: './language-class-detail-comments.component.scss',
 })
@@ -44,7 +31,7 @@ export class LanguageClassDetailCommentsComponent implements OnInit {
   user: InputSignal<IUser> = input.required<IUser>();
   addComment: FormGroup;
 
-  img = inject(ImageService)
+  img = inject(ImageService);
 
   itemsPerPage = 5;
 
@@ -62,64 +49,41 @@ export class LanguageClassDetailCommentsComponent implements OnInit {
     this.addComment = new FormGroup({
       description: new FormControl('', [Validators.required]),
     });
-    
   }
 
   constructor() {
     effect(
       () => {
-        // console.log(this.comments())
-        // if (!!this.comments()) {
-
-          // this.comments().forEach(comment => {
-          //   if (comment.image && (typeof comment.image === 'string')) {
-          //     this.img.getImage(comment.image).subscribe(
-          //       image => comment.image = image as string
-          //     )
-          //   }
-          // })
-          this.commentsList.set(this.comments());
-          this.currentPage.set(Math.ceil(this.comments()?.length / 5));
-        // }
-        // for (let attendee of this.comments()) {
-        //   this.serv.getImage(attendee.image).subscribe(reponse => this.photos.push(reponse))
-        // }
-        
+        this.commentsList.set(this.comments());
+        this.currentPage.set(Math.ceil(this.comments()?.length / 5));
       },
       { allowSignalWrites: true }
     );
-
-    }
-
-    
+  }
 
   public submitFunc(): void {
-    // this.img.getImage(this.user()?.photoUrl).subscribe(image => {
-      // Inside the subscription, create the newComment object with the received image
-      const newComment: IComment = {
-        createdAt: new Date(),
-        body: this.addComment.value.description,
-        userName: this.user()?.userName,
-        fullName: this.user()?.fullName,
-        image: this.user()?.photoUrl, // Assign the received image to the image property
-        // image: image as string, // Assign the received image to the image property
-      };
-  
-      // Perform any action needed with the newComment object here
-      console.log(newComment);
-  
-      // Don't forget to unsubscribe to avoid memory leaks
-      
-      this.sendMessage.emit(new CommentDto(this.addComment.value.description, this.user()?.email));
-  
-      if (!this.commentsList()) {
-        this.commentsList.set([]);
-      }
-      this.commentsList.update((vals) => [...vals, newComment]);
-      const lastPage = this.calculateLastPage();
-      this.currentPage.set(lastPage);
-      this.addComment.reset();
-    // });
+    const newComment: IComment = {
+      createdAt: new Date(),
+      body: this.addComment.value.description,
+      userName: this.user()?.userName,
+      fullName: this.user()?.fullName
+    };
+    if (typeof this.user()?.photoUrl && typeof this.user()?.photoUrl === 'object') {
+      newComment.image = this.user()?.photoUrl;
+    } else {
+      this.img.getImage(this.user()?.photoUrl).subscribe((image) => {
+        newComment.image = image as string;
+      });
+    }
+    this.sendMessage.emit(new CommentDto(this.addComment.value.description, this.user()?.email));
+
+    if (!this.commentsList()) {
+      this.commentsList.set([]);
+    }
+    this.commentsList.update((vals) => [...vals, newComment]);
+    const lastPage = this.calculateLastPage();
+    this.currentPage.set(lastPage);
+    this.addComment.reset();
   }
 
   onPageChanged(page: number) {

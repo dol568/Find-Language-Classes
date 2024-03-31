@@ -29,7 +29,7 @@ export interface IComment {
   body: string;
   userName: string;
   fullName: string;
-  image: string;
+  image?: string;
 }
 export class CommentDto {
   constructor(private body: string, private email: string) {}
