@@ -26,22 +26,12 @@ import {
 import { Subject } from 'rxjs';
 import { SafeUrl } from '@angular/platform-browser';
 import { ImageCroppedEvent, ImageCropperModule } from 'ngx-image-cropper';
-import { AuthenticatePipe } from '../../../core/_services/authenticate.pipe';
-import { HandleImageErrorDirective } from '../../../core/_services/handle-image-error.directive';
 import { IUser } from '../../../shared/_models/IUser';
-import { ImageCachePipe } from '../../../core/_services/image-cache.pipe';
 
 @Component({
   selector: 'app-profile-detail',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    ImageCropperModule,
-    AuthenticatePipe,
-    HandleImageErrorDirective,
-    ImageCachePipe
-  ],
+  imports: [CommonModule, ReactiveFormsModule, ImageCropperModule],
   templateUrl: './profile-detail.component.html',
   styleUrl: './profile-detail.component.scss',
 })
@@ -72,7 +62,6 @@ export class ProfileDetailComponent implements OnInit, OnDestroy {
   constructor() {
     effect(() => {
       if (!!this.profile()) {
-
         this.isFollowMode = !this.profile()?.followers.some((follower) => {
           return follower.username === this.currentUser().userName;
         });

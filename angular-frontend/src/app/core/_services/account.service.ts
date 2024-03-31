@@ -108,8 +108,10 @@ export class AccountService {
           sessionStorage.setItem(_authSecretKey, user.token);
           this.#currentUser.set(user);
           this.#isAuthenticated.set(true);
-          this.#loadPhoto(user.photoUrl).subscribe((photo) => {
+          this.#imageService.getImage(user.photoUrl).subscribe((photo) => {
             this.#loggedInUserPhoto.set(photo);
+          // this.#loadPhoto(user.photoUrl).subscribe((photo) => {
+          //   this.#loggedInUserPhoto.set(photo);
           });
         }
       })
@@ -188,18 +190,38 @@ export class AccountService {
     return this.#http.post<IApiResponse<IProfile>>(this.#followUrl + '/' + userName, null).pipe(
       map((response) => response.data),
       tap((response) => {
-        this.#profile.set(response);
-      })
-    );
+        response.followers.forEach((photo) => {
+          this.#imageService.getImage(photo.photoUrl)
+          .subscribe((image) => photo.photoUrl = image as string)
+        })
+        // }
+        // if (response.data.followings) {
+          response.followings.forEach((photo) => {
+            this.#imageService.getImage(photo.photoUrl)
+            .subscribe((image) => photo.photoUrl = image as string)
+          })
+          this.#profile.set(response);
+        })
+        );
   }
 
   public unFollowUser(userName: string): Observable<IProfile> {
     return this.#http.delete<IApiResponse<IProfile>>(this.#followUrl + '/' + userName).pipe(
       map((response) => response.data),
       tap((response) => {
-        this.#profile.set(response);
-      })
-    );
+        response.followers.forEach((photo) => {
+          this.#imageService.getImage(photo.photoUrl)
+          .subscribe((image) => photo.photoUrl = image as string)
+        })
+        // }
+        // if (response.data.followings) {
+          response.followings.forEach((photo) => {
+            this.#imageService.getImage(photo.photoUrl)
+            .subscribe((image) => photo.photoUrl = image as string)
+          })
+          this.#profile.set(response);
+        })
+        );
   }
 
   #loadPhoto(photoUrl: string): Observable<SafeUrl> {

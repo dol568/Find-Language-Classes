@@ -1,7 +1,6 @@
 import {
   Component,
   computed,
-  effect,
   inject,
   OnDestroy,
   Signal,
@@ -16,8 +15,6 @@ import { AttendanceType, Params } from '../../shared/_models/Params';
 import { _client_language_classes } from '../../shared/_constVars/_client_consts';
 import { CommonModule } from '@angular/common';
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
-import { AuthenticatePipe } from '../../core/_services/authenticate.pipe';
-import { HandleImageErrorDirective } from '../../core/_services/handle-image-error.directive';
 import { SnackbarService } from '../../core/_services/snackbar.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
@@ -35,8 +32,6 @@ import { ILanguageClass } from '../../shared/_models/ILanguageClass';
     CommonModule,
     ReactiveFormsModule,
     NgxMaterialTimepickerModule,
-    AuthenticatePipe,
-    HandleImageErrorDirective,
     LanguageClassItemComponent,
   ],
   templateUrl: './language-classes.component.html',
@@ -56,34 +51,20 @@ export class LanguageClassesComponent implements OnDestroy {
   currentUser: Signal<IUser> = this.#accountService.currentUser;
   
   languageClasses: Signal<ILanguageClass[]> = computed(() =>
-    this.#languageClassesService.getLanguageClasses(this.currentUser(), this.classesParams())
+    this.#languageClassesService.getLanguageClasses(this.classesParams())
   );
   
   ngOnInit(): void {
-    // this.#languageClassesService.languageClasses$.pipe(takeUntil(this.#destroySubject$)).subscribe({
-    //   next: () => this.#snackBar.success('Language classes retrieved'),
-    //   error: (err) => console.error(err),
-    // });
-
-    // this.timeForm = new FormGroup({
-    //   time: new FormControl('', [Validators.required]),
-    // });
-  }
-  constructor() {
-    this.#languageClassesService.languageClasses$.pipe(takeUntil(this.#destroySubject$)).subscribe({
-      next: (resp) => {
-        this.#snackBar.success('Language classes retrieved')
-      console.log(resp)
-      },
-      error: (err) => console.error(err),
-    });
-
     this.timeForm = new FormGroup({
       time: new FormControl('', [Validators.required]),
     });
-effect(() => 
-console.log(this.languageClasses())
-)
+  }
+
+  constructor() {
+    this.#languageClassesService.languageClasses$.pipe(takeUntil(this.#destroySubject$)).subscribe({
+      next: () => this.#snackBar.success('Language classes retrieved'),
+      error: (err) => console.error(err),
+    });
   }
 
   ngOnDestroy(): void {
