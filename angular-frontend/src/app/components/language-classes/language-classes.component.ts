@@ -1,6 +1,7 @@
 import {
   Component,
   computed,
+  effect,
   inject,
   OnDestroy,
   Signal,
@@ -53,21 +54,36 @@ export class LanguageClassesComponent implements OnDestroy {
   protected readonly AttendanceType = AttendanceType;
   classesParams: WritableSignal<Params | undefined> = signal<Params | undefined>(new Params());
   currentUser: Signal<IUser> = this.#accountService.currentUser;
+  
   languageClasses: Signal<ILanguageClass[]> = computed(() =>
     this.#languageClassesService.getLanguageClasses(this.currentUser(), this.classesParams())
   );
   
-
-
   ngOnInit(): void {
+    // this.#languageClassesService.languageClasses$.pipe(takeUntil(this.#destroySubject$)).subscribe({
+    //   next: () => this.#snackBar.success('Language classes retrieved'),
+    //   error: (err) => console.error(err),
+    // });
+
+    // this.timeForm = new FormGroup({
+    //   time: new FormControl('', [Validators.required]),
+    // });
+  }
+  constructor() {
     this.#languageClassesService.languageClasses$.pipe(takeUntil(this.#destroySubject$)).subscribe({
-      next: () => this.#snackBar.success('Language classes retrieved'),
+      next: (resp) => {
+        this.#snackBar.success('Language classes retrieved')
+      console.log(resp)
+      },
       error: (err) => console.error(err),
     });
 
     this.timeForm = new FormGroup({
       time: new FormControl('', [Validators.required]),
     });
+effect(() => 
+console.log(this.languageClasses())
+)
   }
 
   ngOnDestroy(): void {

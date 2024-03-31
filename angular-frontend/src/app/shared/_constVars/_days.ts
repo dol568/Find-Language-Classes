@@ -11,7 +11,10 @@ export const getDays = [
 ];
 
 export const getDaysOfWeekWords = (dayOFWeek: number) => {
-  return getDays.filter((x) => x.key === dayOFWeek)[0].text;
+  if (dayOFWeek) {
+    return getDays.filter((x) => x.key === dayOFWeek)[0].text;
+  } 
+  return null;
 };
 
 export const getDaysOfWeekNumbers = (dayOFWeek: string) => {

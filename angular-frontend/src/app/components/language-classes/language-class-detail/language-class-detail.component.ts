@@ -46,14 +46,13 @@ import { SnackbarService } from '../../../core/_services/snackbar.service';
   templateUrl: './language-class-detail.component.html',
   styleUrl: './language-class-detail.component.scss',
 })
-export class LanguageClassDetailComponent implements OnInit, OnDestroy {
+export class LanguageClassDetailComponent implements OnDestroy {
   #destroySubject$: Subject<void> = new Subject<void>();
   #languageClassesService = inject(LanguageClassesService);
   #activatedRoute = inject(ActivatedRoute);
   #accountService = inject(AccountService);
   #router = inject(Router);
   client_language_classes: string = _client_language_classes;
-  // languageClass: Signal<ILanguageClass> = this.#languageClassesService.languageClass;
   user: Signal<IUser> = this.#accountService.currentUser;
 
   params: Signal<ParamMap> = toSignal(this.#activatedRoute.paramMap);
@@ -61,44 +60,7 @@ export class LanguageClassDetailComponent implements OnInit, OnDestroy {
 
   languageClass = this.#languageClassesService.langClassSignal(this.id);
 
-  total: WritableSignal<number> = signal<number>(0);
-
-  // comments: WritableSignal<IComment[]> = signal<IComment[]>([]);
   comments = computed(() => this.languageClass()?.comments)
-  // #page: WritableSignal<number> = signal<number>(0);
-  // page: Signal<number> = computed(this.#page);
-
-  // public getPage(num: number) {
-  //   this.#page.set(num);
-  // }
-
-  // ngOnInit(): void {
-  //   if (!this.languageClass()) {
-  //     this.#languageClassesService.languageClasses$.pipe(takeUntil(this.#destroySubject$)).subscribe({
-  //       next: () => {
-  //         console.log(this.languageClass()?.comments)
-  //         this.comments.set(this.languageClass()?.comments)
-  //       },
-  //       error: (err) => console.error(err),
-  //     });
-  //   } else {
-  //     this.comments.set(this.languageClass()?.comments)
-  //   }
-  // }
-
-  ngOnInit(): void {
-    // if (!this.languageClass()) {
-    //   this.#languageClassesService.languageClass$(this.id).pipe(takeUntil(this.#destroySubject$)).subscribe({
-    //     next: () => {
-    //       console.log(this.languageClass()?.comments)
-    //       this.comments.set(this.languageClass()?.comments)
-    //     },
-    //     error: (err) => console.error(err),
-    //   });
-    // } else {
-    //   this.comments.set(this.languageClass()?.comments)
-    // }
-  }
 
   ngOnDestroy(): void {
     this.#destroySubject$.next();
@@ -112,17 +74,6 @@ export class LanguageClassDetailComponent implements OnInit, OnDestroy {
   public postComment(data: CommentDto): void {
       this.#languageClassesService
         .postComment(data, this.id)
-        // .pipe(
-        //   tap(() => {
-        //     this.total.update((value) => {
-        //       const newTotal = value + 1;
-        //       if (newTotal > 5 && newTotal % 5 === 1) {
-        //         this.#page.update((value) => value + 1);
-        //       }
-        //       return newTotal;
-        //     });
-        //   })
-        // )
         .subscribe();
   }
 }

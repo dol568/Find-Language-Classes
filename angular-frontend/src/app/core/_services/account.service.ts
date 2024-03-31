@@ -56,6 +56,10 @@ export class AccountService {
         const user = response.data;
         if (user) {
           sessionStorage.setItem(_authSecretKey, user.token);
+          this.#imageService.getImage(user?.photoUrl).subscribe((photo) => {
+            user.photoUrl = photo as string
+      
+          })
           this.#currentUser.set(user);
           this.#imageService.getImage(user?.photoUrl).subscribe((photo) => {
             this.#loggedInUserPhoto.set(photo);
@@ -83,8 +87,14 @@ export class AccountService {
         const user = response.data;
         if (user) {
           sessionStorage.setItem(_authSecretKey, user.token);
+       
           this.#currentUser.set(user);
           this.#isAuthenticated.set(true);
+          
+          this.#imageService.getImage(user.photoUrl).subscribe((photo) => {
+            this.#loggedInUserPhoto.set(photo);
+      
+          })
         }
       })
     );
@@ -98,6 +108,9 @@ export class AccountService {
           sessionStorage.setItem(_authSecretKey, user.token);
           this.#currentUser.set(user);
           this.#isAuthenticated.set(true);
+          this.#loadPhoto(user.photoUrl).subscribe((photo) => {
+            this.#loggedInUserPhoto.set(photo);
+          });
         }
       })
     );
@@ -115,8 +128,20 @@ export class AccountService {
       tap((response) => {
         this.#imageService.getImage(response.data.photoUrl).subscribe((photo) => {
           this.#photo.set(photo);
-    
         })
+        // if (response.data.followers) {
+          response.data.followers.forEach((photo) => {
+            this.#imageService.getImage(photo.photoUrl)
+            .subscribe((image) => photo.photoUrl = image as string)
+          })
+        // }
+        // if (response.data.followings) {
+          response.data.followings.forEach((photo) => {
+            this.#imageService.getImage(photo.photoUrl)
+            .subscribe((image) => photo.photoUrl = image as string)
+          })
+        // }
+      
         // this.#loadPhoto(response.data.photoUrl).subscribe((photo) => {
         //   this.#photo.set(photo);
         // });

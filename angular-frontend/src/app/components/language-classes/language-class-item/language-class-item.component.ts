@@ -34,19 +34,24 @@ export class LanguageClassItemComponent {
 
   languageClass: InputSignal<ILanguageClass> = input.required<ILanguageClass>();
 
-  // ph
+
   // photos = []
+  // ph
 
-  // serv = inject(ImageService)
+  serv = inject(ImageService)
 
-  // constructor() {
-  //   effect(() => {
-  //     this.serv.getImage(this.languageClass()?.hostImage).subscribe(resp => this.ph = resp);
-  //     for (let user of this.languageClass()?.userLanguageClasses) {
-  //       this.serv.getImage(user.image).subscribe(reponse => this.photos.push(reponse))
-  //     }
-  //   })
-  // }
+  constructor() {
+    effect(() => {
+      console.log(this.languageClass())
+      // if (typeof this.languageClass()?.hostImage === 'string') {
+
+      //   this.serv.getImage(this.languageClass()?.hostImage).subscribe(resp => this.ph = resp);
+      // } else {
+      //   this.ph = this.languageClass()?.hostImage
+      // }
+     
+    })
+  }
 
   client_language_classes: string = _client_language_classes;
 
