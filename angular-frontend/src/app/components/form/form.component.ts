@@ -40,19 +40,22 @@ export class FormComponent implements OnInit, OnDestroy {
   addClassForm: FormGroup;
 
   paramsUrl = toSignal(this.#activatedRoute.url);
-  isEditMode = this.paramsUrl().find((urlSegment) => urlSegment.path.includes('edit'));
+  isEditMode = this.paramsUrl().findIndex((urlSegment) => urlSegment.path.includes('edit')) > -1;
 
   params: Signal<ParamMap> = toSignal(this.#activatedRoute.paramMap);
   id = Number(this.params().get('id'));
 
-  languageClass = this.#languageClassesService.langClassSignal(this.id);
+  languageClass = this.isEditMode ? this.#languageClassesService.langClassSignal(this.id): null;
 
   constructor() {
-    if (this.isEditMode !== null) {
+    console.log('form')
+    console.log(this.languageClass)
+    console.log(this.isEditMode)
+    if (this.isEditMode !== null && this.languageClass !== null) {
         effect(() => {
-          if (!!this.languageClass()) {
+          // if (!!this.languageClass()) {
             this.#populateForm();
-          }
+          // }
       });
     }
   }

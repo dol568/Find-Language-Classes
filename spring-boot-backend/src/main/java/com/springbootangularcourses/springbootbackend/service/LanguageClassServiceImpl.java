@@ -72,8 +72,11 @@ public class LanguageClassServiceImpl implements LanguageClassService {
         LanguageClass editLanguageClass = this.languageClassDTOToLanguageClassConverter.convert(languageClassDTO);
 
         editLanguageClass.setId(languageClass.getId());
+        editLanguageClass.setUserLanguageClasses(languageClass.getUserLanguageClasses());
+        editLanguageClass.setComments(languageClass.getComments());
 
         return this.languageClassRepository.save(editLanguageClass);
+
     }
 
     @Override

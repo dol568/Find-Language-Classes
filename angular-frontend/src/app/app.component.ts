@@ -33,8 +33,11 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('hi from app')
     if (!this.currentUser() && sessionStorage.getItem(_authSecretKey)) {
-      this.#accountService.loadCurrentUser().subscribe();
+      this.#accountService.loadCurrentUser().subscribe(
+        
+      );
     }
   }
 }

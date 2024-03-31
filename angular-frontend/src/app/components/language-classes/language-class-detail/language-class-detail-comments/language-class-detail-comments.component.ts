@@ -94,14 +94,15 @@ export class LanguageClassDetailCommentsComponent implements OnInit {
     
 
   public submitFunc(): void {
-    this.img.getImage(this.user()?.photoUrl).subscribe(image => {
+    // this.img.getImage(this.user()?.photoUrl).subscribe(image => {
       // Inside the subscription, create the newComment object with the received image
       const newComment: IComment = {
         createdAt: new Date(),
         body: this.addComment.value.description,
         userName: this.user()?.userName,
         fullName: this.user()?.fullName,
-        image: image as string, // Assign the received image to the image property
+        image: this.user()?.photoUrl, // Assign the received image to the image property
+        // image: image as string, // Assign the received image to the image property
       };
   
       // Perform any action needed with the newComment object here
@@ -118,7 +119,7 @@ export class LanguageClassDetailCommentsComponent implements OnInit {
       const lastPage = this.calculateLastPage();
       this.currentPage.set(lastPage);
       this.addComment.reset();
-    });
+    // });
   }
 
   onPageChanged(page: number) {

@@ -36,7 +36,7 @@ export class NavbarComponent implements OnDestroy {
 
   // constructor() {
   //   effect(() => {
-  //     this.serv.getImage(this.currentUser()?.photoUrl).subscribe(resp => this.ph = resp)
+  //     console.log(this.photo())
   //   })
   // }
 
