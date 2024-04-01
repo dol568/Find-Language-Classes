@@ -6,6 +6,7 @@ import com.springbootangularcourses.springbootbackend.resource.LanguageClassCont
 import com.springbootangularcourses.springbootbackend.service.LanguageClassService;
 import com.springbootangularcourses.springbootbackend.system.exceptions.CustomResponseEntityExceptionHandler;
 import com.springbootangularcourses.springbootbackend.system.exceptions.ObjectNotFoundException;
+import com.springbootangularcourses.springbootbackend.utils.converter.CommentToReturnCommentConverter;
 import com.springbootangularcourses.springbootbackend.utils.converter.LanguageClassToReturnLanguageClassConverter;
 import com.springbootangularcourses.springbootbackend.utils.converter.LanguageClassesToReturnLanguageClassesConverter;
 import com.springbootangularcourses.springbootbackend.domain.dto.ReturnLanguageClass;
@@ -46,10 +47,13 @@ class LanguageClassControllerTest {
     LanguageClassService languageClassService;
 
     @MockBean
-    LanguageClassToReturnLanguageClassConverter LanguageClassToReturnLanguageClass;
+    LanguageClassToReturnLanguageClassConverter languageClassToReturnLanguageClass;
 
     @MockBean
-    LanguageClassesToReturnLanguageClassesConverter LanguageClassesToReturnLanguageClassesConverter;
+    LanguageClassesToReturnLanguageClassesConverter languageClassesToReturnLanguageClassesConverter;
+
+    @MockBean
+    CommentToReturnCommentConverter commentToReturnCommentConverter;
 
     @MockBean
     Principal mockPrincipal;
@@ -118,7 +122,7 @@ class LanguageClassControllerTest {
     void testGetLanguageClassesSuccess() throws Exception {
         // Given
         given(this.languageClassService.getAllLanguageClasses()).willReturn(this.languageClasses);
-        given(this.LanguageClassesToReturnLanguageClassesConverter.convert(this.languageClasses))
+        given(this.languageClassesToReturnLanguageClassesConverter.convert(this.languageClasses))
                 .willReturn(this.returnLanguageClasses);
 
         // When and then
@@ -136,10 +140,9 @@ class LanguageClassControllerTest {
 
     @Test
     void testGetLanguageClassSuccess() throws Exception {
-
         // Given
         given(this.languageClassService.getLanguageClass(1L)).willReturn(this.languageClasses.get(0));
-        given(this.LanguageClassToReturnLanguageClass.convert(this.languageClasses.get(0))).willReturn(tcr1);
+        given(this.languageClassToReturnLanguageClass.convert(this.languageClasses.get(0))).willReturn(tcr1);
 
         // When and then
         this.mockMvc.perform(get(this.baseUrl + "/1")
@@ -178,7 +181,7 @@ class LanguageClassControllerTest {
                 .saveLanguageClass(Mockito.any(LanguageClassDTO.class), Mockito.any(String.class)))
                 .willReturn(tc1);
 
-        given(this.LanguageClassToReturnLanguageClass.convert(tc1)).willReturn(tcr1);
+        given(this.languageClassToReturnLanguageClass.convert(tc1)).willReturn(tcr1);
 
         // When and then
         this.mockMvc.perform(post(this.baseUrl)
@@ -219,7 +222,7 @@ class LanguageClassControllerTest {
         String json = this.objectMapper.writeValueAsString(tcDTO);
 
         given(this.languageClassService.editLanguageClass(Mockito.any(LanguageClassDTO.class), eq(1L))).willReturn(update);
-        given(this.LanguageClassToReturnLanguageClass.convert(Mockito.any(LanguageClass.class)))
+        given(this.languageClassToReturnLanguageClass.convert(Mockito.any(LanguageClass.class)))
                 .willReturn(rtc1);
 
         // When and then
@@ -301,7 +304,7 @@ class LanguageClassControllerTest {
         given(mockPrincipal.getName()).willReturn("me");
 
         given(this.languageClassService.attendClass(eq(1L), Mockito.any(String.class))).willReturn(tc1);
-        given(this.LanguageClassToReturnLanguageClass.convert(tc1)).willReturn(tcr1);
+        given(this.languageClassToReturnLanguageClass.convert(tc1)).willReturn(tcr1);
 
         // When and then
         this.mockMvc.perform(post(this.baseUrl + "/1/attend")
@@ -339,7 +342,7 @@ class LanguageClassControllerTest {
         given(mockPrincipal.getName()).willReturn("me");
 
         given(this.languageClassService.abandonClass(eq(1L), Mockito.any(String.class))).willReturn(tc1);
-        given(this.LanguageClassToReturnLanguageClass.convert(tc1)).willReturn(tcr1);
+        given(this.languageClassToReturnLanguageClass.convert(tc1)).willReturn(tcr1);
 
         // When and then
         this.mockMvc.perform(delete(this.baseUrl + "/1/abandon")

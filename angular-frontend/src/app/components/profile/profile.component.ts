@@ -29,44 +29,20 @@ import { IUser } from '../../shared/_models/IUser';
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent {
   #destroySubject$: Subject<void> = new Subject<void>();
-  #injector = inject(Injector);
   #accountService = inject(AccountService);
   #activatedRoute = inject(ActivatedRoute);
   #snackBar = inject(SnackbarService);
   #domSanitizer = inject(DomSanitizer);
 
   profile: Signal<IProfile> = this.#accountService.profile;
-  // photo: Signal<string> = this.#accountService.photo;
   photo: Signal<SafeUrl> = this.#accountService.photo;
   currentUser: Signal<IUser> = this.#accountService.currentUser;
   safeCroppedImage: WritableSignal<SafeUrl> = signal<SafeUrl>('');
   listInfo: WritableSignal<ProfileInfo> = signal<ProfileInfo>(ProfileInfo.ABOUT);
 
   @Input() userName = '';
-
-  ngOnInit(): void {
-    // runInInjectionContext(this.#injector, () => {
-    //   effect(() => {
-    //     this.#activatedRoute.paramMap
-    //       .pipe(
-    //         switchMap((params) => {
-    //           const userName = params.get('userName');
-    //           if (userName) {
-    //             return this.#accountService.profile$(userName)
-    //           } else {
-    //             return EMPTY;
-    //           }
-    //         }),
-    //         takeUntil(this.#destroySubject$)
-    //       )
-    //       .subscribe({
-    //         error: (err) => console.error(err),
-    //       });
-    //   });
-    // });
-  }
 
   constructor() {
       effect(() => {

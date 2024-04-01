@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, Signal, signal, WritableSignal } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { map, Observable, tap } from 'rxjs';
+import { map, Observable, of, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import {
   _api_account,
@@ -12,7 +12,7 @@ import { _authSecretKey, _client_home } from '../../shared/_constVars/_client_co
 import { IUser, IUserFormValues } from '../../shared/_models/IUser';
 import { IApiResponse } from '../../shared/_models/IApiResponse';
 import { IProfile, IProfileEdit } from '../../shared/_models/IProfile';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
 import { ImageService } from './image.service';
 
 @Injectable({
@@ -26,28 +26,24 @@ export class AccountService {
   #baseUrl: string = _api_default;
   #followUrl: string = this.#baseUrl + 'follow';
   #profileUrl: string = this.#baseUrl + 'profiles';
-
+  
+  #isAuthenticated: WritableSignal<boolean> = signal<boolean>(false);
   #currentUser: WritableSignal<IUser> = signal<IUser | null>(null);
   #profile: WritableSignal<IProfile> = signal<IProfile | undefined>(undefined);
-  // #photo: WritableSignal<string> = signal<string>(undefined);
-  #photo: WritableSignal<SafeUrl> = signal<SafeUrl>(undefined);
-  // #loggedInUserPhoto: WritableSignal<string> = signal<string>(undefined);
-  #loggedInUserPhoto: WritableSignal<SafeUrl> = signal<SafeUrl>(undefined);
-  #isAuthenticated: WritableSignal<boolean> = signal<boolean>(false);
+  #photo: WritableSignal<string> = signal<string>(undefined);
+  #loggedInUserPhoto: WritableSignal<string> = signal<string>(undefined);
 
   currentUser: Signal<IUser> = computed(this.#currentUser);
   profile: Signal<IProfile> = computed(this.#profile);
-  // photo: Signal<string> = computed(this.#photo);
-  photo: Signal<SafeUrl> = computed(this.#photo);
-  // loggedInUserPhoto: Signal<string> = computed(this.#loggedInUserPhoto);
-  loggedInUserPhoto: Signal<SafeUrl> = computed(this.#loggedInUserPhoto);
+  photo: Signal<string> = computed(this.#photo);
+  loggedInUserPhoto: Signal<string> = computed(this.#loggedInUserPhoto);
 
   public loadCurrentUser(): Observable<void> {
     const token = sessionStorage.getItem(_authSecretKey);
     if (token === null) {
       this.#currentUser.set(null);
       this.#isAuthenticated.set(false);
-      return null;
+      return of(null);
     }
     let headers = new HttpHeaders();
     headers = headers.set('Authorization', `Bearer ${token}`);
@@ -57,18 +53,9 @@ export class AccountService {
         if (user) {
           sessionStorage.setItem(_authSecretKey, user.token);
           this.#imageService.getImage(user?.photoUrl).subscribe((photo) => {
-            user.photoUrl = photo as string
-      
-          })
-          this.#currentUser.set(user);
-          this.#imageService.getImage(user?.photoUrl).subscribe((photo) => {
-            this.#loggedInUserPhoto.set(photo);
-      
-          })
-          // this.#loadPhoto(user?.photoUrl).subscribe((photo) => {
-          //   this.#loggedInUserPhoto.set(photo);
-          // });
-          this.#isAuthenticated.set(true);
+            user.photoUrl = photo as string;
+          });
+          this.#updateUserData(user);
         } else {
           this.#isAuthenticated.set(false);
           this.#currentUser.set(null);
@@ -87,14 +74,7 @@ export class AccountService {
         const user = response.data;
         if (user) {
           sessionStorage.setItem(_authSecretKey, user.token);
-       
-          this.#currentUser.set(user);
-          this.#isAuthenticated.set(true);
-          
-          this.#imageService.getImage(user.photoUrl).subscribe((photo) => {
-            this.#loggedInUserPhoto.set(photo);
-      
-          })
+          this.#updateUserData(user);
         }
       })
     );
@@ -106,16 +86,18 @@ export class AccountService {
         const user = response.data;
         if (user) {
           sessionStorage.setItem(_authSecretKey, user.token);
-          this.#currentUser.set(user);
-          this.#isAuthenticated.set(true);
-          this.#imageService.getImage(user.photoUrl).subscribe((photo) => {
-            this.#loggedInUserPhoto.set(photo);
-          // this.#loadPhoto(user.photoUrl).subscribe((photo) => {
-          //   this.#loggedInUserPhoto.set(photo);
-          });
+          this.#updateUserData(user);
         }
       })
     );
+  }
+
+  #updateUserData(user: IUser): void {
+    this.#currentUser.set(user);
+    this.#imageService.getImage(user.photoUrl).subscribe((photo) => {
+      this.#loggedInUserPhoto.set(photo as string);
+    });
+    this.#isAuthenticated.set(true);
   }
 
   public logout(): void {
@@ -130,23 +112,17 @@ export class AccountService {
       tap((response) => {
         this.#imageService.getImage(response.data.photoUrl).subscribe((photo) => {
           this.#photo.set(photo);
-        })
-        // if (response.data.followers) {
-          response.data.followers.forEach((photo) => {
-            this.#imageService.getImage(photo.photoUrl)
-            .subscribe((image) => photo.photoUrl = image as string)
-          })
-        // }
-        // if (response.data.followings) {
-          response.data.followings.forEach((photo) => {
-            this.#imageService.getImage(photo.photoUrl)
-            .subscribe((image) => photo.photoUrl = image as string)
-          })
-        // }
-      
-        // this.#loadPhoto(response.data.photoUrl).subscribe((photo) => {
-        //   this.#photo.set(photo);
-        // });
+        });
+        response.data.followers.forEach((photo) => {
+          this.#imageService
+            .getImage(photo.photoUrl)
+            .subscribe((image) => (photo.photoUrl = image as string));
+        });
+        response.data.followings.forEach((photo) => {
+          this.#imageService
+            .getImage(photo.photoUrl)
+            .subscribe((image) => (photo.photoUrl = image as string));
+        });
         this.#profile.set(response.data);
       })
     );
@@ -171,11 +147,6 @@ export class AccountService {
       tap((response) => {
         const copy = { ...this.currentUser() };
         copy.photoUrl = response;
-        // this.#imageService.getImage(response).subscribe((photo) => {
-        //   // console.log(photo)
-        //   this.#photo.set(photo);
-        //   this.#loggedInUserPhoto.set(photo);
-        // })
         this.#loadPhoto(response).subscribe((photo) => {
           this.#photo.set(photo);
           this.#loggedInUserPhoto.set(photo);
@@ -191,18 +162,18 @@ export class AccountService {
       map((response) => response.data),
       tap((response) => {
         response.followers.forEach((photo) => {
-          this.#imageService.getImage(photo.photoUrl)
-          .subscribe((image) => photo.photoUrl = image as string)
-        })
-        // }
-        // if (response.data.followings) {
-          response.followings.forEach((photo) => {
-            this.#imageService.getImage(photo.photoUrl)
-            .subscribe((image) => photo.photoUrl = image as string)
-          })
-          this.#profile.set(response);
-        })
-        );
+          this.#imageService
+            .getImage(photo.photoUrl)
+            .subscribe((image) => (photo.photoUrl = image as string));
+        });
+        response.followings.forEach((photo) => {
+          this.#imageService
+            .getImage(photo.photoUrl)
+            .subscribe((image) => (photo.photoUrl = image as string));
+        });
+        this.#profile.set(response);
+      })
+    );
   }
 
   public unFollowUser(userName: string): Observable<IProfile> {
@@ -210,33 +181,24 @@ export class AccountService {
       map((response) => response.data),
       tap((response) => {
         response.followers.forEach((photo) => {
-          this.#imageService.getImage(photo.photoUrl)
-          .subscribe((image) => photo.photoUrl = image as string)
-        })
-        // }
-        // if (response.data.followings) {
-          response.followings.forEach((photo) => {
-            this.#imageService.getImage(photo.photoUrl)
-            .subscribe((image) => photo.photoUrl = image as string)
-          })
-          this.#profile.set(response);
-        })
-        );
+          this.#imageService
+            .getImage(photo.photoUrl)
+            .subscribe((image) => (photo.photoUrl = image as string));
+        });
+        response.followings.forEach((photo) => {
+          this.#imageService
+            .getImage(photo.photoUrl)
+            .subscribe((image) => (photo.photoUrl = image as string));
+        });
+        this.#profile.set(response);
+      })
+    );
   }
 
-  #loadPhoto(photoUrl: string): Observable<SafeUrl> {
-    return this.#http
-      .get(photoUrl, { responseType: 'blob' })
-      .pipe(
-        map(
-          (blob) => this.#domSanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob))
-        ),
-          
-        tap((blob) => {
-          console.log(blob)
-          this.#imageService._cachedImages[photoUrl] = blob
-          // console.log(this._cachedImages)
-  }))
-      
+  #loadPhoto(photoUrl: string): Observable<string> {
+    return this.#http.get(photoUrl, { responseType: 'blob' }).pipe(
+      map((blob) => this.#domSanitizer.bypassSecurityTrustUrl(URL.createObjectURL(blob)) as string),
+      tap((blob) => this.#imageService.setCachedImage(photoUrl, blob))
+    );
   }
 }

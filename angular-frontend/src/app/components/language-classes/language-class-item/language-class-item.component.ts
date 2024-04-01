@@ -19,7 +19,7 @@ import { ILanguageClass } from '../../../shared/_models/ILanguageClass';
   styleUrl: './language-class-item.component.scss',
 })
 export class LanguageClassItemComponent {
-  protected readonly getDaysOfWeekWords = getDaysOfWeekWords;
+  readonly getDaysOfWeekWords = getDaysOfWeekWords;
 
   @Output() goToProfile: EventEmitter<string> = new EventEmitter<string>();
   @Output() deleteClass: EventEmitter<number> = new EventEmitter<number>();
@@ -28,7 +28,7 @@ export class LanguageClassItemComponent {
 
   languageClass: InputSignal<ILanguageClass> = input.required<ILanguageClass>();
 
-  client_language_classes: string = _client_language_classes;
+  language_classes: string = _client_language_classes;
 
   public navigateToProfile(username: string): void {
     this.goToProfile.emit(username);

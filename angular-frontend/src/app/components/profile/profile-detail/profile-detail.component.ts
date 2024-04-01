@@ -53,8 +53,8 @@ export class ProfileDetailComponent implements OnInit, OnDestroy {
   imageChangedEvent: WritableSignal<string> = signal<string>('');
   crop: WritableSignal<Blob> = signal<Blob>(null);
 
-  protected readonly ProfileInfo = ProfileInfo;
-  protected readonly getDaysOfWeekWords = getDaysOfWeekWords;
+  readonly ProfileInfo = ProfileInfo;
+  readonly getDaysOfWeekWords = getDaysOfWeekWords;
   editProfileForm: FormGroup;
 
   isFollowMode: boolean = false;

@@ -10,7 +10,7 @@ import {CommonModule} from "@angular/common";
   styleUrl: './profile-list.component.scss'
 })
 export class ProfileListComponent {
-  protected readonly ProfileInfo = ProfileInfo;
+  readonly ProfileInfo = ProfileInfo;
   info: ProfileInfo = ProfileInfo.ABOUT;
   @Output() listInfo = new EventEmitter<ProfileInfo>();
 
