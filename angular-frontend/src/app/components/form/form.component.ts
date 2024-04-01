@@ -2,23 +2,19 @@ import {
   Component,
   effect,
   inject,
-  Injector,
   OnDestroy,
   OnInit,
-  runInInjectionContext,
-  signal,
   Signal,
   ViewChild,
-  WritableSignal,
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LanguageClassesService } from '../../core/_services/language-classes.service';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router, UrlSegment } from '@angular/router';
 import { getDaysOfWeekNumbers, getDaysOfWeekWords } from '../../shared/_constVars/_days';
 import { CommonModule, Location } from '@angular/common';
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 import { SnackbarService } from '../../core/_services/snackbar.service';
-import { EMPTY, Subject, switchMap, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { ILanguageClass } from '../../shared/_models/ILanguageClass';
 import { toSignal } from '@angular/core/rxjs-interop';
 
@@ -39,24 +35,20 @@ export class FormComponent implements OnInit, OnDestroy {
   @ViewChild('myPickerRef') myTimePicker;
   addClassForm: FormGroup;
 
-  paramsUrl = toSignal(this.#activatedRoute.url);
-  isEditMode = this.paramsUrl().findIndex((urlSegment) => urlSegment.path.includes('edit')) > -1;
+  paramsUrl: Signal<UrlSegment[]> = toSignal(this.#activatedRoute.url);
+  isEditMode: boolean =
+    this.paramsUrl().findIndex((urlSegment) => urlSegment.path.includes('edit')) > -1;
 
   params: Signal<ParamMap> = toSignal(this.#activatedRoute.paramMap);
-  id = Number(this.params().get('id'));
+  id: number = Number(this.params().get('id'));
 
-  languageClass = this.isEditMode ? this.#languageClassesService.langClassSignal(this.id): null;
+  languageClass: Signal<ILanguageClass> = this.isEditMode
+    ? this.#languageClassesService.languageClass(this.id)
+    : null;
 
   constructor() {
-    console.log('form')
-    console.log(this.languageClass)
-    console.log(this.isEditMode)
     if (this.isEditMode !== null && this.languageClass !== null) {
-        effect(() => {
-          // if (!!this.languageClass()) {
-            this.#populateForm();
-          // }
-      });
+      effect(() => this.#populateForm());
     }
   }
 

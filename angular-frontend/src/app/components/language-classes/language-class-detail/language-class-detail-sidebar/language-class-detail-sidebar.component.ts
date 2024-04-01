@@ -1,4 +1,4 @@
-import { Component, EventEmitter, InputSignal, Output, effect, inject, input } from '@angular/core';
+import { Component, EventEmitter, InputSignal, Output, input } from '@angular/core';
 import { ILanguageClass } from '../../../../shared/_models/ILanguageClass';
 import { CommonModule } from '@angular/common';
 
@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './language-class-detail-sidebar.component.scss'
 })
 export class LanguageClassDetailSidebarComponent {
-  @Output() goToProfile = new EventEmitter<string>();
+  @Output() goToProfile: EventEmitter<string> = new EventEmitter<string>();
   languageClass: InputSignal<ILanguageClass> = input.required<ILanguageClass>();
 
   public navigateToProfile(username: string): void {

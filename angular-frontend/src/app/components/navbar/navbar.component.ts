@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, Signal} from '@angular/core';
+import { Component, inject, Signal} from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AccountService } from '../../core/_services/account.service';
 import {
@@ -7,7 +7,6 @@ import {
   _client_profiles,
 } from '../../shared/_constVars/_client_consts';
 import { CommonModule } from '@angular/common';
-import { Subject } from 'rxjs';
 import { IUser } from '../../shared/_models/IUser';
 
 @Component({
@@ -17,19 +16,12 @@ import { IUser } from '../../shared/_models/IUser';
     styleUrl: './navbar.component.scss',
     imports: [RouterModule, CommonModule]
 })
-export class NavbarComponent implements OnDestroy {
-  #destroySubject$: Subject<void> = new Subject<void>();
+export class NavbarComponent{
   #router = inject(Router);
   #accountService = inject(AccountService);
-  currentUser: Signal<IUser> = this.#accountService.currentUser;
-  profile = this.#accountService.profile;
   add_class: string = _client_add_class;
-  photo = this.#accountService.loggedInUserPhoto;
-
-  ngOnDestroy(): void {
-    this.#destroySubject$.next();
-    this.#destroySubject$.complete();
-  }
+  currentUser: Signal<IUser> = this.#accountService.currentUser;
+  photo: Signal<string> = this.#accountService.loggedInUserPhoto;
 
   public logout(): void {
     this.#accountService.logout();

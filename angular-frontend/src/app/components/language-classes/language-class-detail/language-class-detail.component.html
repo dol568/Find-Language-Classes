@@ -7,19 +7,22 @@
             <app-language-class-detail-top
               [languageClass]="languageClass()"
               (goToProfile)="goToProfile($event)"
+              [dayInfo]="dayInfo()"
+              [backgroundImage]="backgroundImage()"
             ></app-language-class-detail-top>
           </div>
           <div class="card shadow-lg mt-3 w-100">
-            <app-language-class-detail-info [languageClass]="languageClass()"></app-language-class-detail-info>
+            <app-language-class-detail-info
+              [dayInfo]="dayInfo()"
+              [languageClass]="languageClass()"
+            ></app-language-class-detail-info>
           </div>
           <div class="card shadow-lg mt-3 mb-5 w-100">
             <app-language-class-detail-comments
               [user]="user()"
               [comments]="comments()"
               (sendMessage)="postComment($event)"
-     
-              ></app-language-class-detail-comments>
-              <!-- (sendPage)="getPage($event)" -->
+            ></app-language-class-detail-comments>
           </div>
         </div>
       </section>

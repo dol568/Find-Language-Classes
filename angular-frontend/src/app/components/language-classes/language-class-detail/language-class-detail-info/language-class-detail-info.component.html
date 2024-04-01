@@ -5,12 +5,11 @@
   </li>
   <li class="list-group-item d-flex align-items-center">
     <i class="fas fa-calendar mr-3 icon"></i>
-    Every {{ dateInfo() }} at
-    {{ languageClass()?.time }}
+    Every {{ dayInfo() }} at {{ languageClass()?.time }}
   </li>
   <li class="list-group-item bg-light d-flex align-items-center">
     <i class="fas fa-map-marker mr-3 icon"></i>
-    {{ languageClass()?.address }} {{ languageClass()?.city }} ,
-    {{ languageClass()?.country }} {{ languageClass()?.postalCode }}
+    {{ languageClass()?.address }} {{ languageClass()?.city }} , {{ languageClass()?.country }}
+    {{ languageClass()?.postalCode }}
   </li>
 </ul>

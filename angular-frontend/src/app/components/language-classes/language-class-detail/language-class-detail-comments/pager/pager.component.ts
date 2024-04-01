@@ -3,6 +3,7 @@ import {
   EventEmitter,
   InputSignal,
   Output,
+  Signal,
   computed,
   input,
 } from '@angular/core';
@@ -17,15 +18,19 @@ import { CommonModule } from '@angular/common';
   styleUrl: './pager.component.scss',
 })
 export class PagerComponent {
+  @Output() pageChanged: EventEmitter<number> = new EventEmitter<number>();
   comments: InputSignal<IComment[]> = input.required<IComment[]>();
-  @Output() pageChanged = new EventEmitter<number>();
-  page = input.required<number>();
-  getArrayData = computed(() =>
-    Array.from({ length: Math.ceil(this.comments()?.length / 5) }, (v, i) => i + 1)
+  page: InputSignal<number> = input.required<number>();
+  itemsPerPage: InputSignal<number> = input.required<number>();
+  paginationLength: Signal<number> = computed(() =>
+    Math.ceil(this.comments()?.length / this.itemsPerPage())
+  );
+  getArrayData: Signal<number[]> = computed(() =>
+    Array.from({ length: this.paginationLength() }, (v, i) => i + 1)
   );
 
-  onPagerChange(page: number) {
-    if (page > 0 && page <= Math.ceil(this.comments()?.length / 5) && page !== this.page()) {
+  public onPagerChange(page: number): void {
+    if (page > 0 && page <= this.paginationLength() && page !== this.page()) {
       this.pageChanged.emit(page);
     }
   }

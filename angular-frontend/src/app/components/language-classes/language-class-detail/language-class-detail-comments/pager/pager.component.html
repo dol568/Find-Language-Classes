@@ -1,7 +1,7 @@
-<nav *ngIf="comments()?.length / 5 > 1">
+<nav *ngIf="comments()?.length / itemsPerPage() > 1">
   <ul class="pagination justify-content-end">
     <li class="page-item" [ngClass]="{ disabled: page() === 1 }">
-      <a class="page-link" (click)="onPagerChange(page() - 1)">Previous</a>
+      <a class="page-link" (click)="onPagerChange(page() - 1)"><span>&laquo;</span></a>
     </li>
     <li
       class="page-item"
@@ -10,8 +10,8 @@
     >
       <a class="page-link" (click)="onPagerChange(item)">{{ item }}</a>
     </li>
-    <li class="page-item" [ngClass]="{ disabled: page() === (this.comments()?.length / 5) }">
-      <a class="page-link" (click)="onPagerChange(page() + 1)">Next</a>
+    <li class="page-item" [ngClass]="{ disabled: page() === paginationLength() }">
+      <a class="page-link" (click)="onPagerChange(page() + 1)"><span>&raquo;</span></a>
     </li>
   </ul>
 </nav>

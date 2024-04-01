@@ -24,7 +24,7 @@ export class LoginComponent implements OnDestroy {
   #accountService = inject(AccountService);
   currentUser: Signal<IUser> = this.#accountService.currentUser;
   language_classes: string = _client_language_classes;
-  client_signup: string = _client_signup;
+  signup: string = _client_signup;
 
   ngOnDestroy(): void {
     this.#destroySubject$.next();

@@ -2,9 +2,8 @@
   <div class="row">
     <div class="col-2">
       <img
-      class="card-img-top rounded-circle mt-3 ml-3"
-      
-      [src]="languageClass()?.hostImage"
+        class="card-img-top rounded-circle mt-3 ml-3"
+        [src]="languageClass()?.hostImage"
         alt="Card image cap"
         style="width: 100%"
       />
@@ -20,9 +19,9 @@
             >{{ languageClass()?.hostName }}</a
           >
         </p>
-        <button type="button" class="btn btn-outline-danger" *ngIf="languageClass()?.isHost">
-          You are hosting this Class
-        </button>
+        @if (languageClass()?.isHost) {
+        <button type="button" class="btn btn-outline-danger">You are hosting this Class</button>
+        }
         <button type="button" class="btn btn-outline-success" *ngIf="languageClass()?.isGoing">
           You are going to this Class
         </button>
@@ -64,13 +63,12 @@
         class="col-lg-1 col-md-1 col-xs-1 thumb px-1"
         *ngFor="let user of languageClass()?.userLanguageClasses; let i = index"
       >
-      <!-- handleImageError -->
-      <img
-      class="rounded-circle resize-image"
-      [src]="user.image"
-      alt="Card image cap"
-      (click)="navigateToProfile(user.userName)"
-      data-toggle="tooltip"
+        <img
+          class="rounded-circle resize-image"
+          [src]="user.image"
+          alt="Card image cap"
+          (click)="navigateToProfile(user.userName)"
+          data-toggle="tooltip"
           data-placement="top"
           [title]="user.fullName"
           style="width: 100%; cursor: pointer"
@@ -103,7 +101,7 @@
       <button
         type="button"
         class="btn btn-primary"
-        [routerLink]="'/' + client_language_classes + '/' + languageClass()?.id"
+        [routerLink]="'/' + language_classes + '/' + languageClass()?.id"
       >
         View
       </button>

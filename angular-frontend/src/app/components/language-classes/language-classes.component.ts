@@ -46,24 +46,24 @@ export class LanguageClassesComponent implements OnDestroy {
   #router = inject(Router);
   timeForm: FormGroup;
   displayedHours: Signal<number[]> = this.#languageClassesService.displayedHours;
-  protected readonly AttendanceType = AttendanceType;
+  readonly AttendanceType = AttendanceType;
   classesParams: WritableSignal<Params | undefined> = signal<Params | undefined>(new Params());
   currentUser: Signal<IUser> = this.#accountService.currentUser;
-  
+
   languageClasses: Signal<ILanguageClass[]> = computed(() =>
     this.#languageClassesService.getLanguageClasses(this.classesParams())
   );
-  
-  ngOnInit(): void {
-    this.timeForm = new FormGroup({
-      time: new FormControl('', [Validators.required]),
-    });
-  }
 
   constructor() {
     this.#languageClassesService.languageClasses$.pipe(takeUntil(this.#destroySubject$)).subscribe({
       next: () => this.#snackBar.success('Language classes retrieved'),
       error: (err) => console.error(err),
+    });
+  }
+
+  ngOnInit(): void {
+    this.timeForm = new FormGroup({
+      time: new FormControl('', [Validators.required]),
     });
   }
 

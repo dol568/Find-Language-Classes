@@ -20,7 +20,6 @@ export class AppComponent implements OnInit {
   #accountService = inject(AccountService);
   currentUser: Signal<IUser> = this.#accountService.currentUser;
   showNavbar: WritableSignal<boolean> = signal<boolean>(false);
-  @Input() userName = '';
 
   constructor() {
     this.#router.events
@@ -33,10 +32,8 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('hi from app')
     if (!this.currentUser() && sessionStorage.getItem(_authSecretKey)) {
       this.#accountService.loadCurrentUser().subscribe(
-        
       );
     }
   }
