@@ -1,6 +1,7 @@
 import {
   Component,
   computed,
+  effect,
   inject,
   OnDestroy,
   Signal,
@@ -55,6 +56,7 @@ export class LanguageClassesComponent implements OnDestroy {
   );
 
   constructor() {
+    effect(() => console.log(this.languageClasses()))
     this.#languageClassesService.languageClasses$.pipe(takeUntil(this.#destroySubject$)).subscribe({
       next: () => this.#snackBar.success('Language classes retrieved'),
       error: (err) => console.error(err),

@@ -58,47 +58,48 @@ export class LanguageClassesService {
   }
 
   public languageClasses$: Observable<ILanguageClass[]> = this.#http
-  .get<IApiResponse<ILanguageClass[]>>(this.#baseUrl)
-  .pipe(
-    map((response) => response.data),
-    map((languageClasses) =>
-      languageClasses.map((languageClass) => ({
-        ...languageClass,
-        isHost: languageClass.userLanguageClasses.some(
-          (x) => x.userName === this.currentUser()?.userName && x.host
-        ),
-        isGoing: languageClass.userLanguageClasses.some(
-          (x) => x.userName === this.currentUser()?.userName && !x.host
-        ),
-      }))
-    ),
-    concatMap((languageClasses) =>
-      from(languageClasses).pipe(
-        concatMap((languageClass) =>
-          this.processLanguageClass(languageClass)
-        ),
-        toArray()
-      )
-    ),
-    tap(languageClasses => this.#languageClasses.set(languageClasses))
-  );
+    .get<IApiResponse<ILanguageClass[]>>(this.#baseUrl)
+    .pipe(
+      map((response) => response.data),
+      map((languageClasses) =>
+        languageClasses.map((languageClass) => ({
+          ...languageClass,
+          isHost: languageClass.userLanguageClasses.some(
+            (x) => x.userName === this.currentUser()?.userName && x.host
+          ),
+          isGoing: languageClass.userLanguageClasses.some(
+            (x) => x.userName === this.currentUser()?.userName && !x.host
+          ),
+        }))
+      ),
+      concatMap((languageClasses) =>
+        from(languageClasses).pipe(
+          concatMap((languageClass) => {
+            return this.processLanguageClass(languageClass);
+          }),
+          toArray()
+        )
+      ),
+      tap((languageClasses) => this.#languageClasses.set(languageClasses))
+    );
 
   private processLanguageClass(languageClass: ILanguageClass): Observable<ILanguageClass> {
     return new Observable<ILanguageClass>((observer) => {
       this.img.getImage(languageClass.hostImage).subscribe((hostImage) => {
         languageClass.hostImage = hostImage as string;
-        if (languageClass.comments) {
+        if (languageClass.comments.length > 0) {
           const commentImageObservables = languageClass.comments.map((comment) =>
-            this.img.getImage(comment.image).pipe(
-              tap((commentImage) => (comment.image = commentImage as string))
-            )
+            this.img
+              .getImage(comment.image)
+              .pipe(tap((commentImage) => (comment.image = commentImage as string)))
           );
           forkJoin(commentImageObservables).subscribe(() => {
             if (languageClass.userLanguageClasses) {
-              const userLanguageClassImageObservables = languageClass.userLanguageClasses.map((ulc) =>
-                this.img.getImage(ulc.image).pipe(
-                  tap((ulcImage) => (ulc.image = ulcImage as string))
-                )
+              const userLanguageClassImageObservables = languageClass.userLanguageClasses.map(
+                (ulc) =>
+                  this.img
+                    .getImage(ulc.image)
+                    .pipe(tap((ulcImage) => (ulc.image = ulcImage as string)))
               );
               forkJoin(userLanguageClassImageObservables).subscribe(() => {
                 observer.next(languageClass);
@@ -111,9 +112,7 @@ export class LanguageClassesService {
           });
         } else if (languageClass.userLanguageClasses) {
           const userLanguageClassImageObservables = languageClass.userLanguageClasses.map((ulc) =>
-            this.img.getImage(ulc.image).pipe(
-              tap((ulcImage) => (ulc.image = ulcImage as string))
-            )
+            this.img.getImage(ulc.image).pipe(tap((ulcImage) => (ulc.image = ulcImage as string)))
           );
           forkJoin(userLanguageClassImageObservables).subscribe(() => {
             observer.next(languageClass);
@@ -138,10 +137,7 @@ export class LanguageClassesService {
   public languageClass$ = (id: number): Observable<ILanguageClass> =>
     this.#http.get<IApiResponse<ILanguageClass>>(this.#baseUrl + '/' + id).pipe(
       map((response) => response.data),
-      concatMap((languageClass) =>
-          this.processLanguageClass(languageClass)
-        ),
-
+      concatMap((languageClass) => this.processLanguageClass(languageClass))
     );
 
   #filterAndSort(params: Params) {
